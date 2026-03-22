@@ -1,0 +1,290 @@
+:root {
+  --bleu:        #2B5F8E;
+  --bleu-fonce:  #1A3F63;
+  --bleu-clair:  #4A85B8;
+  --or:          #C4973A;
+  --or-clair:    #D4A853;
+  --or-pale:     #F0D9A8;
+  --sidebar-bg:  #0F2840;
+  --sidebar-w:   260px;
+  --sidebar-w-c: 72px;
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border-right: 1px solid rgba(196,151,58,0.12);
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed { width: var(--sidebar-w-c); }
+
+/* ── Logo ───────────────────────────────────────────────── */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 20px;
+  border-bottom: 1px solid rgba(196,151,58,0.1);
+  overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-logo-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.sidebar-logo-img {
+  width: 160px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+  mix-blend-mode: lighten;
+}
+
+.sidebar-logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #fff 0%, var(--or-pale) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.3px;
+}
+
+/* ── Navigation ─────────────────────────────────────────── */
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.nav-section-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.2);
+  padding: 0 10px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.9);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(43,95,142,0.5), rgba(196,151,58,0.15));
+  color: white;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s;
+}
+
+.nav-item:hover .nav-icon svg {
+  transform: scale(1.1);
+}
+
+.nav-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-badge {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  background: linear-gradient(135deg, var(--or), var(--or-clair));
+  color: white;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.nav-active-bar {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, var(--or-clair), var(--or));
+  border-radius: 3px 0 0 3px;
+}
+
+/* ── Bottom ─────────────────────────────────────────────── */
+.sidebar-bottom {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(196,151,58,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--bleu), var(--or));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.user-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.72rem;
+  color: var(--or-clair);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.87rem;
+  transition: all 0.2s;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: rgba(224,82,82,0.12);
+  border-color: rgba(224,82,82,0.3);
+  color: #E87B7B;
+}
+
+.btn-logout svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Toggle ─────────────────────────────────────────────── */
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  background: var(--sidebar-bg);
+  border: 1px solid rgba(196,151,58,0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.sidebar-toggle:hover {
+  background: var(--or);
+  border-color: var(--or);
+  color: white;
+}
+
+.sidebar-toggle svg {
+  width: 14px;
+  height: 14px;
+}
+.nav-badge-red {
+  background: #C0392B !important;
+  color: white !important;
+  animation: sidebarPulse 2s ease-in-out infinite;
+}
+@keyframes sidebarPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(192,57,43,0); }
+}

@@ -1,0 +1,42 @@
+.ft-root {
+  background: linear-gradient(135deg, #040C1A, #0A1628);
+  padding: 56px 40px 0;
+}
+.ft-inner {
+  max-width: 1300px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+  padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.ft-logo {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.7rem;
+  font-weight: 700; color: white; display: block; margin-bottom: 12px;
+}
+.ft-logo span { color: #C4973A; }
+.ft-brand p { font-family: 'Lato', sans-serif; font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.6; }
+.ft-socials { display: flex; gap: 10px; margin-top: 16px; }
+.ft-social {
+  width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%; background: transparent; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.ft-social:hover { background: rgba(255,255,255,0.1); }
+
+.ft-col { display: flex; flex-direction: column; gap: 10px; }
+.ft-col h4 {
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.35); margin-bottom: 4px;
+}
+.ft-col a, .ft-col p, .ft-col .ft-dest-link {
+  font-family: 'Lato', sans-serif; font-size: 0.87rem;
+  color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s;
+}
+.ft-col a:hover, .ft-col .ft-dest-link:hover { color: #C4973A; cursor: pointer; }
+
+.ft-bottom {
+  max-width: 1300px; margin: 0 auto;
+  padding: 20px 0; text-align: center;
+}
+.ft-bottom p { font-family: 'Lato', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.2); }
+
+@media (max-width: 1024px) { .ft-inner { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px)  { .ft-inner { grid-template-columns: 1fr; gap: 28px; } .ft-root { padding: 40px 16px 0; } }

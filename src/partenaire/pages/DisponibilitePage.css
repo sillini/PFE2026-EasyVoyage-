@@ -1,0 +1,268 @@
+.dispo-page {
+  padding: 28px 32px;
+  background: #F0F4F8;
+  min-height: calc(100vh - 72px);
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.dispo-header { display: flex; align-items: center; gap: 20px; }
+.dispo-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px;
+  background: white; border: 1.5px solid #DDE3EC; border-radius: 10px;
+  font-family: 'Lato', sans-serif; font-size: 0.87rem; font-weight: 600;
+  color: #2B5F8E; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+}
+.dispo-back:hover { background: #EEF2F8; border-color: #2B5F8E; }
+.dispo-back svg { width: 16px; height: 16px; }
+
+.dispo-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 600; color: #1A3F63;
+}
+.dispo-subtitle {
+  font-family: 'Lato', sans-serif; font-size: 0.87rem; color: #8A9BB0; margin-top: 3px;
+}
+
+/* ── Search Card ────────────────────────────────────────── */
+.dispo-search-card {
+  background: white; border-radius: 20px;
+  border: 1px solid #E8EDF5;
+  box-shadow: 0 2px 20px rgba(43,95,142,0.06);
+  padding: 24px 28px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 20px;
+  position: relative; overflow: hidden;
+}
+.dispo-search-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #1A3F63, #C4973A);
+}
+
+.dispo-search-icon {
+  width: 52px; height: 52px; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(26,63,99,0.1), rgba(196,151,58,0.08));
+  border: 1.5px solid rgba(196,151,58,0.2); border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; color: #1A3F63;
+}
+.dispo-search-icon svg { width: 22px; height: 22px; }
+
+.dispo-search-content { flex: 1; min-width: 180px; }
+.dispo-search-content h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 600; color: #1A3F63;
+}
+.dispo-search-content p {
+  font-family: 'Lato', sans-serif; font-size: 0.82rem; color: #8A9BB0; margin-top: 2px;
+}
+
+.dispo-search-fields {
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+}
+
+.dispo-date-field {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.dispo-date-field label {
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  font-weight: 700; color: #8A9BB0; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.dispo-date-field input {
+  padding: 11px 14px;
+  border: 1.5px solid #DDE3EC; border-radius: 11px;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #1C2E42;
+  background: #F8FAFC; outline: none; cursor: pointer; transition: all 0.2s;
+}
+.dispo-date-field input:focus {
+  border-color: #2B5F8E; background: white;
+  box-shadow: 0 0 0 3px rgba(43,95,142,0.08);
+}
+
+.dispo-date-arrow {
+  font-size: 1.2rem; color: #C4973A; font-weight: 300;
+  padding-bottom: 10px; flex-shrink: 0;
+}
+
+.dispo-btn-search {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, #1A3F63, #2B5F8E);
+  color: white; border: none; border-radius: 11px;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 600;
+  cursor: pointer; transition: all 0.25s; white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(43,95,142,0.3);
+}
+.dispo-btn-search:hover:not(:disabled) {
+  transform: translateY(-2px); box-shadow: 0 8px 22px rgba(43,95,142,0.35);
+}
+.dispo-btn-search:disabled { opacity: 0.7; cursor: not-allowed; }
+.dispo-btn-search svg { width: 16px; height: 16px; }
+
+.dispo-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+
+.dispo-error-inline {
+  width: 100%;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; color: #E05252;
+  padding: 8px 12px; background: rgba(224,82,82,0.06);
+  border: 1px solid rgba(224,82,82,0.2); border-radius: 8px;
+}
+
+/* ── Summary ────────────────────────────────────────────── */
+.dispo-summary {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+  background: white; border-radius: 16px;
+  border: 1px solid #E8EDF5; padding: 18px 24px;
+  box-shadow: 0 2px 12px rgba(43,95,142,0.05);
+}
+
+.summary-period {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #4A5568;
+}
+.summary-period svg { width: 18px; height: 18px; color: #C4973A; flex-shrink: 0; }
+.summary-period strong { color: #1A3F63; }
+
+.summary-stats { display: flex; align-items: center; gap: 12px; }
+
+.summary-stat {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 20px; border-radius: 12px; border: 1.5px solid;
+}
+.summary-stat.dispo { background: rgba(39,174,96,0.06); border-color: rgba(39,174,96,0.2); }
+.summary-stat.occupe { background: rgba(224,82,82,0.06); border-color: rgba(224,82,82,0.2); }
+.summary-stat.total { background: rgba(43,95,142,0.06); border-color: rgba(43,95,142,0.15); }
+
+.summary-num {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; line-height: 1;
+}
+.summary-stat.dispo .summary-num  { color: #27AE60; }
+.summary-stat.occupe .summary-num { color: #E05252; }
+.summary-stat.total .summary-num  { color: #2B5F8E; }
+
+.summary-lbl {
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; color: #8A9BB0;
+}
+
+/* ── Grille chambres ────────────────────────────────────── */
+.dispo-chambres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.dispo-chambre-card {
+  background: white; border-radius: 18px;
+  border: 1.5px solid #E8EDF5;
+  overflow: hidden; transition: all 0.25s;
+  box-shadow: 0 2px 12px rgba(43,95,142,0.05);
+  position: relative;
+}
+.dispo-chambre-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(43,95,142,0.1);
+}
+.dispo-chambre-card.dispo  { border-color: rgba(39,174,96,0.25); }
+.dispo-chambre-card.occupe { border-color: rgba(224,82,82,0.2); }
+
+.dispo-card-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #27AE60, #2ECC71);
+}
+.dispo-card-bar.occupe {
+  background: linear-gradient(90deg, #E05252, #E87B7B);
+}
+
+.dispo-card-content { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+.dispo-card-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.dispo-card-type { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.dispo-type-badge {
+  padding: 4px 12px;
+  background: linear-gradient(135deg, rgba(26,63,99,0.08), rgba(43,95,142,0.05));
+  border: 1px solid rgba(43,95,142,0.15);
+  border-radius: 20px;
+  font-family: 'Lato', sans-serif; font-size: 0.78rem; font-weight: 700; color: #2B5F8E;
+}
+
+.dispo-capacite {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Lato', sans-serif; font-size: 0.82rem; color: #8A9BB0;
+}
+.dispo-capacite svg { width: 14px; height: 14px; color: #C4973A; }
+
+/* Badge disponible/occupé */
+.dispo-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  font-family: 'Lato', sans-serif; font-size: 0.75rem; font-weight: 700;
+  white-space: nowrap;
+}
+.dispo-badge.dispo  { background: rgba(39,174,96,0.1); color: #27AE60; border: 1px solid rgba(39,174,96,0.2); }
+.dispo-badge.occupe { background: rgba(224,82,82,0.08); color: #E05252; border: 1px solid rgba(224,82,82,0.2); }
+.dispo-badge svg { width: 12px; height: 12px; }
+
+.dispo-card-desc {
+  font-family: 'Lato', sans-serif; font-size: 0.82rem; color: #8A9BB0; line-height: 1.5;
+}
+
+.dispo-card-prix {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700; color: #C4973A;
+}
+.dispo-card-prix svg { width: 14px; height: 14px; }
+
+/* Occupations */
+.dispo-occupations {
+  padding: 12px 14px;
+  background: rgba(224,82,82,0.04); border: 1px solid rgba(224,82,82,0.15);
+  border-radius: 12px; display: flex; flex-direction: column; gap: 8px;
+}
+.occ-title {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'Lato', sans-serif; font-size: 0.78rem; font-weight: 700;
+  color: #E05252; text-transform: uppercase; letter-spacing: 0.3px;
+}
+.occ-title svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.occupation-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: white; border-radius: 8px; border: 1px solid rgba(224,82,82,0.15);
+}
+.occupation-card svg { width: 13px; height: 13px; color: #E05252; flex-shrink: 0; }
+.occ-dates { font-family: 'Lato', sans-serif; font-size: 0.8rem; color: #1C2E42; font-weight: 500; }
+.occ-sep { color: #E05252; margin: 0 5px; }
+.occ-ref {
+  margin-left: auto;
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; color: #8A9BB0;
+  white-space: nowrap;
+}
+
+/* ── Empty state ────────────────────────────────────────── */
+.dispo-empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; padding: 80px 40px; text-align: center;
+  background: white; border-radius: 20px; border: 1px solid #E8EDF5;
+}
+.dispo-empty-icon { font-size: 3.5rem; }
+.dispo-empty-state h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 600; color: #1A3F63;
+}
+.dispo-empty-state p {
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #8A9BB0;
+  max-width: 400px; line-height: 1.6;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }

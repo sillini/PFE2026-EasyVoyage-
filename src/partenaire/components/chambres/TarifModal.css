@@ -1,0 +1,63 @@
+.price-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.price-input-wrap .field-input {
+  padding-right: 90px;
+}
+
+.price-suffix {
+  position: absolute;
+  right: 14px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #C4973A;
+  pointer-events: none;
+}
+
+.tarif-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, rgba(43,95,142,0.05), rgba(196,151,58,0.05));
+  border: 1px solid rgba(196,151,58,0.2);
+  border-radius: 12px;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #8A9BB0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1A3F63;
+}
+
+.preview-sep {
+  font-family: 'Lato', sans-serif;
+  font-size: 1.1rem;
+  color: #8A9BB0;
+  font-weight: 300;
+}
+
+.preview-item.highlight .preview-val {
+  color: #C4973A;
+  font-size: 1.3rem;
+}

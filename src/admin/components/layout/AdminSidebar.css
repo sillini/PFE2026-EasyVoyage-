@@ -1,0 +1,281 @@
+/* ══════════════════════════════════════════════════════════
+   ADMIN SIDEBAR — Thème sombre premium bleu nuit + or/rouge
+══════════════════════════════════════════════════════════ */
+
+.adm-sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: linear-gradient(175deg, #0B1929 0%, #0F2235 50%, #0B1929 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border-right: 1px solid rgba(196, 151, 58, 0.1);
+  flex-shrink: 0;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+}
+.adm-sidebar.collapsed { width: 72px; }
+
+/* ── Logo ────────────────────────────────────────────────── */
+.adm-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 26px 16px 20px;
+  border-bottom: 1px solid rgba(196, 151, 58, 0.08);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.adm-logo-img {
+  width: 148px;
+  height: 52px;
+  object-fit: contain;
+  mix-blend-mode: lighten;
+  transition: all 0.3s;
+}
+.adm-sidebar.collapsed .adm-logo-img {
+  width: 38px;
+  height: 38px;
+}
+
+.adm-role-tag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 13px;
+  background: rgba(192, 57, 43, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.22);
+  border-radius: 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #E08070;
+  white-space: nowrap;
+}
+
+.adm-role-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E05252;
+  flex-shrink: 0;
+  animation: admPulse 2s ease-in-out infinite;
+}
+
+@keyframes admPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Nav ─────────────────────────────────────────────────── */
+.adm-nav {
+  flex: 1;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.adm-section-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  color: rgba(255, 255, 255, 0.17);
+  padding: 4px 10px 12px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.adm-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.42);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.adm-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.adm-nav-item.active {
+  background: linear-gradient(
+    135deg,
+    rgba(192, 57, 43, 0.2) 0%,
+    rgba(196, 151, 58, 0.1) 100%
+  );
+  color: white;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.adm-nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.adm-nav-icon svg {
+  width: 19px;
+  height: 19px;
+  transition: transform 0.2s;
+}
+.adm-nav-item:hover .adm-nav-icon svg {
+  transform: scale(1.1);
+}
+
+.adm-nav-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.adm-badge {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 2px 7px;
+  background: linear-gradient(135deg, #C4973A, #D4A853);
+  color: white;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.adm-active-bar {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #E05252, #C4973A);
+  border-radius: 3px 0 0 3px;
+}
+
+/* ── Bottom ──────────────────────────────────────────────── */
+.adm-bottom {
+  padding: 14px 10px;
+  border-top: 1px solid rgba(196, 151, 58, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.adm-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+}
+
+.adm-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #C0392B, #C4973A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.adm-user-name {
+  display: block;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-user-role {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.72rem;
+  color: #E08070;
+  font-weight: 500;
+}
+
+.adm-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.38);
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.87rem;
+  transition: all 0.2s;
+  width: 100%;
+  white-space: nowrap;
+}
+.adm-logout:hover {
+  background: rgba(224, 82, 82, 0.1);
+  border-color: rgba(224, 82, 82, 0.28);
+  color: #E87B7B;
+}
+.adm-logout svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Toggle ──────────────────────────────────────────────── */
+.adm-toggle {
+  position: absolute;
+  top: 50%;
+  right: -14px;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  background: #0F2235;
+  border: 1px solid rgba(196, 151, 58, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.35);
+  transition: all 0.2s;
+  z-index: 10;
+}
+.adm-toggle:hover {
+  background: #C0392B;
+  border-color: #C0392B;
+  color: white;
+}
+.adm-toggle svg {
+  width: 14px;
+  height: 14px;
+}

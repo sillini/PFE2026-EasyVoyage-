@@ -1,0 +1,126 @@
+.adm-topbar {
+  height: 72px;
+  background: white;
+  border-bottom: 1px solid #EEF2F8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 20px rgba(192, 57, 43, 0.05), 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.adm-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.adm-topbar-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.18);
+  border-radius: 9px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #C0392B;
+  flex-shrink: 0;
+}
+.adm-topbar-badge svg { width: 12px; height: 12px; }
+
+
+
+.adm-topbar-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1A3F63;
+  line-height: 1.1;
+}
+
+.adm-topbar-subtitle {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.8rem;
+  color: #8A9BB0;
+  margin-top: 2px;
+}
+
+/* Right */
+.adm-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.adm-topbar-date {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  color: #8A9BB0;
+  text-transform: capitalize;
+}
+
+.adm-topbar-divider {
+  width: 1px;
+  height: 28px;
+  background: #EEF2F8;
+}
+
+.adm-topbar-notif {
+  position: relative;
+  width: 38px; height: 38px;
+  background: #F5F7FA;
+  border: 1px solid #EEF2F8;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #8A9BB0; transition: all 0.2s;
+}
+.adm-topbar-notif:hover { background: #EEF2F8; color: #C0392B; }
+.adm-topbar-notif svg { width: 18px; height: 18px; }
+
+.adm-notif-dot {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px;
+  background: #C0392B;
+  border-radius: 50%;
+  border: 1.5px solid white;
+}
+
+.adm-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  background: #F5F7FA;
+  border: 1px solid #EEF2F8;
+  border-radius: 12px;
+  cursor: default;
+  transition: all 0.2s;
+}
+.adm-topbar-user:hover { background: #EEF2F8; }
+
+.adm-topbar-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #C0392B, #C4973A);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem; font-weight: 700; color: white;
+}
+
+.adm-topbar-name {
+  display: block;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem; font-weight: 600; color: #1C2E42;
+}
+.adm-topbar-role {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.72rem; color: #C0392B; font-weight: 500;
+}

@@ -1,0 +1,140 @@
+.topbar {
+  height: 72px;
+  background: white;
+  border-bottom: 1px solid #EEF2F8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 20px rgba(43,95,142,0.06);
+}
+
+
+
+.topbar-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1A3F63;
+  line-height: 1.1;
+}
+
+.topbar-subtitle {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.8rem;
+  color: #8A9BB0;
+  margin-top: 2px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.topbar-date {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  color: #8A9BB0;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.topbar-divider {
+  width: 1px;
+  height: 28px;
+  background: #EEF2F8;
+}
+
+.topbar-notif {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  background: #F5F7FA;
+  border: 1px solid #EEF2F8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8A9BB0;
+  transition: all 0.2s;
+}
+
+.topbar-notif:hover {
+  background: #EEF2F8;
+  color: #2B5F8E;
+}
+
+.topbar-notif svg { width: 18px; height: 18px; }
+
+.notif-dot {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px;
+  background: #C4973A;
+  border-radius: 50%;
+  border: 1.5px solid white;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  background: #F5F7FA;
+  border: 1px solid #EEF2F8;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.topbar-user:hover {
+  background: #EEF2F8;
+  border-color: rgba(43,95,142,0.2);
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2B5F8E, #C4973A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.topbar-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.topbar-user-name {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #1C2E42;
+}
+
+.topbar-user-role {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.72rem;
+  color: #C4973A;
+  font-weight: 500;
+}
+
+/* Profil actif */
+.topbar-user.active .topbar-avatar {
+  box-shadow: 0 0 0 2px #C4973A;
+}
+.topbar-user.active .topbar-user-name {
+  color: #C4973A;
+}
