@@ -1,8 +1,3 @@
-/**
- * visiteur/services/api.js
- * Appels API publics (sans authentification)
- */
-
 const BASE = "http://localhost:8000/api/v1";
 
 async function get(url) {
@@ -14,25 +9,31 @@ async function get(url) {
   return data;
 }
 
-// ── Hôtels publics ────────────────────────────────────────
+// Hôtels mis en avant (landing)
 export const hotelsPublicApi = {
-  list: (params = {}) => {
-    const q = new URLSearchParams({ page: 1, per_page: 8, actif_only: "true", ...params });
+  featured:    ()           => get(`${BASE}/hotels/featured`),
+  byVille:     (ville)      => get(`${BASE}/hotels?ville=${encodeURIComponent(ville)}&actif_only=true&per_page=12`),
+  list: (params={}) => {
+    const { ville, ...rest } = params;
+    const q = new URLSearchParams({ page: 1, per_page: 12, actif_only: "true", ...rest });
+    if (ville) q.set("ville", ville);
     return get(`${BASE}/hotels?${q}`);
   },
-  getImages: (id) => get(`${BASE}/hotels/${id}/images`),
+  getImages:   (id)         => get(`${BASE}/hotels/${id}/images`),
 };
 
-// ── Voyages publics ───────────────────────────────────────
+// Villes vedettes
+export const villesApi = {
+  list: () => get(`${BASE}/hotels/villes-vedettes`),
+};
+
+// Voyages
 export const voyagesPublicApi = {
-  list: (params = {}) => {
-    const q = new URLSearchParams({ page: 1, per_page: 8, actif_only: "true", ...params });
-    return get(`${BASE}/voyages?${q}`);
-  },
-  getImages: (id) => get(`${BASE}/voyages/${id}/images`),
+  list:      (params={})  => { const q = new URLSearchParams({page:1,per_page:12,actif_only:"true",...params}); return get(`${BASE}/voyages?${q}`); },
+  getImages: (id)         => get(`${BASE}/voyages/${id}/images`),
 };
 
-// ── Helper image principale ───────────────────────────────
+// Image principale helper
 export async function fetchMainImage(type, id) {
   try {
     const res = type === "hotel"

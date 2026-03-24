@@ -10,7 +10,8 @@ const PAGE_META = {
   marketing:    { title: "Marketing",         subtitle: "Validation et suivi des campagnes" },
   factures:     { title: "Factures",          subtitle: "Historique et gestion des factures" },
   agent:        { title: "Agent IA",          subtitle: "Assistant intelligent d'administration" },
-  "hero-slides":{ title: "Hero Slides",       subtitle: "Gestion du carousel de la page d'accueil" },
+  "hotels-vedettes":{ title:"Mise en avant",      subtitle:"Hôtels et villes affichés sur la page client" },
+  "hero-slides":    { title: "Hero Slides",       subtitle: "Gestion du carousel de la page d'accueil" },
   support:      { title: "Support",           subtitle: "Conversations avec les partenaires" },
 };
 

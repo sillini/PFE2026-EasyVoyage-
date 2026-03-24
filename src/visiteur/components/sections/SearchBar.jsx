@@ -4,95 +4,205 @@ import "./SearchBar.css";
 const VILLES = [
   "Toute la Tunisie","Tunis","Hammamet","Sousse","Monastir",
   "Djerba","Tabarka","Sfax","Tozeur","Mahdia","Nabeul","Bizerte",
-  "Gabès","Kairouan","Zarzis","Kébili","Tozeur","Douz",
+  "Gabès","Kairouan","Zarzis","Kébili","Douz",
 ];
 
-const CATEGORIES = [
-  { id: "hotels",  label: "Hôtels en Tunisie",   icon: "🏨" },
-  { id: "voyages", label: "Voyages organisés",    icon: "✈️" },
-];
+function todayStr() { return new Date().toISOString().split("T")[0]; }
+function addDays(d, n) {
+  const dt = new Date(d); dt.setDate(dt.getDate() + n);
+  return dt.toISOString().split("T")[0];
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"});
+}
 
 export default function SearchBar({ onSearch }) {
-  const [categorie, setCategorie] = useState("hotels");
-  const [ville, setVille]         = useState("Toute la Tunisie");
-  const [texte, setTexte]         = useState("");
+  const today = todayStr();
+  const [cat,      setCat]      = useState("hotels");
+  const [ville,    setVille]    = useState("Toute la Tunisie");
+  const [texte,    setTexte]    = useState("");
+  const [arrivee,  setArrivee]  = useState(today);
+  const [depart,   setDepart]   = useState(addDays(today, 1));
+  const [nuits,    setNuits]    = useState(1);
+  const [chambres, setChambres] = useState(1);
+  const [adultes,  setAdultes]  = useState(2);
+  const [enfants,  setEnfants]  = useState(0);
+  const [showOcc,  setShowOcc]  = useState(false);
 
-  const handleSearch = () => {
-    onSearch?.({
-      categorie,
-      ville: ville === "Toute la Tunisie" ? "" : ville,
-      texte,
-    });
-    // Scroll vers la section concernée
-    const el = document.getElementById(categorie);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const handleArrivee = (v) => { setArrivee(v); setDepart(addDays(v, nuits)); };
+  const handleDepart  = (v) => {
+    setDepart(v);
+    const diff = Math.round((new Date(v)-new Date(arrivee))/86400000);
+    if (diff > 0) setNuits(diff);
+  };
+  const handleNuits = (v) => {
+    const n = Math.max(1, v);
+    setNuits(n); setDepart(addDays(arrivee, n));
   };
 
-  return (
-    <div className="sb-root">
-      <div className="sb-inner">
-        {/* Onglets catégorie */}
-        <div className="sb-tabs">
-          {CATEGORIES.map(c => (
-            <button
-              key={c.id}
-              className={`sb-tab ${categorie === c.id ? "active" : ""}`}
-              onClick={() => setCategorie(c.id)}
-            >
-              <span>{c.icon}</span> {c.label}
-            </button>
-          ))}
-        </div>
+  const doSearch = () => {
+    onSearch?.({ categorie:cat, ville: ville==="Toute la Tunisie"?"":ville,
+      texte, arrivee, depart, nuits, chambres, adultes, enfants });
+    const el = document.getElementById(cat);
+    if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+  };
 
-        {/* Barre de recherche */}
-        <div className="sb-bar">
-          {/* Destination */}
-          <div className="sb-field">
-            <div className="sb-field-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              Destination
-            </div>
-            <select
-              className="sb-select"
-              value={ville}
-              onChange={e => setVille(e.target.value)}
-            >
+  const occLabel = `${chambres} ch. · ${adultes} adulte${adultes>1?"s":""} · ${enfants} enfant${enfants>1?"s":""}`;
+
+  return (
+    <div className="sb-wrap">
+      {/* Onglets */}
+      <div className="sb-tabs">
+        <button className={`sb-tab ${cat==="hotels"?"on":""}`}  onClick={() => setCat("hotels")}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Hôtels en Tunisie
+        </button>
+        <button className={`sb-tab ${cat==="voyages"?"on":""}`} onClick={() => setCat("voyages")}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/>
+          </svg>
+          Voyages organisés
+        </button>
+      </div>
+
+      {/* Barre de recherche */}
+      <div className="sb-bar">
+
+        {/* Destination */}
+        <div className="sb-field">
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="10" r="3"/>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            </svg>DESTINATION
+          </span>
+          <div className="sb-val-wrap">
+            <select className="sb-native" value={ville} onChange={e => setVille(e.target.value)}>
               {VILLES.map(v => <option key={v}>{v}</option>)}
             </select>
-          </div>
-
-          <div className="sb-sep"/>
-
-          {/* Mot clé */}
-          <div className="sb-field sb-field-grow">
-            <div className="sb-field-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              {categorie === "hotels" ? "Nom de l'hôtel" : "Nom du voyage"}
-            </div>
-            <input
-              className="sb-input"
-              value={texte}
-              onChange={e => setTexte(e.target.value)}
-              placeholder={categorie === "hotels" ? "Ex : Hôtel Barceló..." : "Ex : Circuit Sud..."}
-              onKeyDown={e => e.key === "Enter" && handleSearch()}
-            />
-          </div>
-
-          {/* Bouton */}
-          <button className="sb-btn" onClick={handleSearch}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <span className="sb-val">{ville}</span>
+            <svg className="sb-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 12 15 18 9"/>
             </svg>
-            Rechercher
-          </button>
+          </div>
         </div>
+
+        <div className="sb-sep"/>
+
+        {/* Nom */}
+        <div className="sb-field sb-field-lg">
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>{cat==="hotels"?"NOM DE L'HÔTEL":"NOM DU VOYAGE"}
+          </span>
+          <input className="sb-input" value={texte} onChange={e => setTexte(e.target.value)}
+            placeholder={cat==="hotels"?"Ex : Barceló, Marhaba...":"Ex : Circuit Sahara..."}
+            onKeyDown={e => e.key==="Enter" && doSearch()}/>
+        </div>
+
+        <div className="sb-sep"/>
+
+        {/* Arrivée */}
+        <div className="sb-field">
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>VOTRE ARRIVÉE
+          </span>
+          <div className="sb-val-wrap">
+            <input type="date" className="sb-native" value={arrivee} min={today}
+              onChange={e => handleArrivee(e.target.value)}/>
+            <span className="sb-val">{fmtDate(arrivee)}</span>
+          </div>
+        </div>
+
+        <div className="sb-sep"/>
+
+        {/* Départ */}
+        <div className="sb-field">
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/>
+            </svg>VOTRE DÉPART
+          </span>
+          <div className="sb-val-wrap">
+            <input type="date" className="sb-native" value={depart} min={addDays(arrivee,1)}
+              onChange={e => handleDepart(e.target.value)}/>
+            <span className="sb-val">{fmtDate(depart)}</span>
+          </div>
+        </div>
+
+        <div className="sb-sep"/>
+
+        {/* Nuitées */}
+        <div className="sb-field sb-field-nuits">
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 3H3v7a6 6 0 0 0 12 0V3"/><line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>NUITÉES
+          </span>
+          <div className="sb-counter">
+            <button className="sb-cnt-btn" onClick={() => handleNuits(nuits-1)} disabled={nuits<=1}>−</button>
+            <span className="sb-cnt-val">{nuits}</span>
+            <button className="sb-cnt-btn" onClick={() => handleNuits(nuits+1)}>+</button>
+          </div>
+        </div>
+
+        <div className="sb-sep"/>
+
+        {/* Occupation */}
+        <div className="sb-field sb-field-occ" style={{position:"relative"}}>
+          <span className="sb-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>OCCUPATION
+          </span>
+          <button className="sb-occ-trigger" onClick={() => setShowOcc(!showOcc)}>
+            <span className="sb-val">{occLabel}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              style={{width:13,height:13,color:"#8A9BB0",marginLeft:4}}>
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          {showOcc && (
+            <div className="sb-occ-panel">
+              {[
+                { lbl:"Chambres",  val:chambres, set:setChambres, min:1 },
+                { lbl:"Adultes",   val:adultes,  set:setAdultes,  min:1 },
+                { lbl:"Enfants",   val:enfants,  set:setEnfants,  min:0 },
+              ].map(r => (
+                <div key={r.lbl} className="sb-occ-row">
+                  <span>{r.lbl}</span>
+                  <div className="sb-counter">
+                    <button className="sb-cnt-btn" onClick={() => r.set(Math.max(r.min, r.val-1))} disabled={r.val<=r.min}>−</button>
+                    <span className="sb-cnt-val">{r.val}</span>
+                    <button className="sb-cnt-btn" onClick={() => r.set(r.val+1)}>+</button>
+                  </div>
+                </div>
+              ))}
+              <button className="sb-occ-ok" onClick={() => setShowOcc(false)}>Confirmer</button>
+            </div>
+          )}
+        </div>
+
+        {/* Bouton */}
+        <button className="sb-btn-search" onClick={doSearch}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Rechercher
+        </button>
       </div>
     </div>
   );

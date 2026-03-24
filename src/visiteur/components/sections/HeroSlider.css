@@ -4,15 +4,15 @@
 
 .hero-root {
   position: relative;
-  height: calc(100vh - 104px);   /* moins topbar + navbar */
-  min-height: 560px;
-  max-height: 800px;
+  height: 55vh;
+  min-height: 380px;
+  max-height: 500px;
   overflow: hidden;
   background: #060F1C;
 }
 
 .hero-loading {
-  height: calc(100vh - 104px); min-height: 560px;
+  height: 55vh; min-height: 380px; max-height: 500px;
   background: linear-gradient(135deg, #060F1C, #1A3F63);
   display: flex; align-items: center; justify-content: center;
 }

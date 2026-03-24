@@ -1,7 +1,15 @@
 .lp-root {
   font-family: 'Lato', 'Segoe UI', sans-serif;
-  color: #1C2E42; overflow-x: hidden; min-height: 100vh;
+  color: #1C2E42;
+  min-height: 100vh;
+  /* PAS de overflow ici — sinon position:sticky de la navbar est cassé */
 }
+
+/* Empêcher le débordement horizontal sans casser sticky */
+.lp-root > *:not(nav) {
+  overflow-x: hidden;
+}
+
 .lp-login-wrap {
   min-height: 100vh;
   background: linear-gradient(135deg, #060F1C, #0F2235, #1A3F63);

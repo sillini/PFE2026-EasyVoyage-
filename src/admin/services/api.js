@@ -54,7 +54,16 @@ export const hotelsAdminApi = {
   create: (data)     => fetch(`${BASE}/hotels`, { method: "POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
   update: (id, data) => fetch(`${BASE}/hotels/${id}`, { method: "PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
   toggle: (id, actif) => fetch(`${BASE}/hotels/${id}/toggle`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ actif }) }).then(handleResponse),
-  delete: (id)       => fetch(`${BASE}/hotels/${id}`, { method: "DELETE", headers: authHeaders() }).then(handleResponse),
+  toggleFeatured: (id, mis_en_avant) => fetch(`${BASE}/hotels/admin/${id}/featured`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ mis_en_avant }) }).then(handleResponse),
+  delete: (id) => fetch(`${BASE}/hotels/${id}`, { method: "DELETE", headers: authHeaders() }).then(handleResponse),
+};
+
+// ── Villes vedettes ────────────────────────────────────────
+export const villesVedettesApi = {
+  list:   ()           => fetch(`${BASE}/hotels/admin/villes-vedettes`, { headers: authHeaders() }).then(handleResponse),
+  create: (data)       => fetch(`${BASE}/hotels/admin/villes-vedettes`, { method:"POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  update: (id, data)   => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method:"PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  delete: (id)         => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method:"DELETE", headers: authHeaders() }).then(handleResponse),
 };
 
 // ── Voyages ───────────────────────────────────────────────

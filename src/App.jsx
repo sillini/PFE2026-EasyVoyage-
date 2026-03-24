@@ -17,6 +17,7 @@ import AdminAgentIA      from "./admin/pages/AdminAgentIA";
 import AdminProfil       from "./admin/pages/AdminProfil";
 import AdminHeroSlides   from "./admin/pages/AdminHeroSlides";
 import AdminSupport      from "./admin/pages/AdminSupport";
+import AdminHotelsVedettes from "./admin/pages/AdminHotelsVedettes";
 
 import Sidebar         from "./partenaire/components/layout/Sidebar";
 import Topbar          from "./partenaire/components/layout/Topbar";
@@ -64,23 +65,30 @@ export default function App() {
     localStorage.clear(); setUser(null); setRole(null); setActivePage("dashboard");
   };
 
-  if (!user) return <LandingPage onLogin={handleLogin} />;
+  if (!user) {
+    document.body.style.overflow = "auto";
+    document.documentElement.style.overflow = "auto";
+    return <LandingPage onLogin={handleLogin} />;
+  }
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
 
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
-        case "reservations": return <AdminReservations />;
-        case "hotels":       return <AdminHotels />;
-        case "voyages":      return <AdminVoyages />;
-        case "partenaires":  return <AdminPartenaires />;
-        case "utilisateurs": return <AdminUtilisateurs />;
-        case "marketing":    return <AdminMarketing />;
-        case "factures":     return <AdminFactures />;
-        case "agent":        return <AdminAgentIA />;
-        case "hero-slides":   return <AdminHeroSlides />;
-        case "support":       return <AdminSupport currentUserId={user?.id}/>;
-        case "profil":        return <AdminProfil />;
-        default:             return <AdminDashboard />;
+        case "reservations":    return <AdminReservations />;
+        case "hotels":          return <AdminHotels />;
+        case "voyages":         return <AdminVoyages />;
+        case "partenaires":     return <AdminPartenaires />;
+        case "utilisateurs":    return <AdminUtilisateurs />;
+        case "marketing":       return <AdminMarketing />;
+        case "factures":        return <AdminFactures />;
+        case "agent":           return <AdminAgentIA />;
+        case "hotels-vedettes": return <AdminHotelsVedettes />;
+        case "hero-slides":     return <AdminHeroSlides />;
+        case "support":         return <AdminSupport currentUserId={user?.id}/>;
+        case "profil":          return <AdminProfil />;
+        default:                return <AdminDashboard />;
       }
     };
     return (

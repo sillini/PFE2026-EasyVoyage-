@@ -1,36 +1,34 @@
-/* ═══════════════════════════════════════════════
-   NAVBAR VISITEUR
-═══════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   NAVBAR — EasyVoyage Landing Page
+════════════════════════════════════════════════════════════ */
 
-/* Top bar */
+/* Topbar (bandeau supérieur) */
 .nav-topbar {
-  background: linear-gradient(135deg, #0A1628, #0F2235);
-  border-bottom: 1px solid rgba(196,151,58,0.2);
+  background: #0F2235; color: rgba(255,255,255,0.7);
   padding: 0 40px;
   position: relative; z-index: 101;
 }
 .nav-topbar-inner {
   max-width: 1300px; margin: 0 auto;
-  display: flex; align-items: center;
-  justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between;
   height: 38px;
 }
 .nav-topbar-slogan {
-  font-family: 'Lato', sans-serif; font-size: 0.78rem;
-  color: rgba(255,255,255,0.6); font-style: italic;
+  font-family:'Lato',sans-serif; font-size:0.72rem; letter-spacing:0.3px;
 }
 .nav-topbar-right {
-  display: flex; gap: 24px;
-  font-family: 'Lato', sans-serif; font-size: 0.76rem;
-  color: rgba(255,255,255,0.5);
+  font-family:'Lato',sans-serif; font-size:0.72rem;
+  display:flex; align-items:center; gap:16px;
 }
 
-/* Main nav */
+/* Main nav — sticky OBLIGATOIRE */
 .ev-nav {
-  position: sticky; top: 0; left: 0; right: 0; z-index: 100;
+  position: sticky;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
   background: white;
   border-bottom: 1px solid #EEF2F7;
-  transition: all 0.3s;
+  transition: box-shadow 0.3s;
   padding: 0 40px;
 }
 .ev-nav.scrolled {
@@ -43,79 +41,76 @@
 }
 
 /* Logo */
-.ev-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.ev-logo-icon svg { width: 36px; height: 36px; }
+.ev-logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
+.ev-logo-icon svg { width:36px; height:36px; }
 .ev-logo-text {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.55rem; font-weight: 700; color: #0F2235;
+  font-family:'Cormorant Garamond',serif; font-size:1.4rem;
+  font-weight:700; color:#0F2235; letter-spacing:-0.3px;
 }
-.ev-logo-text span { color: #C4973A; }
+.ev-logo-text span { color:#C4973A; }
 
-/* Links */
+/* Nav links */
 .ev-nav-links {
-  display: flex; gap: 2px; margin-left: auto;
+  display:flex; gap:2px; margin-left:auto;
 }
 .ev-nav-link {
-  padding: 8px 16px; border: none; background: transparent;
-  font-family: 'Lato', sans-serif; font-size: 0.88rem;
-  font-weight: 600; color: #4A5568; cursor: pointer;
-  border-radius: 8px; transition: all 0.2s;
-  position: relative; white-space: nowrap;
+  padding:8px 16px; border:none; background:transparent;
+  font-family:'Lato',sans-serif; font-size:0.88rem; font-weight:600;
+  color:#6B7E99; cursor:pointer; border-radius:8px; transition:all 0.2s;
+  position:relative; white-space:nowrap;
 }
 .ev-nav-link::after {
-  content: ''; position: absolute; bottom: 4px; left: 50%; right: 50%;
-  height: 2px; background: #C4973A; border-radius: 2px;
-  transition: all 0.25s;
+  content:''; position:absolute; bottom:4px; left:50%; right:50%;
+  height:2px; background:#C4973A; border-radius:2px; transition:all 0.25s;
 }
-.ev-nav-link:hover { color: #0F2235; background: #F8FAFC; }
-.ev-nav-link.active { color: #1A3F63; }
+.ev-nav-link:hover { color:#0F2235; background:#F8FAFC; }
+.ev-nav-link.active { color:#1A3F63; }
 .ev-nav-link.active::after,
-.ev-nav-link:hover::after { left: 16px; right: 16px; }
+.ev-nav-link:hover::after { left:16px; right:16px; }
 
 /* Bouton connexion */
 .ev-btn-connect {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 22px; flex-shrink: 0;
-  background: linear-gradient(135deg, #0F2235, #1A3F63);
-  border: none; border-radius: 24px;
-  font-family: 'Lato', sans-serif; font-size: 0.88rem;
-  font-weight: 700; color: white; cursor: pointer;
-  transition: all 0.25s;
-  box-shadow: 0 4px 14px rgba(15,34,53,0.25);
+  display:flex; align-items:center; gap:7px;
+  padding:10px 22px; flex-shrink:0;
+  background:linear-gradient(135deg,#0F2235,#1A3F63);
+  border:none; border-radius:24px;
+  font-family:'Lato',sans-serif; font-size:0.85rem; font-weight:700; color:white;
+  cursor:pointer; transition:all 0.25s;
+  box-shadow:0 4px 14px rgba(15,34,53,0.28);
 }
-.ev-btn-connect:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(15,34,53,0.35); }
-.ev-btn-connect svg { width: 15px; height: 15px; flex-shrink: 0; }
+.ev-btn-connect:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(15,34,53,0.35); }
+.ev-btn-connect svg { width:15px; height:15px; flex-shrink:0; }
 
-/* Burger */
+/* Burger mobile */
 .ev-burger {
-  display: none; flex-direction: column; gap: 5px;
-  background: none; border: none; cursor: pointer; padding: 6px;
+  background:none; border:none; cursor:pointer; padding:6px;
+  display:none;
 }
-.ev-burger span { display: block; width: 22px; height: 2px; background: #0F2235; border-radius: 2px; }
+.ev-burger span { display:block; width:22px; height:2px; background:#0F2235; border-radius:2px; }
+.ev-burger span+span { margin-top:5px; }
 
 /* Mobile menu */
 .ev-mobile-menu {
-  display: flex; flex-direction: column; gap: 4px;
-  padding: 12px 16px 16px;
-  border-top: 1px solid #EEF2F7;
-  background: white;
+  padding:12px 16px 16px;
+  border-top:1px solid #EEF2F7; background:white;
+  display:flex; flex-direction:column; gap:4px;
 }
 .ev-mobile-link {
-  padding: 12px 16px; text-align: left; border: none;
-  background: transparent; font-family: 'Lato', sans-serif;
-  font-size: 0.92rem; font-weight: 600; color: #4A5568;
-  cursor: pointer; border-radius: 10px; transition: all 0.2s;
+  padding:10px 12px; border:none; background:none;
+  font-family:'Lato',sans-serif; font-size:0.92rem; font-weight:600; color:#6B7E99;
+  cursor:pointer; border-radius:8px; text-align:left; transition:all 0.2s;
 }
-.ev-mobile-link:hover { background: #F8FAFC; color: #0F2235; }
-.ev-mobile-connect { margin-top: 8px; width: 100%; justify-content: center; }
+.ev-mobile-link:hover { background:#F8FAFC; color:#0F2235; }
+.ev-mobile-connect {
+  margin-top:8px; padding:12px; border:none; border-radius:10px;
+  background:linear-gradient(135deg,#0F2235,#1A3F63); color:white;
+  font-family:'Lato',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer;
+}
 
-@media (max-width: 900px) {
-  .ev-nav-links { display: none; }
-  .ev-burger { display: flex; margin-left: auto; }
-  .ev-btn-connect:not(.ev-mobile-connect) { display: none; }
-  .nav-topbar-right { display: none; }
-}
-@media (max-width: 600px) {
-  .ev-nav { padding: 0 16px; }
-  .nav-topbar { padding: 0 16px; }
+@media (max-width:768px) {
+  .ev-nav { padding:0 16px; }
+  .ev-nav-links { display:none; }
+  .ev-btn-connect { display:none; }
+  .ev-burger { display:block; margin-left:auto; }
+  .nav-topbar { display:none; }
 }
