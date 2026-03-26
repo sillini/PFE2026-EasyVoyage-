@@ -1,16 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 
 const NAV_LINKS = [
-  { id: "hotels",   label: "Hôtels en Tunisie" },
-  { id: "voyages",  label: "Voyages organisés" },
-  { id: "promos",   label: "Promos" },
-  { id: "pourquoi", label: "À propos" },
+  { id:"hotels",   label:"Hôtels en Tunisie" },
+  { id:"voyages",  label:"Voyages organisés" },
+  { id:"promos",   label:"Promos" },
+  { id:"pourquoi", label:"À propos" },
 ];
 
-export default function Navbar({ activeSection, onSectionClick, onLoginClick }) {
+export default function Navbar({ activeSection, onSectionClick, onLoginClick, isClient, user, onLogout, onProfilClick }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
+  const dropRef = useRef();
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 70);
@@ -18,21 +20,27 @@ export default function Navbar({ activeSection, onSectionClick, onLoginClick }) 
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  useEffect(() => {
+    const fn = e => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
+    document.addEventListener("mousedown", fn);
+    return () => document.removeEventListener("mousedown", fn);
+  }, []);
+
   const handleNav = (id) => {
     setMenuOpen(false);
     onSectionClick?.(id);
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) setTimeout(() => el.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   };
+
+  const initiales = user ? ((user.prenom?.[0]||"")+(user.nom?.[0]||"")).toUpperCase() : "";
 
   return (
     <>
-      {/* Top bar */}
+      {/* Topbar */}
       <div className="nav-topbar">
         <div className="nav-topbar-inner">
-          <span className="nav-topbar-slogan">
-            🇹🇳 EasyVoyage — La plateforme tunisienne de réservation
-          </span>
+          <span className="nav-topbar-slogan">🇹🇳 EasyVoyage — La plateforme tunisienne de réservation</span>
           <div className="nav-topbar-right">
             <span>📧 contact@easyvoyage.tn</span>
             <span>📞 +216 XX XXX XXX</span>
@@ -40,11 +48,12 @@ export default function Navbar({ activeSection, onSectionClick, onLoginClick }) 
         </div>
       </div>
 
-      {/* Main navbar */}
-      <nav className={`ev-nav ${scrolled ? "scrolled" : ""}`}>
+      {/* Navbar principale */}
+      <nav className={`ev-nav ${scrolled?"scrolled":""}`}>
         <div className="ev-nav-inner">
+
           {/* Logo */}
-          <div className="ev-logo" onClick={() => handleNav("top")} style={{ cursor: "pointer" }}>
+          <div className="ev-logo" onClick={()=>handleNav("top")} style={{cursor:"pointer"}}>
             <div className="ev-logo-icon">
               <svg viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="16" r="14" fill="#1A3F63" stroke="#C4973A" strokeWidth="2"/>
@@ -55,45 +64,90 @@ export default function Navbar({ activeSection, onSectionClick, onLoginClick }) 
             <span className="ev-logo-text">Easy<span>Voyage</span></span>
           </div>
 
-          {/* Links desktop */}
+          {/* Liens */}
           <div className="ev-nav-links">
-            {NAV_LINKS.map(l => (
-              <button
-                key={l.id}
-                className={`ev-nav-link ${activeSection === l.id ? "active" : ""}`}
-                onClick={() => handleNav(l.id)}
-              >
+            {NAV_LINKS.map(l=>(
+              <button key={l.id}
+                className={`ev-nav-link ${activeSection===l.id?"active":""}`}
+                onClick={()=>handleNav(l.id)}>
                 {l.label}
               </button>
             ))}
           </div>
 
-          {/* Bouton connexion */}
-          <button className="ev-btn-connect" onClick={onLoginClick}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            Se connecter
-          </button>
+          {/* Zone droite — visiteur ou client */}
+          {isClient ? (
+            // ── CLIENT CONNECTÉ ──
+            <div className="ev-client-zone" ref={dropRef}>
+              <button className="ev-client-btn" onClick={()=>setDropOpen(!dropOpen)}>
+                <div className="ev-client-avatar">{initiales}</div>
+                <div className="ev-client-info">
+                  <span className="ev-client-name">{user.prenom} {user.nom}</span>
+                  <span className="ev-client-role">Mon compte</span>
+                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                  style={{width:12,height:12,color:"#8A9BB0",transition:"transform 0.2s",transform:dropOpen?"rotate(180deg)":"rotate(0)"}}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+
+              {dropOpen && (
+                <div className="ev-client-drop">
+                  <div className="ev-drop-header">
+                    <div className="ev-drop-avatar">{initiales}</div>
+                    <div>
+                      <div className="ev-drop-name">{user.prenom} {user.nom}</div>
+                      <div className="ev-drop-email">{user.email}</div>
+                    </div>
+                  </div>
+                  <div className="ev-drop-sep"/>
+                  <button className="ev-drop-item" onClick={()=>{setDropOpen(false);onProfilClick?.();}}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                    Mon profil
+                  </button>
+                  <button className="ev-drop-item" onClick={()=>{setDropOpen(false);handleNav("reservations");}}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Mes réservations
+                  </button>
+                  <div className="ev-drop-sep"/>
+                  <button className="ev-drop-item ev-drop-logout" onClick={()=>{setDropOpen(false);onLogout?.();}}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Se déconnecter
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            // ── VISITEUR ──
+            <button className="ev-btn-connect" onClick={onLoginClick}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Se connecter
+            </button>
+          )}
 
           {/* Burger mobile */}
-          <button className="ev-burger" onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="ev-burger" onClick={()=>setMenuOpen(!menuOpen)}>
             <span/><span/><span/>
           </button>
         </div>
 
-        {/* Menu mobile */}
+        {/* Mobile menu */}
         {menuOpen && (
           <div className="ev-mobile-menu">
-            {NAV_LINKS.map(l => (
-              <button key={l.id} className="ev-mobile-link" onClick={() => handleNav(l.id)}>
-                {l.label}
-              </button>
+            {NAV_LINKS.map(l=>(
+              <button key={l.id} className="ev-mobile-link" onClick={()=>handleNav(l.id)}>{l.label}</button>
             ))}
-            <button className="ev-btn-connect ev-mobile-connect" onClick={() => { setMenuOpen(false); onLoginClick(); }}>
-              Se connecter
-            </button>
+            {isClient ? (
+              <>
+                <button className="ev-mobile-link" onClick={()=>{setMenuOpen(false);onProfilClick?.();}}>Mon profil</button>
+                <button className="ev-mobile-connect" style={{background:"#C0392B"}} onClick={()=>{setMenuOpen(false);onLogout?.();}}>Se déconnecter</button>
+              </>
+            ) : (
+              <button className="ev-mobile-connect" onClick={()=>{setMenuOpen(false);onLoginClick();}}>Se connecter</button>
+            )}
           </div>
         )}
       </nav>

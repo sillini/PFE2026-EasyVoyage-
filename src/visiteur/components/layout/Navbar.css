@@ -114,3 +114,55 @@
   .ev-burger { display:block; margin-left:auto; }
   .nav-topbar { display:none; }
 }
+
+/* ── Zone client connecté ──────────────────────────── */
+.ev-client-zone { position: relative; }
+.ev-client-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 5px 14px 5px 5px; border: 1.5px solid #EEF2F7;
+  border-radius: 28px; background: white; cursor: pointer;
+  transition: all 0.22s;
+}
+.ev-client-btn:hover { border-color: #C4973A; box-shadow: 0 4px 14px rgba(15,34,53,0.1); }
+.ev-client-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg,#0F2235,#1A3F63);
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Lato',sans-serif; font-size: 0.75rem; font-weight: 800; color: white;
+}
+.ev-client-info { display: flex; flex-direction: column; text-align: left; }
+.ev-client-name { font-family:'Lato',sans-serif; font-size: 0.8rem; font-weight: 700; color: #0F2235; line-height: 1.2; }
+.ev-client-role { font-family:'Lato',sans-serif; font-size: 0.65rem; color: #C4973A; font-weight: 600; }
+
+/* Dropdown client */
+.ev-client-drop {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  background: white; border: 1px solid #EEF2F7; border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(15,34,53,0.15); padding: 6px;
+  min-width: 240px; z-index: 200;
+  animation: evDropFade 0.18s ease;
+}
+@keyframes evDropFade { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.ev-drop-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px 14px;
+}
+.ev-drop-avatar {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg,#0F2235,#1A3F63);
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Lato',sans-serif; font-size: 0.88rem; font-weight: 800; color: white;
+}
+.ev-drop-name { font-family:'Lato',sans-serif; font-size: 0.88rem; font-weight: 700; color: #0F2235; }
+.ev-drop-email { font-family:'Lato',sans-serif; font-size: 0.72rem; color: #8A9BB0; margin-top: 2px; }
+.ev-drop-sep { height: 1px; background: #EEF2F7; margin: 4px 0; }
+.ev-drop-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 12px; border: none; background: transparent;
+  font-family:'Lato',sans-serif; font-size: 0.86rem; font-weight: 600; color: #1C2E42;
+  cursor: pointer; border-radius: 10px; transition: background 0.15s;
+}
+.ev-drop-item svg { width: 15px; height: 15px; color: #8A9BB0; flex-shrink: 0; }
+.ev-drop-item:hover { background: #F4F7FA; }
+.ev-drop-logout { color: #C0392B !important; }
+.ev-drop-logout svg { color: #C0392B !important; }

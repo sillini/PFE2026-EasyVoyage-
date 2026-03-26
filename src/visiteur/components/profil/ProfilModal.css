@@ -1,0 +1,43 @@
+.pm-overlay{position:fixed;inset:0;z-index:9998;background:rgba(6,15,28,0.65);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:16px;animation:pmFade 0.2s ease;}
+@keyframes pmFade{from{opacity:0}to{opacity:1}}
+.pm-modal{background:white;border-radius:22px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.35);scrollbar-width:thin;animation:pmSlide 0.25s cubic-bezier(0.22,1,0.36,1);}
+@keyframes pmSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.pm-header{display:flex;align-items:center;gap:14px;padding:20px 20px 16px;background:linear-gradient(135deg,#0F2235,#1A3F63);border-radius:22px 22px 0 0;}
+.pm-avatar{width:50px;height:50px;border-radius:50%;background:rgba(196,151,58,0.9);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:white;flex-shrink:0;border:2px solid rgba(255,255,255,0.3);}
+.pm-header-info{flex:1;}
+.pm-header-info h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:white;}
+.pm-header-info p{font-family:'Lato',sans-serif;font-size:0.78rem;color:rgba(255,255,255,0.55);margin-top:2px;}
+.pm-close{background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.pm-close:hover{background:rgba(255,255,255,0.2);}
+.pm-close svg{width:13px;height:13px;stroke:rgba(255,255,255,0.7);}
+.pm-tabs{display:flex;padding:12px 16px 0;gap:4px;border-bottom:1px solid #F0F4F8;}
+.pm-tab{display:flex;align-items:center;gap:7px;padding:9px 16px;border:none;background:transparent;font-family:'Lato',sans-serif;font-size:0.84rem;font-weight:600;color:#8A9BB0;cursor:pointer;border-radius:10px 10px 0 0;transition:all 0.2s;border-bottom:2px solid transparent;}
+.pm-tab svg{width:14px;height:14px;}
+.pm-tab.on{color:#1A3F63;border-bottom-color:#1A3F63;background:#F4F7FA;}
+.pm-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px;}
+.pm-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pm-field{display:flex;flex-direction:column;gap:4px;}
+.pm-field label{font-family:'Lato',sans-serif;font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:#8A9BB0;}
+.pm-field input{padding:9px 12px;border:1.5px solid #DDE3EC;border-radius:10px;font-family:'Lato',sans-serif;font-size:0.87rem;color:#1C2E42;background:#F8FAFC;outline:none;transition:all 0.2s;}
+.pm-field input:focus{border-color:#1A3F63;background:white;}
+.pm-disabled{opacity:0.5;cursor:not-allowed!important;}
+.pm-success{padding:9px 13px;background:rgba(39,174,96,0.08);border:1px solid rgba(39,174,96,0.22);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.82rem;color:#27AE60;}
+.pm-error{padding:9px 13px;background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.2);border-radius:9px;font-family:'Lato',sans-serif;font-size:0.82rem;color:#C0392B;}
+.pm-btn-save{width:100%;padding:12px;background:linear-gradient(135deg,#0F2235,#1A3F63);border:none;border-radius:11px;color:white;font-family:'Lato',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.22s;display:flex;align-items:center;justify-content:center;}
+.pm-btn-save:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 22px rgba(15,34,53,0.28);}
+.pm-btn-save:disabled{opacity:0.6;cursor:not-allowed;}
+.pm-spin{width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:pmSpin 0.7s linear infinite;}
+@keyframes pmSpin{to{transform:rotate(360deg)}}
+.pm-btn-logout{width:100%;padding:10px;background:rgba(192,57,43,0.06);border:1.5px solid rgba(192,57,43,0.2);border-radius:11px;color:#C0392B;font-family:'Lato',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;}
+.pm-btn-logout svg{width:15px;height:15px;}
+.pm-btn-logout:hover{background:rgba(192,57,43,0.12);}
+.pm-reservations{display:flex;flex-direction:column;gap:8px;}
+.pm-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px;text-align:center;}
+.pm-empty span{font-size:2.5rem;}
+.pm-empty p{font-family:'Lato',sans-serif;font-size:0.88rem;color:#8A9BB0;}
+.pm-resa{background:#F8FAFC;border:1px solid #E8EDF5;border-radius:12px;padding:12px 14px;}
+.pm-resa-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.pm-resa-id{font-family:'Lato',sans-serif;font-size:0.75rem;font-weight:700;color:#8A9BB0;}
+.pm-resa-statut{font-family:'Lato',sans-serif;font-size:0.78rem;font-weight:600;color:#1C2E42;}
+.pm-resa-dates{font-family:'Lato',sans-serif;font-size:0.82rem;color:#4A5568;}
+.pm-resa-prix{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:#C4973A;margin-top:4px;}

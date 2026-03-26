@@ -1,30 +1,29 @@
 import { useState, useEffect } from "react";
 
-import LoginPage from "./auth/LoginPage";
 import LandingPage from "./visiteur/pages/LandingPage";
 
-import AdminSidebar      from "./admin/components/layout/AdminSidebar";
-import AdminTopbar       from "./admin/components/layout/AdminTopbar";
-import AdminDashboard    from "./admin/pages/AdminDashboard";
-import AdminReservations from "./admin/pages/AdminReservations";
-import AdminHotels       from "./admin/pages/AdminHotels";
-import AdminVoyages      from "./admin/pages/AdminVoyages";
-import AdminPartenaires  from "./admin/pages/AdminPartenaires";
-import AdminUtilisateurs from "./admin/pages/AdminUtilisateurs";
-import AdminMarketing    from "./admin/pages/AdminMarketing";
-import AdminFactures     from "./admin/pages/AdminFactures";
-import AdminAgentIA      from "./admin/pages/AdminAgentIA";
-import AdminProfil       from "./admin/pages/AdminProfil";
-import AdminHeroSlides   from "./admin/pages/AdminHeroSlides";
-import AdminSupport      from "./admin/pages/AdminSupport";
+import AdminSidebar        from "./admin/components/layout/AdminSidebar";
+import AdminTopbar         from "./admin/components/layout/AdminTopbar";
+import AdminDashboard      from "./admin/pages/AdminDashboard";
+import AdminReservations   from "./admin/pages/AdminReservations";
+import AdminHotels         from "./admin/pages/AdminHotels";
+import AdminVoyages        from "./admin/pages/AdminVoyages";
+import AdminPartenaires    from "./admin/pages/AdminPartenaires";
+import AdminUtilisateurs   from "./admin/pages/AdminUtilisateurs";
+import AdminMarketing      from "./admin/pages/AdminMarketing";
+import AdminFactures       from "./admin/pages/AdminFactures";
+import AdminAgentIA        from "./admin/pages/AdminAgentIA";
+import AdminProfil         from "./admin/pages/AdminProfil";
+import AdminHeroSlides     from "./admin/pages/AdminHeroSlides";
+import AdminSupport        from "./admin/pages/AdminSupport";
 import AdminHotelsVedettes from "./admin/pages/AdminHotelsVedettes";
 
-import Sidebar         from "./partenaire/components/layout/Sidebar";
-import Topbar          from "./partenaire/components/layout/Topbar";
-import MesHotels       from "./partenaire/pages/MesHotels";
-import ChambresPage    from "./partenaire/pages/ChambresPage";
-import PlaceholderPage from "./partenaire/pages/PlaceholderPage";
-import PartenaireProfil from "./partenaire/pages/PartenaireProfil";
+import Sidebar               from "./partenaire/components/layout/Sidebar";
+import Topbar                from "./partenaire/components/layout/Topbar";
+import MesHotels             from "./partenaire/pages/MesHotels";
+import ChambresPage          from "./partenaire/pages/ChambresPage";
+import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
+import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
 
 import "./App.css";
@@ -32,8 +31,8 @@ import "./App.css";
 const API_BASE = "http://localhost:8000/api/v1";
 
 export default function App() {
-  const [user, setUser]             = useState(null);
-  const [role, setRole]             = useState(null);
+  const [user,       setUser]       = useState(null);
+  const [role,       setRole]       = useState(null);
   const [activePage, setActivePage] = useState("dashboard");
 
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function App() {
   };
 
   const handleLogin = (data) => {
-    if (!["PARTENAIRE", "ADMIN"].includes(data.role)) {
+    if (!["PARTENAIRE", "ADMIN", "CLIENT"].includes(data.role)) {
       alert("Accès non autorisé."); localStorage.clear(); return;
     }
     fetchMe(data.access_token, data.role);
@@ -65,14 +64,24 @@ export default function App() {
     localStorage.clear(); setUser(null); setRole(null); setActivePage("dashboard");
   };
 
-  if (!user) {
-    document.body.style.overflow = "auto";
-    document.documentElement.style.overflow = "auto";
-    return <LandingPage onLogin={handleLogin} />;
+  // ── VISITEUR / CLIENT → même page LandingPage ──────────
+  // CLIENT = visiteur authentifié, même interface mais avec fonctionnalités en plus
+  if (!user || role === "CLIENT") {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top      = "";
+    document.documentElement.style.overflow = "";
+    return (
+      <LandingPage
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+        user={role === "CLIENT" ? user : null}
+        role={role}
+      />
+    );
   }
-  document.body.style.overflow = "";
-  document.documentElement.style.overflow = "";
 
+  // ── ADMIN ──────────────────────────────────────────────
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
@@ -93,15 +102,16 @@ export default function App() {
     };
     return (
       <div className="app-shell">
-        <AdminSidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout} />
+        <AdminSidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout}/>
         <div className="app-main">
-          <AdminTopbar activePage={activePage} user={user} onNavigate={setActivePage} />
+          <AdminTopbar activePage={activePage} user={user} onNavigate={setActivePage}/>
           <main className="app-content">{renderAdmin()}</main>
         </div>
       </div>
     );
   }
 
+  // ── PARTENAIRE ─────────────────────────────────────────
   const renderPartenaire = () => {
     switch (activePage) {
       case "hotels":   return <MesHotels />;
@@ -111,12 +121,11 @@ export default function App() {
       default:         return <PlaceholderPage page={activePage} />;
     }
   };
-
   return (
     <div className="app-shell">
-      <Sidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout} />
+      <Sidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout}/>
       <div className="app-main">
-        <Topbar activePage={activePage} user={user} onNavigate={setActivePage} />
+        <Topbar activePage={activePage} user={user} onNavigate={setActivePage}/>
         <main className="app-content">{renderPartenaire()}</main>
       </div>
     </div>
