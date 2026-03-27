@@ -1,22 +1,26 @@
 import "./AdminTopbar.css";
 
 const PAGE_META = {
-  dashboard:    { title: "Tableau de bord",  subtitle: "Vue globale de la plateforme" },
-  reservations: { title: "Réservations",      subtitle: "Toutes les réservations de la plateforme" },
-  hotels:       { title: "Hôtels",            subtitle: "Gestion de tous les établissements" },
-  voyages:      { title: "Voyages",           subtitle: "Gestion des offres de voyages" },
-  partenaires:  { title: "Partenaires",       subtitle: "Gestion des comptes partenaires" },
-  utilisateurs: { title: "Utilisateurs",      subtitle: "Gestion des clients et administrateurs" },
-  marketing:    { title: "Marketing",         subtitle: "Validation et suivi des campagnes" },
-  factures:     { title: "Factures",          subtitle: "Historique et gestion des factures" },
-  agent:        { title: "Agent IA",          subtitle: "Assistant intelligent d'administration" },
-  "hotels-vedettes":{ title:"Mise en avant",      subtitle:"Hôtels et villes affichés sur la page client" },
-  "hero-slides":    { title: "Hero Slides",       subtitle: "Gestion du carousel de la page d'accueil" },
-  support:      { title: "Support",           subtitle: "Conversations avec les partenaires" },
+  dashboard:             { title: "Tableau de bord",        subtitle: "Vue globale de la plateforme" },
+  reservations:          { title: "Réservations",            subtitle: "Toutes les réservations de la plateforme" },
+  hotels:                { title: "Hôtels",                  subtitle: "Gestion de tous les établissements" },
+  voyages:               { title: "Voyages",                 subtitle: "Gestion des offres de voyages" },
+  partenaires:           { title: "Partenaires",             subtitle: "Gestion des comptes partenaires" },
+  "demandes-partenaire": { title: "Demandes partenaires",    subtitle: "Demandes d'inscription reçues depuis la landing page" },
+  clients:               { title: "Clients",                  subtitle: "Gestion des comptes clients" },
+  marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
+  factures:              { title: "Factures",                subtitle: "Historique et gestion des factures" },
+  agent:                 { title: "Agent IA",                subtitle: "Assistant intelligent d'administration" },
+  "hotels-vedettes":     { title: "Mise en avant",           subtitle: "Hôtels et villes affichés sur la page client" },
+  "hero-slides":         { title: "Hero Slides",             subtitle: "Gestion du carousel de la page d'accueil" },
+  support:               { title: "Support",                 subtitle: "Conversations avec les partenaires" },
 };
 
 export default function AdminTopbar({ activePage, user, onNavigate }) {
-  const meta = PAGE_META[activePage] || { title: activePage === "profil" ? "Mon Profil" : "Tableau de bord", subtitle: activePage === "profil" ? "Gérer vos informations personnelles" : "Vue globale" };
+  const meta = PAGE_META[activePage] || {
+    title:    activePage === "profil" ? "Mon Profil"   : "Tableau de bord",
+    subtitle: activePage === "profil" ? "Gérer vos informations personnelles" : "Vue globale",
+  };
   const { title, subtitle } = meta;
   const dateStr = new Date().toLocaleDateString("fr-FR", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -49,9 +53,9 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
         </button>
         <div className="adm-topbar-user"
           onClick={() => onNavigate && onNavigate("profil")}
-          style={{ cursor:"pointer" }}
+          style={{ cursor: "pointer" }}
           title="Mon profil">
-          <div className={`adm-topbar-avatar ${activePage==="profil"?"active":""}`}>
+          <div className={`adm-topbar-avatar ${activePage === "profil" ? "active" : ""}`}>
             {user?.prenom?.[0]}{user?.nom?.[0]}
           </div>
           <div className="adm-topbar-user-info">

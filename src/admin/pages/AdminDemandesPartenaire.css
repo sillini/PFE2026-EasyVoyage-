@@ -1,0 +1,435 @@
+/* ════════════════════════════════════════════════════════
+   ADMIN — DEMANDES PARTENAIRES
+════════════════════════════════════════════════════════ */
+
+.adp-page {
+  padding: 28px 32px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.adp-page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+
+.adp-page-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem; font-weight: 700; color: #0F2235; margin: 0 0 4px;
+}
+
+.adp-page-header p {
+  font-family: 'Lato', sans-serif; font-size: 0.87rem; color: #8A9BB0; margin: 0;
+}
+
+.adp-alert-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px;
+  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+  border: 1px solid #FFB74D; color: #E65100;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700;
+  animation: adp-pulse 2s ease-in-out infinite;
+}
+
+@keyframes adp-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(230, 81, 0, 0.15); }
+  50%       { box-shadow: 0 0 0 8px rgba(230, 81, 0, 0); }
+}
+
+.adp-alert-badge svg { width: 16px; height: 16px; }
+
+/* ── Filtres ─────────────────────────────────────────── */
+.adp-filters {
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+
+.adp-statut-tabs {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+.adp-tab {
+  padding: 8px 16px; border-radius: 20px;
+  border: 1.5px solid #D8E4EF; background: white;
+  font-family: 'Lato', sans-serif; font-size: 0.83rem; font-weight: 600;
+  color: #5A7A99; cursor: pointer; transition: all 0.2s;
+}
+
+.adp-tab:hover { background: #F5F7FA; }
+.adp-tab.active { background: white; }
+
+.adp-search-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px; border-radius: 10px;
+  border: 1.5px solid #D8E4EF; background: white;
+  flex: 1; min-width: 220px;
+}
+
+.adp-search-wrap svg { width: 16px; height: 16px; stroke: #8A9BB0; flex-shrink: 0; }
+
+.adp-search-wrap input {
+  border: none; outline: none; background: transparent;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #1C2E42; width: 100%;
+}
+
+.adp-search-wrap input::placeholder { color: #B0C4D8; }
+
+/* ── Table ───────────────────────────────────────────── */
+.adp-table-wrap {
+  background: white; border-radius: 16px;
+  border: 1px solid #EEF2F7;
+  overflow: hidden;
+}
+
+.adp-table {
+  width: 100%; border-collapse: collapse;
+}
+
+.adp-table thead tr {
+  background: #F8FAFC; border-bottom: 1px solid #EEF2F7;
+}
+
+.adp-table th {
+  padding: 13px 16px;
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.6px; color: #8A9BB0;
+  text-align: left; white-space: nowrap;
+}
+
+.adp-row {
+  border-bottom: 1px solid #F5F7FA; transition: background 0.15s; cursor: pointer;
+}
+.adp-row:last-child { border-bottom: none; }
+.adp-row:hover { background: #FAFBFF; }
+
+.adp-table td { padding: 14px 16px; }
+
+.adp-id {
+  font-family: 'Lato', sans-serif; font-size: 0.78rem;
+  font-weight: 700; color: #B0C4D8;
+}
+
+.adp-person { display: flex; align-items: center; gap: 10px; }
+
+.adp-person-avatar {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, #1A3F63, #2B5F8E);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  font-weight: 800; color: white; letter-spacing: 0.5px;
+}
+
+.adp-person strong {
+  display: block; font-family: 'Lato', sans-serif; font-size: 0.88rem;
+  font-weight: 700; color: #1C2E42;
+}
+
+.adp-person span {
+  display: block; font-family: 'Lato', sans-serif; font-size: 0.78rem;
+  color: #8A9BB0;
+}
+
+.adp-entreprise {
+  font-family: 'Lato', sans-serif; font-size: 0.88rem;
+  font-weight: 600; color: #3A5570;
+}
+
+.adp-type-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 20px;
+  font-family: 'Lato', sans-serif; font-size: 0.78rem; font-weight: 700;
+}
+
+.adp-date {
+  font-family: 'Lato', sans-serif; font-size: 0.8rem; color: #8A9BB0;
+  white-space: nowrap;
+}
+
+/* ── Badges statut ────────────────────────────────────── */
+.adp-badge {
+  display: inline-block; padding: 4px 12px; border-radius: 20px;
+  font-family: 'Lato', sans-serif; font-size: 0.75rem; font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.badge-attente  { background: #FFF3E0; color: #E65100; border: 1px solid #FFB74D; }
+.badge-confirmee{ background: #E8F5E9; color: #2E7D32; border: 1px solid #81C784; }
+.badge-annulee  { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+
+/* ── Row button ──────────────────────────────────────── */
+.adp-row-btn {
+  padding: 6px 14px; border-radius: 8px;
+  border: 1.5px solid #D8E4EF; background: white;
+  font-family: 'Lato', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: #2B5F8E; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.adp-row-btn:hover {
+  background: #1A3F63; color: white; border-color: #1A3F63;
+}
+
+/* ── Empty / Loading ─────────────────────────────────── */
+.adp-loading, .adp-empty {
+  text-align: center; padding: 60px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+
+.adp-empty svg {
+  width: 48px; height: 48px; stroke: #D8E4EF;
+}
+
+.adp-empty p, .adp-loading p {
+  font-family: 'Lato', sans-serif; font-size: 0.92rem; color: #8A9BB0;
+}
+
+/* ── Pagination ──────────────────────────────────────── */
+.adp-pagination {
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+}
+
+.adp-pagination button {
+  padding: 8px 18px; border-radius: 8px;
+  border: 1.5px solid #D8E4EF; background: white;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 600;
+  color: #2B5F8E; cursor: pointer; transition: all 0.2s;
+}
+
+.adp-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.adp-pagination button:not(:disabled):hover { background: #F5F7FA; }
+
+.adp-pagination span {
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; color: #5A7A99;
+}
+
+/* ════════════════════════════════════════════════════════
+   MODAL DÉTAIL
+════════════════════════════════════════════════════════ */
+.adp-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(4, 12, 26, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.adp-detail-modal {
+  background: white; border-radius: 20px;
+  width: 100%; max-width: 600px; max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(4, 12, 26, 0.3);
+  animation: adp-slide-up 0.25s cubic-bezier(0.34, 1.1, 0.64, 1);
+}
+
+@keyframes adp-slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.adp-detail-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 22px 24px; border-bottom: 1px solid #EEF2F7;
+}
+
+.adp-detail-avatar {
+  width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+  background: linear-gradient(135deg, #1A3F63, #2B5F8E);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 800;
+  color: white; letter-spacing: 0.5px;
+}
+
+.adp-detail-header h3 {
+  font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 800;
+  color: #0F2235; margin: 0 0 3px;
+}
+
+.adp-detail-header p {
+  font-family: 'Lato', sans-serif; font-size: 0.83rem; color: #8A9BB0; margin: 0;
+}
+
+.adp-detail-header-right {
+  margin-left: auto; display: flex; align-items: center; gap: 12px;
+}
+
+.adp-detail-close {
+  width: 30px; height: 30px; border: none; background: #F5F7FA;
+  border-radius: 50%; cursor: pointer; font-size: 0.8rem;
+  color: #5A7A99; transition: all 0.2s; display: flex;
+  align-items: center; justify-content: center;
+}
+
+.adp-detail-close:hover { background: #EEF2F7; color: #1C2E42; }
+
+/* ── Detail body ─────────────────────────────────────── */
+.adp-detail-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.adp-detail-section h4 {
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.6px; color: #B0C4D8;
+  margin: 0 0 12px;
+}
+
+.adp-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+
+.adp-detail-item {
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.adp-detail-item.full { grid-column: span 2; }
+
+.adp-detail-item span {
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  color: #8A9BB0; font-weight: 600;
+}
+
+.adp-detail-item strong,
+.adp-detail-item a {
+  font-family: 'Lato', sans-serif; font-size: 0.88rem;
+  color: #1C2E42; font-weight: 600; text-decoration: none;
+}
+
+.adp-detail-item a { color: #2B5F8E; }
+.adp-detail-item a:hover { text-decoration: underline; }
+
+.adp-detail-message {
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; font-style: italic;
+  color: #3A5570; line-height: 1.65;
+  background: #F8FAFC; border-left: 3px solid #C4973A;
+  padding: 12px 16px; border-radius: 0 10px 10px 0;
+}
+
+/* ── Traitement ──────────────────────────────────────── */
+.adp-traitement {
+  background: #F8FAFC; border-radius: 14px; padding: 20px;
+  border: 1px solid #EEF2F7;
+}
+
+.adp-action-btns {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+}
+
+.adp-action-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: 10px;
+  border: 1.5px solid; font-family: 'Lato', sans-serif;
+  font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; flex: 1;
+  justify-content: center;
+}
+
+.adp-action-btn svg { width: 15px; height: 15px; }
+
+.adp-action-btn.confirm {
+  border-color: #81C784; background: white; color: #2E7D32;
+}
+.adp-action-btn.confirm:hover,
+.adp-action-btn.confirm.selected {
+  background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+  border-color: #2E7D32;
+}
+
+.adp-action-btn.cancel {
+  border-color: #EF9A9A; background: white; color: #C62828;
+}
+.adp-action-btn.cancel:hover,
+.adp-action-btn.cancel.selected {
+  background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+  border-color: #C62828;
+}
+
+.adp-field { display: flex; flex-direction: column; gap: 6px; }
+.adp-field label {
+  font-family: 'Lato', sans-serif; font-size: 0.78rem; font-weight: 700;
+  color: #5A7A99; text-transform: uppercase; letter-spacing: 0.4px;
+}
+.adp-field textarea {
+  padding: 10px 14px; border: 1.5px solid #D8E4EF; border-radius: 10px;
+  font-family: 'Lato', sans-serif; font-size: 0.88rem; color: #1C2E42;
+  background: white; outline: none; resize: none; transition: border 0.2s;
+}
+.adp-field textarea:focus { border-color: #2B5F8E; }
+
+.adp-confirm-info {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 10px;
+  padding: 12px 14px; margin: 12px 0;
+  font-family: 'Lato', sans-serif; font-size: 0.84rem; color: #1565C0; line-height: 1.5;
+}
+.adp-confirm-info svg { width: 16px; height: 16px; stroke: #1976D2; flex-shrink: 0; margin-top: 1px; }
+
+.adp-error {
+  background: #FFEBEE; border: 1px solid #FFCDD2; border-radius: 10px;
+  padding: 10px 14px; margin: 8px 0;
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; color: #C62828;
+}
+
+.adp-traitement-footer {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; margin-top: 16px;
+}
+
+.adp-btn-cancel {
+  padding: 9px 18px; border-radius: 9px; border: 1.5px solid #D8E4EF;
+  background: white; font-family: 'Lato', sans-serif; font-size: 0.85rem;
+  font-weight: 600; color: #5A7A99; cursor: pointer; transition: all 0.2s;
+}
+.adp-btn-cancel:hover { background: #F5F7FA; }
+
+.adp-btn-confirm {
+  padding: 9px 20px; border-radius: 9px; border: none;
+  background: linear-gradient(135deg, #1A3F63, #2B5F8E);
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; font-weight: 700;
+  color: white; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(26,63,99,0.25);
+  display: flex; align-items: center; gap: 8px;
+}
+.adp-btn-confirm.danger {
+  background: linear-gradient(135deg, #C62828, #E53935);
+  box-shadow: 0 4px 14px rgba(198,40,40,0.25);
+}
+.adp-btn-confirm:hover:not(:disabled) { transform: translateY(-1px); }
+.adp-btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Result ──────────────────────────────────────────── */
+.adp-result {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px 20px; border-radius: 12px; border: 1.5px solid;
+}
+.adp-result.success { background: #E8F5E9; border-color: #81C784; }
+.adp-result.cancelled { background: #FFEBEE; border-color: #EF9A9A; }
+
+.adp-result-icon {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; font-weight: 800;
+}
+
+.adp-result.success .adp-result-icon   { background: #C8E6C9; color: #2E7D32; }
+.adp-result.cancelled .adp-result-icon { background: #FFCDD2; color: #C62828; }
+
+.adp-result strong {
+  display: block; font-family: 'Lato', sans-serif; font-size: 0.9rem;
+  font-weight: 800; color: #0F2235; margin-bottom: 4px;
+}
+.adp-result p {
+  font-family: 'Lato', sans-serif; font-size: 0.84rem; color: #5A7A99;
+  margin: 0; line-height: 1.5;
+}
+
+/* ── Spinner ─────────────────────────────────────────── */
+.adp-spin {
+  display: inline-block; width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%;
+  animation: adp-spin 0.7s linear infinite;
+}
+
+.adp-spin.large {
+  width: 36px; height: 36px;
+  border-color: #D8E4EF; border-top-color: #2B5F8E;
+  border-width: 3px;
+}
+
+@keyframes adp-spin { to { transform: rotate(360deg); } }

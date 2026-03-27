@@ -12,22 +12,25 @@ import AuthModal             from "../components/auth/AuthModal";
 import ReservationFlow       from "../components/reservation/ReservationFlow";
 import VoyageReservationFlow from "../components/reservation/VoyageReservationFlow";
 import ProfilModal           from "../components/profil/ProfilModal";
+import DemandePartenaireModal from "../components/partenaire/DemandePartenaireModal";
 import "./LandingPage.css";
 
 export default function LandingPage({ onLogin, onLogout, user, role }) {
   const isClient = role === "CLIENT" && !!user;
 
   // ── Navigation / UI ────────────────────────────────────
-  const [activeSection,   setActiveSection]   = useState("hotels");
-  const [searchParams,    setSearchParams]     = useState(null);
-  const [showResults,     setShowResults]      = useState(false);
-  const [showAuth,        setShowAuth]         = useState(false);
-  const [authTab,         setAuthTab]          = useState("login");
-  const [showProfil,      setShowProfil]       = useState(false);
+  const [activeSection,    setActiveSection]    = useState("hotels");
+  const [searchParams,     setSearchParams]     = useState(null);
+  const [showResults,      setShowResults]      = useState(false);
+  const [showAuth,         setShowAuth]         = useState(false);
+  const [authTab,          setAuthTab]          = useState("login");
+  const [showProfil,       setShowProfil]       = useState(false);
+  const [profilDefaultTab, setProfilDefaultTab] = useState("profil");
+  const [showDemande,      setShowDemande]      = useState(false);   // ← nouveau
 
   // ── Pages détail ───────────────────────────────────────
-  const [hotelDetail,     setHotelDetail]      = useState(null); // objet hôtel
-  const [voyageDetail,    setVoyageDetail]     = useState(null); // objet voyage
+  const [hotelDetail,      setHotelDetail]      = useState(null);
+  const [voyageDetail,     setVoyageDetail]     = useState(null);
 
   // ── Flows réservation ──────────────────────────────────
   const [showReservation,  setShowReservation]  = useState(false);
@@ -36,14 +39,11 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
   const [voyageReservData, setVoyageReservData] = useState(null);
 
   // ── Helpers ────────────────────────────────────────────
-  const openAuth = (tab = "login") => { setAuthTab(tab); setShowAuth(true); };
+  const openAuth    = (tab = "login") => { setAuthTab(tab); setShowAuth(true); };
   const handleLogin = (data) => { setShowAuth(false); onLogin(data); };
-
-  // Réinitialise toutes les vues détail
   const clearDetails = () => { setHotelDetail(null); setVoyageDetail(null); };
 
   // ── Handlers hôtel ─────────────────────────────────────
-  // Clic "Voir les offres" d'un hôtel → page détail
   const handleHotelClick = (hotel) => {
     clearDetails();
     setHotelDetail(hotel);
@@ -51,14 +51,12 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
     window.scrollTo(0, 0);
   };
 
-  // Après sélection chambre → formulaire réservation hôtel
   const handleReserver = (data) => {
     setReservationData(data);
     setShowReservation(true);
   };
 
   // ── Handlers voyage ────────────────────────────────────
-  // Clic "Voir le voyage" → page détail voyage
   const handleVoyageClick = (voyage) => {
     clearDetails();
     setVoyageDetail(voyage);
@@ -66,7 +64,6 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
     window.scrollTo(0, 0);
   };
 
-  // Depuis VoyageDetailPage → ouvrir flow réservation voyage
   const handleReserverVoyage = (data) => {
     setVoyageReservData(data);
     setShowVoyageResa(true);
@@ -84,7 +81,6 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
   let content;
 
   if (voyageDetail) {
-    // Page détail d'un voyage
     content = (
       <VoyageDetailPage
         voyageId={voyageDetail.id}
@@ -99,7 +95,6 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
       />
     );
   } else if (hotelDetail) {
-    // Page détail d'un hôtel
     content = (
       <HotelDetailPage
         hotelId={hotelDetail.id}
@@ -113,7 +108,6 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
       />
     );
   } else if (showResults) {
-    // Page de résultats de recherche
     content = (
       <>
         <ResultatsPage
@@ -128,7 +122,6 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
       </>
     );
   } else {
-    // Landing page principale
     content = (
       <>
         <HeroSlider />
@@ -159,7 +152,9 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
         isClient={isClient}
         user={user}
         onLogout={onLogout}
-        onProfilClick={() => setShowProfil(true)}
+        onProfilClick={() => { setProfilDefaultTab("profil"); setShowProfil(true); }}
+        onReservationsClick={() => { setProfilDefaultTab("reservations"); setShowProfil(true); }}
+        onPartenaireClick={() => setShowDemande(true)}
       />
 
       {content}
@@ -197,9 +192,15 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
       {showProfil && isClient && (
         <ProfilModal
           user={user}
+          defaultTab={profilDefaultTab}
           onClose={() => setShowProfil(false)}
           onLogout={onLogout}
         />
+      )}
+
+      {/* ── Demande Partenaire Modal ── */}
+      {showDemande && (
+        <DemandePartenaireModal onClose={() => setShowDemande(false)} />
       )}
     </div>
   );

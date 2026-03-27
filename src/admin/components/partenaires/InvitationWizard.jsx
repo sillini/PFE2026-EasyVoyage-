@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { partenairesApi } from "../../services/api";
 import "./InvitationWizard.css";
 
@@ -32,23 +32,43 @@ function StepIndicator({ current }) {
   );
 }
 
-export default function InvitationWizard({ onClose, onSuccess }) {
-  const [step, setStep]       = useState(1);
+export default function InvitationWizard({
+  onClose,
+  onSuccess,
+  initialEmail = "",
+  initialStep  = 1,
+  initialForm  = {},
+}) {
+  const [step,    setStep]    = useState(initialStep);
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState("");
+  const [error,   setError]   = useState("");
 
   // Étape 1
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail);
 
   // Étape 2
-  const [code, setCode]   = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
 
-  // Étape 3
+  // Étape 3 — pré-rempli si on vient d'une demande
   const [form, setForm] = useState({
-    nom: "", prenom: "", telephone: "",
-    nom_entreprise: "", type_partenaire: "HOTEL",
+    nom:             "",
+    prenom:          "",
+    telephone:       "",
+    nom_entreprise:  "",
+    type_partenaire: "HOTEL",
+    ...initialForm,
   });
 
+  // Si initialEmail change (navigation depuis demande), sync
+  useEffect(() => {
+    if (initialEmail) setEmail(initialEmail);
+  }, [initialEmail]);
+
+  useEffect(() => {
+    if (initialStep) setStep(initialStep);
+  }, [initialStep]);
+
+  // ── Handlers OTP ─────────────────────────────────────────
   const handleCodeChange = (val, idx) => {
     const next = [...code];
     next[idx] = val.replace(/\D/, "").slice(-1);
@@ -101,9 +121,7 @@ export default function InvitationWizard({ onClose, onSuccess }) {
     e.preventDefault();
     setLoading(true); setError("");
     try {
-      await partenairesApi.create({
-        email, code: code.join(""), ...form,
-      });
+      await partenairesApi.create({ email, code: code.join(""), ...form });
       onSuccess();
       onClose();
     } catch (err) { setError(err.message); }
@@ -114,7 +132,6 @@ export default function InvitationWizard({ onClose, onSuccess }) {
     setLoading(true); setError(""); setCode(["","","","","",""]);
     try {
       await partenairesApi.invite(email);
-      setError(""); // clear
       alert("Nouveau code envoyé !");
     } catch (err) { setError(err.message); }
     finally { setLoading(false); }
@@ -187,11 +204,9 @@ export default function InvitationWizard({ onClose, onSuccess }) {
 
             <div className="iw-actions">
               <button className="iw-btn-cancel" onClick={onClose}>Annuler</button>
-              <button className="iw-btn-primary" onClick={handleInvite}
-                disabled={loading || !email}>
+              <button className="iw-btn-primary" onClick={handleInvite} disabled={loading || !email}>
                 {loading ? <span className="iw-spin"/> : (
-                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                  Envoyer le code</>
+                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer le code</>
                 )}
               </button>
             </div>
@@ -211,6 +226,19 @@ export default function InvitationWizard({ onClose, onSuccess }) {
               <h3>Vérification du code</h3>
               <p>Un code à 6 chiffres a été envoyé à <strong>{email}</strong>. Le partenaire doit vous le communiquer.</p>
             </div>
+
+            {/* Badge info si redirection depuis une demande */}
+            {initialEmail && (
+              <div className="iw-demande-notice">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <div>
+                  <span>Demande confirmée</span>
+                  <p>Le code a déjà été envoyé à <strong>{email}</strong>. Saisissez-le dès réception.</p>
+                </div>
+              </div>
+            )}
 
             <div className="iw-otp-wrap">
               {code.map((c, i) => (
@@ -246,12 +274,14 @@ export default function InvitationWizard({ onClose, onSuccess }) {
                 </svg>
                 Renvoyer
               </button>
-              <button className="iw-btn-cancel" onClick={() => setStep(1)}>Retour</button>
+              {/* Retour étape 1 seulement si on n'est pas venu d'une demande */}
+              {!initialEmail && (
+                <button className="iw-btn-cancel" onClick={() => setStep(1)}>Retour</button>
+              )}
               <button className="iw-btn-primary" onClick={handleVerify}
                 disabled={loading || code.join("").length < 6}>
                 {loading ? <span className="iw-spin"/> : (
-                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
-                  Vérifier</>
+                  <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>Vérifier</>
                 )}
               </button>
             </div>
@@ -269,7 +299,12 @@ export default function InvitationWizard({ onClose, onSuccess }) {
                 </svg>
               </div>
               <h3>Informations du partenaire</h3>
-              <p>Complétez le profil. Un email avec le mot de passe temporaire sera envoyé automatiquement.</p>
+              <p>
+                {initialEmail
+                  ? "Les informations sont pré-remplies depuis la demande. Vérifiez et complétez si nécessaire."
+                  : "Complétez le profil. Un email avec le mot de passe temporaire sera envoyé automatiquement."
+                }
+              </p>
             </div>
 
             <form onSubmit={handleCreate} className="iw-form">
@@ -289,7 +324,7 @@ export default function InvitationWizard({ onClose, onSuccess }) {
               </div>
 
               <div className="iw-field">
-                <label>Email (confirme)</label>
+                <label>Email (confirmé)</label>
                 <div className="iw-input-readonly">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
@@ -342,8 +377,7 @@ export default function InvitationWizard({ onClose, onSuccess }) {
                 <button type="button" className="iw-btn-cancel" onClick={() => setStep(2)}>Retour</button>
                 <button type="submit" className="iw-btn-success" disabled={loading}>
                   {loading ? <span className="iw-spin"/> : (
-                    <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    Créer le compte</>
+                    <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>Créer le compte</>
                   )}
                 </button>
               </div>

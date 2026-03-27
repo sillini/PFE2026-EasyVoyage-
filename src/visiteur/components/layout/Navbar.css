@@ -166,3 +166,67 @@
 .ev-drop-item:hover { background: #F4F7FA; }
 .ev-drop-logout { color: #C0392B !important; }
 .ev-drop-logout svg { color: #C0392B !important; }
+
+/* ════════════════════════════════════════════════════════
+   À AJOUTER dans votre Navbar.css existant
+════════════════════════════════════════════════════════ */
+
+/* Zone droite — regroupe partenaire + login/user */
+.ev-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Bouton Espace Partenaire */
+.ev-nav-partenaire {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(196, 151, 58, 0.4);
+  background: linear-gradient(135deg, rgba(196,151,58,0.06), rgba(196,151,58,0.13));
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #8A6020;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.ev-nav-partenaire svg {
+  width: 15px;
+  height: 15px;
+  stroke: #C4973A;
+  flex-shrink: 0;
+}
+
+.ev-nav-partenaire:hover {
+  background: linear-gradient(135deg, #C4973A, #E4B75A);
+  border-color: #C4973A;
+  color: white;
+  box-shadow: 0 6px 20px rgba(196, 151, 58, 0.35);
+  transform: translateY(-1px);
+}
+
+.ev-nav-partenaire:hover svg {
+  stroke: white;
+}
+
+/* Mobile — lien partenaire */
+.ev-mobile-partenaire {
+  color: #8A6020 !important;
+  font-weight: 700 !important;
+  border-top: 1px solid rgba(196,151,58,0.15);
+  border-bottom: 1px solid rgba(196,151,58,0.15);
+}
+
+/* Masquer bouton partenaire sur très petit écran */
+@media (max-width: 768px) {
+  .ev-nav-partenaire {
+    display: none;
+  }
+}

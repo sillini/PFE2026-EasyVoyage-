@@ -346,7 +346,6 @@ function TabSecurite({ user, onUpdate }) {
 //  ONGLET : MES RÉSERVATIONS — complet
 // ══════════════════════════════════════════════════════════════════
 const STATUT_CFG = {
-  EN_ATTENTE: { label:"En attente",  cls:"pending",   icon:"⏳" },
   CONFIRMEE:  { label:"Confirmée",   cls:"confirmed", icon:"✅" },
   ANNULEE:    { label:"Annulée",     cls:"cancelled", icon:"❌" },
   TERMINEE:   { label:"Terminée",    cls:"done",      icon:"🏁" },
@@ -523,7 +522,6 @@ function TabReservations() {
 
   const FILTERS = [
     { key:"all",        label:"Toutes" },
-    { key:"EN_ATTENTE", label:"En attente" },
     { key:"CONFIRMEE",  label:"Confirmées" },
     { key:"ANNULEE",    label:"Annulées" },
     { key:"TERMINEE",   label:"Terminées" },
@@ -589,9 +587,9 @@ function TabReservations() {
 // ══════════════════════════════════════════════════════════════════
 //  MODAL PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
-export default function ProfilModal({ user: init, onClose, onLogout }) {
+export default function ProfilModal({ user: init, onClose, onLogout , defaultTab = "profil" }) {
   const [user, setUser] = useState(init);
-  const [tab,  setTab]  = useState("profil");
+  const [tab,  setTab]  = useState(defaultTab);
   const initiales = ((user?.prenom?.[0]||"")+(user?.nom?.[0]||"")).toUpperCase();
 
   const TABS = [

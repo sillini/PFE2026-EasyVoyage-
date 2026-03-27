@@ -2,21 +2,22 @@ import { useState, useEffect } from "react";
 
 import LandingPage from "./visiteur/pages/LandingPage";
 
-import AdminSidebar        from "./admin/components/layout/AdminSidebar";
-import AdminTopbar         from "./admin/components/layout/AdminTopbar";
-import AdminDashboard      from "./admin/pages/AdminDashboard";
-import AdminReservations   from "./admin/pages/AdminReservations";
-import AdminHotels         from "./admin/pages/AdminHotels";
-import AdminVoyages        from "./admin/pages/AdminVoyages";
-import AdminPartenaires    from "./admin/pages/AdminPartenaires";
-import AdminUtilisateurs   from "./admin/pages/AdminUtilisateurs";
-import AdminMarketing      from "./admin/pages/AdminMarketing";
-import AdminFactures       from "./admin/pages/AdminFactures";
-import AdminAgentIA        from "./admin/pages/AdminAgentIA";
-import AdminProfil         from "./admin/pages/AdminProfil";
-import AdminHeroSlides     from "./admin/pages/AdminHeroSlides";
-import AdminSupport        from "./admin/pages/AdminSupport";
-import AdminHotelsVedettes from "./admin/pages/AdminHotelsVedettes";
+import AdminSidebar            from "./admin/components/layout/AdminSidebar";
+import AdminTopbar             from "./admin/components/layout/AdminTopbar";
+import AdminDashboard          from "./admin/pages/AdminDashboard";
+import AdminReservations       from "./admin/pages/AdminReservations";
+import AdminHotels             from "./admin/pages/AdminHotels";
+import AdminVoyages            from "./admin/pages/AdminVoyages";
+import AdminPartenaires        from "./admin/pages/AdminPartenaires";
+import AdminDemandesPartenaire from "./admin/pages/AdminDemandesPartenaire";
+import AdminClients            from "./admin/pages/AdminClients";
+import AdminMarketing          from "./admin/pages/AdminMarketing";
+import AdminFactures           from "./admin/pages/AdminFactures";
+import AdminAgentIA            from "./admin/pages/AdminAgentIA";
+import AdminProfil             from "./admin/pages/AdminProfil";
+import AdminHeroSlides         from "./admin/pages/AdminHeroSlides";
+import AdminSupport            from "./admin/pages/AdminSupport";
+import AdminHotelsVedettes     from "./admin/pages/AdminHotelsVedettes";
 
 import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
@@ -34,6 +35,7 @@ export default function App() {
   const [user,       setUser]       = useState(null);
   const [role,       setRole]       = useState(null);
   const [activePage, setActivePage] = useState("dashboard");
+  const [wizardData, setWizardData] = useState(null);
 
   useEffect(() => {
     const token     = localStorage.getItem("access_token");
@@ -61,11 +63,18 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    localStorage.clear(); setUser(null); setRole(null); setActivePage("dashboard");
+    localStorage.clear();
+    setUser(null); setRole(null);
+    setActivePage("dashboard");
+    setWizardData(null);
   };
 
-  // ── VISITEUR / CLIENT → même page LandingPage ──────────
-  // CLIENT = visiteur authentifié, même interface mais avec fonctionnalités en plus
+  const handleConfirmerDemande = (email, formData) => {
+    setWizardData({ email, form: formData });
+    setActivePage("partenaires");
+  };
+
+  // ── VISITEUR / CLIENT ──────────────────────────────────
   if (!user || role === "CLIENT") {
     document.body.style.overflow = "";
     document.body.style.position = "";
@@ -88,8 +97,21 @@ export default function App() {
         case "reservations":    return <AdminReservations />;
         case "hotels":          return <AdminHotels />;
         case "voyages":         return <AdminVoyages />;
-        case "partenaires":     return <AdminPartenaires />;
-        case "utilisateurs":    return <AdminUtilisateurs />;
+        case "partenaires":
+          return (
+            <AdminPartenaires
+              initialWizardEmail={wizardData?.email}
+              initialWizardForm={wizardData?.form}
+              onWizardConsumed={() => setWizardData(null)}
+            />
+          );
+        case "demandes-partenaire":
+          return (
+            <AdminDemandesPartenaire
+              onConfirmer={handleConfirmerDemande}
+            />
+          );
+        case "clients":         return <AdminClients />;
         case "marketing":       return <AdminMarketing />;
         case "factures":        return <AdminFactures />;
         case "agent":           return <AdminAgentIA />;

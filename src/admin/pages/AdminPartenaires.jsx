@@ -180,7 +180,7 @@ function PartenaireDetail({ partenaire, onBack, onToggle, onViewHotel }) {
 }
 
 // ══════════════════════════════════════════════════════════
-export default function AdminPartenaires() {
+export default function AdminPartenaires({ initialWizardEmail, initialWizardForm, onWizardConsumed }) {
   const [partenaires, setPartenaires] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState("");
@@ -193,6 +193,11 @@ export default function AdminPartenaires() {
   const [selectedId, setSelectedId]   = useState(null);
 
   useEffect(() => { load(); }, []);
+
+  // ← Ouvre automatiquement le wizard si on vient d'une demande confirmée
+  useEffect(() => {
+    if (initialWizardEmail) setWizard(true);
+  }, [initialWizardEmail]);
 
   const load = async () => {
     setLoading(true); setError("");
@@ -281,8 +286,6 @@ export default function AdminPartenaires() {
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Nom, email, entreprise..."/>
           {search && <button className="ap-clear" onClick={()=>setSearch("")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>}
         </div>
-       
-        
         <span className="ap-count">{filtered.length} résultat{filtered.length>1?"s":""}</span>
       </div>
 
@@ -314,7 +317,16 @@ export default function AdminPartenaires() {
         </div>
       )}
 
-      {wizard && <InvitationWizard onClose={()=>setWizard(false)} onSuccess={load}/>}
+      {/* ← Wizard avec support redirection depuis demandes */}
+      {wizard && (
+        <InvitationWizard
+          onClose={() => { setWizard(false); onWizardConsumed?.(); }}
+          onSuccess={() => { load(); onWizardConsumed?.(); }}
+          initialEmail={initialWizardEmail || ""}
+          initialStep={initialWizardEmail ? 2 : 1}
+          initialForm={initialWizardForm || {}}
+        />
+      )}
     </div>
   );
 }
