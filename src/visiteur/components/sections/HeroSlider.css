@@ -132,3 +132,32 @@
   .hero-titre { font-size: 2rem; }
   .hero-arrow { display: none; }
 }
+
+
+
+/* ════════════════════════════════════════════════════════
+   SEARCHBAR — styles additionnels pour le mode VOYAGES
+   À ajouter à la fin de SearchBar.css
+════════════════════════════════════════════════════════ */
+
+/* Champ destination voyage (input texte libre, plus large) */
+.sb-field-dest-voyage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1.4;          /* légèrement plus large que les autres champs */
+  min-width: 180px;
+  padding: 10px 16px;
+}
+
+/* Input destination voyage — même style que sb-text-input mais plus visible */
+.sb-dest-input {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #1C2E42 !important;
+}
+
+.sb-dest-input::placeholder {
+  font-weight: 400;
+  color: #B0BEC8;
+}

@@ -1,0 +1,58 @@
+/* ═══════════════════════════════════════════════════
+   VOYAGE RESERVATION FLOW — styles additionnels
+   (complète ReservationFlow.css)
+═══════════════════════════════════════════════════ */
+
+/* Récap voyage */
+.vrf-recap-hero { position: relative; }
+.vrf-recap-icon { font-size: 2rem; text-align: center; margin-bottom: 4px; }
+
+/* Formulaire infos */
+.rf-infos-form { display: flex; flex-direction: column; gap: 14px; padding: 4px 0 8px; }
+
+/* Champs carte */
+.rf-card-form { display: flex; flex-direction: column; gap: 14px; }
+.rf-field { display: flex; flex-direction: column; gap: 5px; }
+.rf-field label {
+  font-family: 'Lato', sans-serif; font-size: 0.72rem;
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #8A9BB0;
+}
+.rf-req { color: #E05252; }
+.rf-field input {
+  padding: 10px 14px; border: 1.5px solid #DDE3EC; border-radius: 10px;
+  font-family: 'Lato', sans-serif; font-size: 0.9rem; color: #1C2E42;
+  background: white; outline: none; transition: border-color 0.2s;
+}
+.rf-field input:focus { border-color: #C4973A; }
+.rf-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Méthodes paiement */
+.rf-pay-methods { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.rf-pay-method {
+  flex: 1; min-width: 100px; padding: 10px 12px;
+  border: 1.5px solid #DDE3EC; border-radius: 12px;
+  background: white; cursor: pointer;
+  font-family: 'Lato', sans-serif; font-size: 0.82rem; font-weight: 600; color: #4A5568;
+  display: flex; align-items: center; gap: 8px; transition: all 0.18s;
+}
+.rf-pay-method:hover { border-color: #C4973A; color: #C4973A; }
+.rf-pay-method.active { border-color: #C4973A; color: #C4973A; background: rgba(196,151,58,0.06); }
+
+/* Bouton payer */
+.rf-btn-pay {
+  display: flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border: none; border-radius: 28px;
+  background: linear-gradient(135deg, #B8842A, #C4973A);
+  color: white; font-family: 'Lato', sans-serif; font-size: 0.92rem; font-weight: 800;
+  cursor: pointer; transition: all 0.22s; box-shadow: 0 6px 20px rgba(196,151,58,0.4);
+  white-space: nowrap;
+}
+.rf-btn-pay:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(196,151,58,0.55); }
+.rf-btn-pay:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Erreur */
+.rf-error-box {
+  padding: 10px 14px; border-radius: 10px;
+  background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.2);
+  font-family: 'Lato', sans-serif; font-size: 0.85rem; color: #C0392B; font-weight: 600;
+}

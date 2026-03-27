@@ -2,26 +2,30 @@ import { useState } from "react";
 import "./ReservationFlow.css";
 
 const API = "http://localhost:8000/api/v1";
+
 function authHeaders() {
   const t = localStorage.getItem("access_token");
-  return { "Content-Type":"application/json", ...(t?{Authorization:"Bearer "+t}:{}) };
+  return { "Content-Type": "application/json", ...(t ? { Authorization: "Bearer " + t } : {}) };
 }
 
-// ── Étape 1 : Récap ───────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  ÉTAPE 1 — RÉCAPITULATIF
+// ══════════════════════════════════════════════════════════
 function StepRecap({ data, isClient, user, onNext, onClose }) {
   return (
     <div className="rf-step-content">
       <div className="rf-recap-hero">
         <div className="rf-recap-hotel">🏨 {data.hotel?.nom}</div>
         <div className="rf-recap-row">
-          <span>📅 {data.dateDebut}</span><span className="rf-arrow">→</span>
+          <span>📅 {data.dateDebut}</span>
+          <span className="rf-arrow">→</span>
           <span>{data.dateFin}</span>
-          <span className="rf-nuits">{data.nuits} nuit{data.nuits>1?"s":""}</span>
+          <span className="rf-nuits">{data.nuits} nuit{data.nuits > 1 ? "s" : ""}</span>
         </div>
         <div className="rf-recap-row">
           🛏 {data.chambre?.type_chambre?.nom || "Chambre"} &nbsp;·&nbsp;
-          {data.adultes} adulte{data.adultes>1?"s":""}
-          {data.enfants>0 ? `, ${data.enfants} enfant${data.enfants>1?"s":""}` : ""}
+          {data.adultes} adulte{data.adultes > 1 ? "s" : ""}
+          {data.enfants > 0 ? `, ${data.enfants} enfant${data.enfants > 1 ? "s" : ""}` : ""}
         </div>
         <div className="rf-recap-prix">
           <span>Total séjour :</span>
@@ -49,39 +53,60 @@ function StepRecap({ data, isClient, user, onNext, onClose }) {
   );
 }
 
-// ── Étape 2 : Infos visiteur ──────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  ÉTAPE 2 — INFOS VISITEUR
+// ══════════════════════════════════════════════════════════
 function StepInfos({ form, setForm, onNext, onBack }) {
   const ok = form.nom && form.prenom && form.email.includes("@") && form.telephone;
   return (
     <div className="rf-step-content">
       <p className="rf-step-desc">Renseignez vos coordonnées pour confirmer la réservation</p>
       <div className="rf-row2">
-        <div className="rf-field"><label>Prénom *</label>
-          <input value={form.prenom} onChange={e=>setForm({...form,prenom:e.target.value})} placeholder="Mohamed"/>
+        <div className="rf-field">
+          <label>Prénom *</label>
+          <input value={form.prenom}
+            onChange={e => setForm({ ...form, prenom: e.target.value })}
+            placeholder="Mohamed" />
         </div>
-        <div className="rf-field"><label>Nom *</label>
-          <input value={form.nom} onChange={e=>setForm({...form,nom:e.target.value})} placeholder="Ben Ali"/>
+        <div className="rf-field">
+          <label>Nom *</label>
+          <input value={form.nom}
+            onChange={e => setForm({ ...form, nom: e.target.value })}
+            placeholder="Ben Ali" />
         </div>
       </div>
-      <div className="rf-field"><label>Email *</label>
-        <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} placeholder="votre@email.com"/>
+      <div className="rf-field">
+        <label>Email *</label>
+        <input type="email" value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          placeholder="votre@email.com" />
       </div>
-      <div className="rf-field"><label>Téléphone *</label>
-        <input value={form.telephone} onChange={e=>setForm({...form,telephone:e.target.value})} placeholder="+216 XX XXX XXX"/>
+      <div className="rf-field">
+        <label>Téléphone *</label>
+        <input value={form.telephone}
+          onChange={e => setForm({ ...form, telephone: e.target.value })}
+          placeholder="+216 XX XXX XXX" />
       </div>
       <div className="rf-footer">
         <button className="rf-btn-back" onClick={onBack}>← Retour</button>
-        <button className="rf-btn-next" disabled={!ok} onClick={onNext}>Passer au paiement →</button>
+        <button className="rf-btn-next" disabled={!ok} onClick={onNext}>
+          Passer au paiement →
+        </button>
       </div>
     </div>
   );
 }
 
-// ── Étape 3 : Paiement ────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  ÉTAPE 3 — PAIEMENT
+// ══════════════════════════════════════════════════════════
 function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, onBack }) {
   const [showNum, setShowNum] = useState(false);
-  const fmtCard   = v => v.replace(/\D/g,"").replace(/(.{4})/g,"$1 ").trim().slice(0,19);
-  const fmtExpiry = v => { const d=v.replace(/\D/g,""); return d.length>=3?d.slice(0,2)+"/"+d.slice(2,4):d; };
+  const fmtCard   = v => v.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim().slice(0, 19);
+  const fmtExpiry = v => {
+    const d = v.replace(/\D/g, "");
+    return d.length >= 3 ? d.slice(0, 2) + "/" + d.slice(2, 4) : d;
+  };
 
   return (
     <div className="rf-step-content">
@@ -90,47 +115,63 @@ function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, o
         <strong>{montant?.toFixed(2)} DT</strong>
       </div>
 
+      {/* Méthodes */}
       <div className="rf-methodes">
-        {[{id:"CARTE_BANCAIRE",label:"Carte bancaire",icon:"💳"},
-          {id:"VIREMENT",label:"Virement",icon:"🏦"},
-          {id:"ESPECES",label:"Espèces",icon:"💵"}].map(m=>(
-          <label key={m.id} className={`rf-methode ${paiement.methode===m.id?"on":""}`}>
+        {[
+          { id: "CARTE_BANCAIRE", label: "Carte bancaire", icon: "💳" },
+          { id: "VIREMENT",       label: "Virement",       icon: "🏦" },
+          { id: "ESPECES",        label: "Espèces",        icon: "💵" },
+        ].map(m => (
+          <label key={m.id} className={`rf-methode ${paiement.methode === m.id ? "on" : ""}`}>
             <input type="radio" name="methode" value={m.id}
-              checked={paiement.methode===m.id} onChange={()=>setPaiement({...paiement,methode:m.id})}/>
+              checked={paiement.methode === m.id}
+              onChange={() => setPaiement({ ...paiement, methode: m.id })} />
             <span>{m.icon}</span><span>{m.label}</span>
           </label>
         ))}
       </div>
 
+      {/* Carte bancaire */}
       {paiement.methode === "CARTE_BANCAIRE" && (
         <div className="rf-carte-form">
           <div className="rf-test-badge">🧪 Mode TEST — aucune transaction réelle</div>
-          <div className="rf-field"><label>Nom sur la carte</label>
-            <input value={paiement.carte_nom} onChange={e=>setPaiement({...paiement,carte_nom:e.target.value})} placeholder="MOHAMED BEN ALI"/>
+          <div className="rf-field">
+            <label>Nom sur la carte</label>
+            <input value={paiement.carte_nom}
+              onChange={e => setPaiement({ ...paiement, carte_nom: e.target.value })}
+              placeholder="PRÉNOM NOM" />
           </div>
-          <div className="rf-field"><label>Numéro de carte</label>
+          <div className="rf-field">
+            <label>Numéro de carte</label>
             <div className="rf-card-input">
               <input value={paiement.carte_numero}
-                onChange={e=>setPaiement({...paiement,carte_numero:fmtCard(e.target.value)})}
-                placeholder="1234 5678 9012 3456" maxLength={19} type={showNum?"text":"password"}/>
-              <button type="button" onClick={()=>setShowNum(!showNum)} className="rf-eye">{showNum?"🙈":"👁"}</button>
+                onChange={e => setPaiement({ ...paiement, carte_numero: fmtCard(e.target.value) })}
+                placeholder="1234 5678 9012 3456" maxLength={19}
+                type={showNum ? "text" : "password"} />
+              <button type="button" onClick={() => setShowNum(!showNum)} className="rf-eye">
+                {showNum ? "🙈" : "👁"}
+              </button>
             </div>
             <div className="rf-card-hint">Mode test : n'importe quel numéro est accepté</div>
           </div>
           <div className="rf-row2">
-            <div className="rf-field"><label>Expiration</label>
+            <div className="rf-field">
+              <label>Expiration</label>
               <input value={paiement.carte_expiry}
-                onChange={e=>setPaiement({...paiement,carte_expiry:fmtExpiry(e.target.value)})}
-                placeholder="MM/AA" maxLength={5}/>
+                onChange={e => setPaiement({ ...paiement, carte_expiry: fmtExpiry(e.target.value) })}
+                placeholder="MM/AA" maxLength={5} />
             </div>
-            <div className="rf-field"><label>CVV</label>
+            <div className="rf-field">
+              <label>CVV</label>
               <input type="password" value={paiement.carte_cvv}
-                onChange={e=>setPaiement({...paiement,carte_cvv:e.target.value.slice(0,3)})}
-                placeholder="***" maxLength={3}/>
+                onChange={e => setPaiement({ ...paiement, carte_cvv: e.target.value.slice(0, 3) })}
+                placeholder="***" maxLength={3} />
             </div>
           </div>
         </div>
       )}
+
+      {/* Virement */}
       {paiement.methode === "VIREMENT" && (
         <div className="rf-info-box">
           <p>Virement bancaire vers :</p>
@@ -138,6 +179,8 @@ function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, o
           <p className="rf-note">Votre réservation sera confirmée dès réception du virement.</p>
         </div>
       )}
+
+      {/* Espèces */}
       {paiement.methode === "ESPECES" && (
         <div className="rf-info-box">
           <p>💵 Paiement en espèces à la réception de l'hôtel lors de votre arrivée.</p>
@@ -145,17 +188,22 @@ function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, o
       )}
 
       {error && <div className="rf-error">⚠️ {error}</div>}
+
       <div className="rf-footer">
         <button className="rf-btn-back" onClick={onBack} disabled={loading}>← Retour</button>
         <button className="rf-btn-pay" onClick={onPay} disabled={loading}>
-          {loading ? <><span className="rf-spin"/>Traitement...</> : <>🔒 Confirmer et payer {montant?.toFixed(2)} DT</>}
+          {loading
+            ? <><span className="rf-spin" />Traitement…</>
+            : <>🔒 Confirmer et payer {montant?.toFixed(2)} DT</>}
         </button>
       </div>
     </div>
   );
 }
 
-// ── Étape 4 : Succès + Téléchargement voucher ────────────
+// ══════════════════════════════════════════════════════════
+//  ÉTAPE 4 — SUCCÈS
+// ══════════════════════════════════════════════════════════
 function StepSucces({ result, isClient, onClose }) {
   const [downloading, setDownloading] = useState(false);
 
@@ -164,26 +212,63 @@ function StepSucces({ result, isClient, onClose }) {
     try {
       const token = localStorage.getItem("access_token");
       let url, filename;
+
       if (isClient) {
-        url = `${API}/reservations/${result.reservation_id}/voucher-pdf`;
+        // CLIENT → endpoint standard avec id réservation + JWT
+        url      = `${API}/reservations/${result.reservation_id}/voucher-pdf`;
         filename = `voucher-${result.facture_numero}.pdf`;
       } else {
-        url = `${API}/reservations/visiteur/${result.numero_voucher}/pdf`;
+        // VISITEUR → endpoint dédié avec numéro voucher (sans auth)
+        // CORRECTION : url correcte = /reservations/visiteur/{num}/pdf
+        url      = `${API}/reservations/visiteur/${result.numero_voucher}/pdf`;
         filename = `voucher-${result.numero_voucher}.pdf`;
       }
+
       const res = await fetch(url, {
-        headers: isClient ? { Authorization:`Bearer ${token}` } : {},
+        headers: isClient ? { Authorization: `Bearer ${token}` } : {},
       });
-      if (!res.ok) throw new Error("Erreur téléchargement");
+
+      if (!res.ok) {
+        // Essayer de lire le message d'erreur du backend
+        const txt = await res.text().catch(() => "");
+        throw new Error(`Erreur ${res.status}${txt ? " : " + txt : ""}`);
+      }
+
       const blob = await res.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
       a.download = filename;
       a.click();
       URL.revokeObjectURL(a.href);
-    } catch(e) { alert("Erreur téléchargement PDF : " + e.message); }
+    } catch (e) {
+      alert("Erreur téléchargement PDF : " + e.message);
+    }
     setDownloading(false);
   };
+
+  // Champs à afficher selon CLIENT ou VISITEUR
+  const rows = isClient
+    ? [
+        ["N° Réservation",  `#${result.reservation_id}`],
+        ["N° Facture",      result.facture_numero],
+        ["Hôtel",           result.hotel_nom],
+        ["Chambre",         result.chambre_nom],
+        ["Arrivée",         result.date_debut],
+        ["Départ",          result.date_fin],
+        ["Durée",           `${result.nb_nuits} nuit${result.nb_nuits > 1 ? "s" : ""}`],
+        ["Montant payé",    `${parseFloat(result.montant_total).toFixed(2)} DT`],
+        ["Email",           result.email],
+      ]
+    : [
+        ["N° Voucher",      result.numero_voucher],
+        ["Hôtel",           result.hotel_nom],
+        ["Chambre",         result.chambre_nom],
+        ["Arrivée",         result.date_debut],
+        ["Départ",          result.date_fin],
+        ["Durée",           `${result.nb_nuits} nuit${result.nb_nuits > 1 ? "s" : ""}`],
+        ["Montant payé",    `${parseFloat(result.montant_total).toFixed(2)} DT`],
+        ["Email",           result.email],
+      ];
 
   return (
     <div className="rf-step-content rf-succes">
@@ -192,120 +277,159 @@ function StepSucces({ result, isClient, onClose }) {
       <p>Votre paiement a bien été enregistré.</p>
 
       <div className="rf-succes-details">
-        {[
-          ["N° Réservation",     isClient ? `#${result.reservation_id}` : `#${result.id}`],
-          ["N° Voucher/Facture", isClient ? result.facture_numero : result.numero_voucher],
-          ["Hôtel",              result.hotel_nom],
-          ["Chambre",            result.chambre_nom],
-          ["Arrivée",            result.date_debut],
-          ["Départ",             result.date_fin],
-          ["Durée",              `${result.nb_nuits} nuit${result.nb_nuits>1?"s":""}`],
-          ["Montant payé",       `${parseFloat(result.montant_total).toFixed(2)} DT`],
-          ["Email",              result.email],
-        ].map(([l,v])=>(
+        {rows.map(([l, v]) => (
           <div key={l} className="rf-succes-item">
             <span>{l}</span><strong>{v}</strong>
           </div>
         ))}
       </div>
 
-      {/* Télécharger voucher PDF */}
       <button className="rf-btn-pdf" onClick={downloadPdf} disabled={downloading}>
-        {downloading ? <><span className="rf-spin"/>Génération...</> : <>📄 Télécharger le voucher PDF</>}
+        {downloading
+          ? <><span className="rf-spin" />Génération…</>
+          : <>📄 Télécharger le voucher PDF</>}
       </button>
 
-      <p className="rf-succes-note">Une confirmation vous sera envoyée par email à {result.email}</p>
+      <p className="rf-succes-note">
+        Une confirmation vous sera envoyée par email à {result.email}
+      </p>
       <button className="rf-btn-close" onClick={onClose}>Fermer</button>
     </div>
   );
 }
 
-// ══ FLOW PRINCIPAL ════════════════════════════════════════
-export default function ReservationFlow({ data, isClient, user, onClose }) {
-  const steps   = isClient ? ["recap","paiement","succes"] : ["recap","infos","paiement","succes"];
+// ══════════════════════════════════════════════════════════
+//  FLOW PRINCIPAL
+// ══════════════════════════════════════════════════════════
+export default function ReservationFlow({ data, isClient, user, onClose, onNeedAuth }) {
+  // CLIENT : recap → paiement → succes (3 étapes)
+  // VISITEUR : recap → infos → paiement → succes (4 étapes)
+  const steps = isClient
+    ? ["recap", "paiement", "succes"]
+    : ["recap", "infos", "paiement", "succes"];
+
   const [step,    setStep]    = useState("recap");
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
   const [result,  setResult]  = useState(null);
 
   const [infos, setInfos] = useState({
-    nom: user?.nom||"", prenom: user?.prenom||"",
-    email: user?.email||"", telephone: user?.telephone||"",
+    nom:       user?.nom       || "",
+    prenom:    user?.prenom    || "",
+    email:     user?.email     || "",
+    telephone: user?.telephone || "",
   });
+
   const [paiement, setPaiement] = useState({
-    methode:"CARTE_BANCAIRE",
-    carte_nom: user ? `${(user.prenom||"").toUpperCase()} ${(user.nom||"").toUpperCase()}` : "",
-    carte_numero:"", carte_expiry:"", carte_cvv:"",
+    methode:      "CARTE_BANCAIRE",
+    carte_nom:    user
+      ? `${(user.prenom || "").toUpperCase()} ${(user.nom || "").toUpperCase()}`
+      : "",
+    carte_numero: "",
+    carte_expiry: "",
+    carte_cvv:    "",
   });
 
   const montant = data?.prix?.total;
   const stepIdx = steps.indexOf(step);
+  const titles  = {
+    recap:    "Récapitulatif",
+    infos:    "Vos coordonnées",
+    paiement: "Paiement",
+    succes:   "Confirmation",
+  };
 
+  // ── Logique paiement ──────────────────────────────────
   const handlePay = async () => {
     setError(""); setLoading(true);
     try {
       let res;
+
       if (isClient) {
-        // 1. Créer réservation
+        // ── CLIENT ──────────────────────────────────────
+        // 1. Créer réservation chambre
         const r1 = await fetch(`${API}/reservations/chambres`, {
-          method:"POST", headers: authHeaders(),
+          method: "POST",
+          headers: authHeaders(),
           body: JSON.stringify({
-            date_debut: data.dateDebut, date_fin: data.dateFin,
-            chambres: [{ id_chambre: data.chambre.id, nb_adultes: data.adultes, nb_enfants: data.enfants }],
+            date_debut: data.dateDebut,
+            date_fin:   data.dateFin,
+            chambres: [{
+              id_chambre: data.chambre.id,
+              nb_adultes: data.adultes,
+              nb_enfants: data.enfants,
+            }],
           }),
         });
         const resa = await r1.json();
         if (!r1.ok) throw new Error(resa.detail || "Erreur création réservation");
 
-        // 2. Payer
+        // 2. Payer → génère la facture
         const r2 = await fetch(`${API}/reservations/${resa.id}/paiement`, {
-          method:"POST", headers: authHeaders(),
-          body: JSON.stringify({ methode: paiement.methode, transaction_id: "TEST-"+Date.now() }),
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            methode:        paiement.methode,
+            transaction_id: "HOT-" + Date.now(),
+          }),
         });
         const facture = await r2.json();
         if (!r2.ok) throw new Error(facture.detail || "Erreur paiement");
 
         res = {
           reservation_id: resa.id,
-          facture_numero:  facture.numero,
-          montant_total:   facture.montant_total,
-          email:           user.email,
-          hotel_nom:       data.hotel?.nom || "—",
-          chambre_nom:     data.chambre?.type_chambre?.nom || "Chambre",
-          date_debut:      data.dateDebut,
-          date_fin:        data.dateFin,
-          nb_nuits:        data.nuits,
+          facture_numero: facture.numero,
+          montant_total:  facture.montant_total,
+          email:          user.email,
+          hotel_nom:      data.hotel?.nom                 || "—",
+          chambre_nom:    data.chambre?.type_chambre?.nom || "Chambre",
+          date_debut:     data.dateDebut,
+          date_fin:       data.dateFin,
+          nb_nuits:       data.nuits,
         };
+
       } else {
-        // VISITEUR — table dédiée
+        // ── VISITEUR ─────────────────────────────────────
+        // Réservation directe dans table reservation_visiteur (sans compte)
         const r = await fetch(`${API}/reservations/visiteur`, {
-          method:"POST", headers:{"Content-Type":"application/json"},
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...infos,
-            date_debut:  data.dateDebut,
-            date_fin:    data.dateFin,
-            id_chambre:  data.chambre.id,
-            nb_adultes:  data.adultes,
-            nb_enfants:  data.enfants,
-            methode:     paiement.methode,
+            nom:        infos.nom,
+            prenom:     infos.prenom,
+            email:      infos.email,
+            telephone:  infos.telephone,
+            date_debut: data.dateDebut,
+            date_fin:   data.dateFin,
+            id_chambre: data.chambre.id,
+            nb_adultes: data.adultes,
+            nb_enfants: data.enfants,
+            methode:    paiement.methode,
           }),
         });
         const d = await r.json();
-        if (!r.ok) throw new Error(d.detail || "Erreur réservation");
+        if (!r.ok) throw new Error(d.detail || "Erreur réservation visiteur");
+        // La réponse contient déjà : id, numero_voucher, hotel_nom, chambre_nom, etc.
         res = d;
       }
+
       setResult(res);
       setStep("succes");
-    } catch(e) { setError(e.message); }
-    finally { setLoading(false); }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const titles = { recap:"Récapitulatif", infos:"Vos coordonnées", paiement:"Paiement", succes:"Confirmation" };
-
   return (
-    <div className="rf-overlay" onClick={e=>e.target===e.currentTarget&&step!=="succes"&&onClose()}>
+    <div
+      className="rf-overlay"
+      onClick={e => e.target === e.currentTarget && step !== "succes" && onClose()}
+    >
       <div className="rf-modal">
-        {/* Header */}
+
+        {/* ── Header ── */}
         <div className="rf-header">
           <div>
             <h2 className="rf-title">Réservation</h2>
@@ -314,36 +438,58 @@ export default function ReservationFlow({ data, isClient, user, onClose }) {
           {step !== "succes" && (
             <button className="rf-close" onClick={onClose}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           )}
         </div>
 
-        {/* Progression */}
+        {/* ── Progression ── */}
         {step !== "succes" && (
           <div className="rf-progress">
-            {steps.filter(s=>s!=="succes").map((s,i)=>(
+            {steps.filter(s => s !== "succes").map((s, i) => (
               <div key={s} className="rf-prog-step">
-                <div className={`rf-prog-dot ${stepIdx>i?"done":stepIdx===i?"current":""}`}>
-                  {stepIdx>i?"✓":i+1}
+                <div className={`rf-prog-dot ${stepIdx > i ? "done" : stepIdx === i ? "current" : ""}`}>
+                  {stepIdx > i ? "✓" : i + 1}
                 </div>
-                <span className={stepIdx===i?"rf-prog-active":""}>{titles[s]}</span>
-                {i < steps.filter(s=>s!=="succes").length-1 &&
-                  <div className={`rf-prog-line ${stepIdx>i?"done":""}`}/>}
+                <span className={stepIdx === i ? "rf-prog-active" : ""}>{titles[s]}</span>
+                {i < steps.filter(s => s !== "succes").length - 1 && (
+                  <div className={`rf-prog-line ${stepIdx > i ? "done" : ""}`} />
+                )}
               </div>
             ))}
           </div>
         )}
 
-        {step === "recap"    && <StepRecap data={data} isClient={isClient} user={user}
-            onNext={()=>setStep(isClient?"paiement":"infos")} onClose={onClose}/>}
-        {step === "infos"    && <StepInfos form={infos} setForm={setInfos}
-            onNext={()=>setStep("paiement")} onBack={()=>setStep("recap")}/>}
-        {step === "paiement" && <StepPaiement montant={montant} paiement={paiement}
-            setPaiement={setPaiement} loading={loading} error={error}
-            onPay={handlePay} onBack={()=>setStep(isClient?"recap":"infos")}/>}
-        {step === "succes"   && <StepSucces result={result} isClient={isClient} onClose={onClose}/>}
+        {/* ── Contenu des étapes ── */}
+        {step === "recap" && (
+          <StepRecap
+            data={data} isClient={isClient} user={user}
+            onNext={() => setStep(isClient ? "paiement" : "infos")}
+            onClose={onClose}
+          />
+        )}
+        {step === "infos" && (
+          <StepInfos
+            form={infos} setForm={setInfos}
+            onNext={() => setStep("paiement")}
+            onBack={() => setStep("recap")}
+          />
+        )}
+        {step === "paiement" && (
+          <StepPaiement
+            montant={montant}
+            paiement={paiement} setPaiement={setPaiement}
+            loading={loading} error={error}
+            onPay={handlePay}
+            onBack={() => setStep(isClient ? "recap" : "infos")}
+          />
+        )}
+        {step === "succes" && (
+          <StepSucces result={result} isClient={isClient} onClose={onClose} />
+        )}
+
       </div>
     </div>
   );
