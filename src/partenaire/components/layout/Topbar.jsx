@@ -1,12 +1,14 @@
 import "./Topbar.css";
 
 const PAGE_TITLES = {
-  dashboard:  { title: "Tableau de bord",    subtitle: "Vue d'ensemble de votre activité" },
-  hotels:     { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
-  chambres:   { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
-  marketing:  { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },
-  agent:      { title: "Agent IA",           subtitle: "Votre assistant intelligent" },
-  profil:     { title: "Mon Profil",         subtitle: "Gérer vos informations personnelles" },
+  dashboard:    { title: "Tableau de bord",    subtitle: "Vue d'ensemble de votre activité" },
+  hotels:       { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
+  chambres:     { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
+  reservations: { title: "Réservations",       subtitle: "Consultez les réservations de vos établissements" },
+  marketing:    { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },
+  support:      { title: "Support",            subtitle: "Vos échanges avec l'équipe" },
+  agent:        { title: "Agent IA",           subtitle: "Votre assistant intelligent" },
+  profil:       { title: "Mon Profil",         subtitle: "Gérer vos informations personnelles" },
 };
 
 export default function Topbar({ activePage, user, onNavigate }) {

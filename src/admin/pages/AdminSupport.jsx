@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { adminSupportApi } from "../services/api";
+import { adminSupportApi, partenairesApi } from "../services/api";
 import "./AdminSupport.css";
 
 function fmtDate(d) {
@@ -20,6 +20,179 @@ function Badge({ statut }) {
   if (statut === "ACCEPTEE")   return <span className="as-badge as-badge-active"><span/>En cours</span>;
   if (statut === "FERMEE")     return <span className="as-badge as-badge-closed"><span/>Fermée</span>;
   return null;
+}
+
+// ══════════════════════════════════════════════════════════
+//  MODAL — Nouvelle conversation (admin → partenaire)       ← NOUVEAU
+// ══════════════════════════════════════════════════════════
+function NouvelleConvModal({ onClose, onCreate }) {
+  const [partenaires,    setPartenaires]    = useState([]);
+  const [loadingPart,    setLoadingPart]    = useState(true);
+  const [selectedPart,   setSelectedPart]   = useState(null);
+  const [sujet,          setSujet]          = useState("");
+  const [premierMessage, setPremierMessage] = useState("");
+  const [searchPart,     setSearchPart]     = useState("");
+  const [creating,       setCreating]       = useState(false);
+  const [error,          setError]          = useState("");
+
+  useEffect(() => {
+    partenairesApi.list({ per_page: 100, actif: "true" })
+      .then(d => setPartenaires(d.items || []))
+      .catch(() => setPartenaires([]))
+      .finally(() => setLoadingPart(false));
+  }, []);
+
+  const filteredParts = partenaires.filter(p => {
+    const q = searchPart.toLowerCase();
+    return (
+      `${p.prenom} ${p.nom}`.toLowerCase().includes(q) ||
+      p.email.toLowerCase().includes(q) ||
+      (p.nom_entreprise || "").toLowerCase().includes(q)
+    );
+  });
+
+  const handleCreate = async () => {
+    if (!selectedPart) { setError("Veuillez sélectionner un partenaire."); return; }
+    if (!sujet.trim())  { setError("Le sujet est obligatoire."); return; }
+    setCreating(true); setError("");
+    try {
+      const conv = await adminSupportApi.createConversation({
+        id_partenaire:   selectedPart.id,
+        sujet:           sujet.trim(),
+        premier_message: premierMessage.trim() || null,
+      });
+      onCreate(conv);
+      onClose();
+    } catch(e) {
+      setError(e.message || "Erreur lors de la création.");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <div className="as-modal-overlay" onClick={onClose}>
+      <div className="as-modal" onClick={e => e.stopPropagation()}>
+
+        <div className="as-modal-header">
+          <div>
+            <h2 className="as-modal-title">Nouvelle conversation</h2>
+            <p className="as-modal-sub">Initiez une discussion avec un partenaire</p>
+          </div>
+          <button className="as-modal-close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="as-modal-body">
+
+          {/* Sélection partenaire */}
+          <div className="as-modal-field">
+            <label className="as-modal-label">Partenaire *</label>
+            {selectedPart ? (
+              <div className="as-modal-selected-part">
+                <div className="as-modal-part-av">
+                  {(selectedPart.prenom?.[0] || "?")}{(selectedPart.nom?.[0] || "")}
+                </div>
+                <div className="as-modal-part-info">
+                  <strong>{selectedPart.prenom} {selectedPart.nom}</strong>
+                  <span>{selectedPart.email}</span>
+                  {selectedPart.nom_entreprise && (
+                    <span className="as-modal-part-ent">{selectedPart.nom_entreprise}</span>
+                  )}
+                </div>
+                <button className="as-modal-part-change" onClick={() => setSelectedPart(null)}>
+                  Changer
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="as-modal-search-wrap">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  </svg>
+                  <input
+                    className="as-modal-search"
+                    placeholder="Rechercher un partenaire..."
+                    value={searchPart}
+                    onChange={e => setSearchPart(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+                <div className="as-modal-part-list">
+                  {loadingPart ? (
+                    <div className="as-modal-loading"><div className="as-spin as-spin-dark"/></div>
+                  ) : filteredParts.length === 0 ? (
+                    <div className="as-modal-empty">Aucun partenaire trouvé</div>
+                  ) : filteredParts.map(p => (
+                    <button key={p.id} className="as-modal-part-row" onClick={() => setSelectedPart(p)}>
+                      <div className="as-modal-part-av sm">
+                        {(p.prenom?.[0] || "?")}{(p.nom?.[0] || "")}
+                      </div>
+                      <div className="as-modal-part-info">
+                        <strong>{p.prenom} {p.nom}</strong>
+                        <span>{p.email}</span>
+                        {p.nom_entreprise && (
+                          <span className="as-modal-part-ent">{p.nom_entreprise}</span>
+                        )}
+                      </div>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="as-modal-part-arrow">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Sujet */}
+          <div className="as-modal-field">
+            <label className="as-modal-label">Sujet *</label>
+            <input
+              className="as-modal-input"
+              placeholder="Ex : Vérification de vos disponibilités, Mise à jour tarifaire..."
+              value={sujet}
+              onChange={e => setSujet(e.target.value)}
+              maxLength={300}
+            />
+          </div>
+
+          {/* Premier message optionnel */}
+          <div className="as-modal-field">
+            <label className="as-modal-label">
+              Premier message <span className="as-modal-optional">(optionnel)</span>
+            </label>
+            <textarea
+              className="as-modal-ta"
+              placeholder="Rédigez votre message d'introduction..."
+              value={premierMessage}
+              onChange={e => setPremierMessage(e.target.value)}
+              rows={4}
+              maxLength={5000}
+            />
+            <div className="as-modal-hint">
+              💡 Si laissé vide, la conversation sera créée sans message initial.
+            </div>
+          </div>
+
+          {error && <div className="as-modal-error">⚠️ {error}</div>}
+        </div>
+
+        <div className="as-modal-footer">
+          <button className="as-modal-btn-cancel" onClick={onClose}>Annuler</button>
+          <button
+            className="as-modal-btn-create"
+            onClick={handleCreate}
+            disabled={creating || !selectedPart || !sujet.trim()}
+          >
+            {creating
+              ? <><span className="as-spin"/>&nbsp;Création...</>
+              : "✉ Lancer la conversation"
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ── Chat ──────────────────────────────────────────────────
@@ -46,7 +219,6 @@ function Chat({ conv, userId, onAccept, onClose, onSend, onRefresh }) {
   const msgs    = [...(conv.messages || [])].sort((a,b) => new Date(a.created_at)-new Date(b.created_at));
   const isWait  = conv.statut === "EN_ATTENTE";
   const isOpen  = conv.statut === "ACCEPTEE";
-  const isClosed= conv.statut === "FERMEE";
 
   const doAccept = async () => {
     setActing(true);
@@ -127,7 +299,7 @@ function Chat({ conv, userId, onAccept, onClose, onSend, onRefresh }) {
       {/* Succès acceptation */}
       {isOpen && msgs.length === 0 && (
         <div className="as-ok-banner">
-          ✅ <strong>Conversation acceptée !</strong> Envoyez votre premier message.
+          ✅ <strong>Conversation ouverte !</strong> Envoyez votre premier message.
         </div>
       )}
 
@@ -199,7 +371,7 @@ function AcceptationPanel({ conv, onAccept, onRefresh, onSwitchToChat }) {
     setActing(true);
     try {
       await onAccept(conv.id);
-      onSwitchToChat(); // basculer vers discussion après acceptation
+      onSwitchToChat();
     } catch(e) { console.error(e); }
     finally { setActing(false); }
   };
@@ -233,7 +405,7 @@ function AcceptationPanel({ conv, onAccept, onRefresh, onSwitchToChat }) {
           )}
           <div className="as-ap-meta">
             <Badge statut={conv.statut}/>
-            <span>· Demande créée {fmtDate(conv.created_at)}</span>
+            <span>· {conv.statut === "EN_ATTENTE" ? "Demande créée" : "Conversation créée"} {fmtDate(conv.created_at)}</span>
           </div>
         </div>
         <button className="as-icon-btn" onClick={onRefresh} title="Actualiser">
@@ -245,7 +417,7 @@ function AcceptationPanel({ conv, onAccept, onRefresh, onSwitchToChat }) {
 
       {/* Sujet */}
       <div className="as-ap-sujet">
-        <div className="as-ap-sujet-label">Sujet de la demande</div>
+        <div className="as-ap-sujet-label">Sujet de la conversation</div>
         <div className="as-ap-sujet-val">« {conv.sujet} »</div>
       </div>
 
@@ -277,8 +449,8 @@ function AcceptationPanel({ conv, onAccept, onRefresh, onSwitchToChat }) {
             <circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/>
           </svg>
           <div>
-            <strong>Conversation acceptée par vous</strong>
-            <p>Vous pouvez maintenant discuter avec ce partenaire dans l'onglet <em>Discussion</em>.</p>
+            <strong>Conversation ouverte</strong>
+            <p>Vous pouvez discuter avec {partNom} dans l'onglet <em>Discussion</em>.</p>
             <button className="as-ap-btn-switch" onClick={onSwitchToChat}>
               Aller à la discussion →
             </button>
@@ -304,13 +476,14 @@ function AcceptationPanel({ conv, onAccept, onRefresh, onSwitchToChat }) {
 
 // ── Page ──────────────────────────────────────────────────
 export default function AdminSupport({ currentUserId }) {
-  const [convs,    setConvs]   = useState([]);
-  const [active,   setActive]  = useState(null);
-  const [loading,  setLoading] = useState(true);
-  const [filtre,   setFiltre]  = useState("tous");
-  const [search,   setSearch]  = useState("");
-  const [chatTab,  setChatTab] = useState("acceptation"); // "acceptation" | "discussion"
-  const [nbNotifs, setNbNotifs]= useState(0);
+  const [convs,     setConvs]     = useState([]);
+  const [active,    setActive]    = useState(null);
+  const [loading,   setLoading]   = useState(true);
+  const [filtre,    setFiltre]    = useState("tous");
+  const [search,    setSearch]    = useState("");
+  const [chatTab,   setChatTab]   = useState("acceptation");
+  const [nbNotifs,  setNbNotifs]  = useState(0);
+  const [showModal, setShowModal] = useState(false);   // ← NOUVEAU
 
   const loadConvs = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -330,14 +503,13 @@ export default function AdminSupport({ currentUserId }) {
 
   useEffect(() => { loadConvs(true); loadNotifs(); }, [loadConvs, loadNotifs]);
 
-  // Poll silencieux 30s
   useEffect(() => {
     const t = setInterval(() => { loadConvs(false); loadNotifs(); }, 30000);
     return () => clearInterval(t);
   }, [loadConvs, loadNotifs]);
 
   const handleSelect = async (conv) => {
-    setActive(conv); // affichage immédiat
+    setActive(conv);
     try {
       const d = await adminSupportApi.getConversation(conv.id);
       setActive(d);
@@ -377,18 +549,31 @@ export default function AdminSupport({ currentUserId }) {
     } catch {}
   };
 
+  // ← NOUVEAU : callback après création d'une conv par l'admin
+  const handleConvCreated = (newConv) => {
+    setConvs(prev => [newConv, ...prev]);
+    setActive(newConv);
+    setChatTab("discussion");   // ouvre directement le chat (conv déjà ACCEPTEE)
+    loadConvs(false);
+  };
+
   const filtered = convs.filter(c => {
+    // ── Filtre statut ──────────────────────────────────────
     if (filtre==="attente") { if (c.statut!=="EN_ATTENTE") return false; }
-    else if (filtre==="cours")   { if (c.statut!=="ACCEPTEE")   return false; }
-    else if (filtre==="fermees") { if (c.statut!=="FERMEE")     return false; }
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const nom   = `${c.partenaire?.prenom||""} ${c.partenaire?.nom||""}`.toLowerCase();
-      const email = (c.partenaire?.email||"").toLowerCase();
-      const sujet = (c.sujet||"").toLowerCase();
-      if (!nom.includes(q) && !email.includes(q) && !sujet.includes(q)) return false;
-    }
-    return true;
+    else if (filtre==="cours")   { if (c.statut!=="ACCEPTEE") return false; }
+    else if (filtre==="fermees") { if (c.statut!=="FERMEE")   return false; }
+
+    // ── Recherche texte ────────────────────────────────────
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+
+    const nom    = `${c.partenaire?.prenom||""} ${c.partenaire?.nom||""}`.toLowerCase();
+    const email  = (c.partenaire?.email||"").toLowerCase();
+    const sujet  = (c.sujet||"").toLowerCase();
+    // Noms des hôtels du partenaire (nouveau champ)
+    const hotels = (c.partenaire?.hotels_noms || []).join(" ").toLowerCase();
+
+    return nom.includes(q) || email.includes(q) || sujet.includes(q) || hotels.includes(q);
   });
 
   const nbAttente = convs.filter(c=>c.statut==="EN_ATTENTE").length;
@@ -409,7 +594,16 @@ export default function AdminSupport({ currentUserId }) {
             }
           </p>
         </div>
+        {/* ← MODIFIÉ : bouton "Nouvelle conversation" ajouté */}
         <div className="as-header-right">
+          <button className="as-btn-new-conv" onClick={() => setShowModal(true)}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="10" y1="11" x2="14" y2="11"/>
+            </svg>
+            Nouvelle conversation
+          </button>
           <button className="as-icon-btn as-notif-btn" onClick={() => loadConvs(false)} title="Actualiser">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="1 4 1 10 7 10"/>
@@ -440,7 +634,6 @@ export default function AdminSupport({ currentUserId }) {
 
         {/* Panel liste gauche */}
         <div className="as-panel-left">
-          {/* Filtres statut */}
           <div className="as-tabs">
             {[
               ["tous",    "Tous",       convs.length],
@@ -454,7 +647,6 @@ export default function AdminSupport({ currentUserId }) {
             ))}
           </div>
 
-          {/* Barre de recherche */}
           <div className="as-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -462,7 +654,7 @@ export default function AdminSupport({ currentUserId }) {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Rechercher par nom, email..."
+              placeholder="Nom, email, hôtel..."
               className="as-search-input"
             />
             {search && (
@@ -495,7 +687,10 @@ export default function AdminSupport({ currentUserId }) {
                 return (
                   <button key={c.id}
                     className={`as-item ${active?.id===c.id?"as-item-on":""} ${c.statut==="EN_ATTENTE"?"as-item-new":""}`}
-                    onClick={() => { handleSelect(c); setChatTab(c.statut==="EN_ATTENTE"?"acceptation":"discussion"); }}>
+                    onClick={() => {
+                      handleSelect(c);
+                      setChatTab(c.statut==="EN_ATTENTE" ? "acceptation" : "discussion");
+                    }}>
                     {c.statut==="EN_ATTENTE" && <div className="as-item-dot"/>}
                     <div className="as-item-av">{init}</div>
                     <div className="as-item-info">
@@ -504,6 +699,13 @@ export default function AdminSupport({ currentUserId }) {
                         <span className="as-item-time">{fmtDate(c.updated_at)}</span>
                       </div>
                       {email && <span className="as-item-email">{email}</span>}
+                      {/* Hôtels du partenaire — affichés si disponibles */}
+                      {c.partenaire?.hotels_noms?.length > 0 && (
+                        <span className="as-item-hotels">
+                          🏨 {c.partenaire.hotels_noms.slice(0, 2).join(", ")}
+                          {c.partenaire.hotels_noms.length > 2 && ` +${c.partenaire.hotels_noms.length - 2}`}
+                        </span>
+                      )}
                       <div className="as-item-mid"><Badge statut={c.statut}/></div>
                       <p className="as-item-prev">{last?.slice(0,50)}{last?.length>50?"…":""}</p>
                     </div>
@@ -518,7 +720,6 @@ export default function AdminSupport({ currentUserId }) {
         <div className="as-panel-right">
           {active ? (
             <>
-              {/* Onglets Acceptation / Discussion */}
               <div className="as-chat-tabs">
                 <button
                   className={`as-chat-tab ${chatTab==="acceptation"?"on":""}`}
@@ -569,11 +770,24 @@ export default function AdminSupport({ currentUserId }) {
               </div>
               <h3>{nbAttente>0 ? `${nbAttente} demande${nbAttente>1?"s":""} en attente` : "Aucune conversation sélectionnée"}</h3>
               <p>Cliquez sur une conversation dans la liste pour l'ouvrir</p>
+              {/* ← NOUVEAU : bouton dans l'état vide */}
+              <button className="as-btn-new-conv-empty" onClick={() => setShowModal(true)}>
+                + Nouvelle conversation
+              </button>
             </div>
           )}
         </div>
 
       </div>
+
+      {/* ← NOUVEAU : Modal nouvelle conversation */}
+      {showModal && (
+        <NouvelleConvModal
+          onClose={() => setShowModal(false)}
+          onCreate={handleConvCreated}
+        />
+      )}
+
     </div>
   );
 }

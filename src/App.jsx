@@ -26,6 +26,7 @@ import ChambresPage          from "./partenaire/pages/ChambresPage";
 import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
 import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
+import MesReservations       from "./partenaire/pages/MesReservations";   // ← AJOUTÉ
 
 import "./App.css";
 
@@ -136,13 +137,15 @@ export default function App() {
   // ── PARTENAIRE ─────────────────────────────────────────
   const renderPartenaire = () => {
     switch (activePage) {
-      case "hotels":   return <MesHotels />;
-      case "chambres": return <ChambresPage />;
-      case "profil":   return <PartenaireProfil />;
-      case "support":  return <PartenaireSupportPage currentUserId={user?.id}/>;
-      default:         return <PlaceholderPage page={activePage} />;
+      case "hotels":        return <MesHotels />;
+      case "chambres":      return <ChambresPage />;
+      case "reservations":  return <MesReservations />;   // ← AJOUTÉ
+      case "profil":        return <PartenaireProfil />;
+      case "support":       return <PartenaireSupportPage currentUserId={user?.id}/>;
+      default:              return <PlaceholderPage page={activePage} />;
     }
   };
+
   return (
     <div className="app-shell">
       <Sidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout}/>

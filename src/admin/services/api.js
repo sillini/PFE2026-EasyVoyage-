@@ -185,35 +185,66 @@ export const heroSlidesApi = {
       method: "DELETE", headers: authHeaders(),
     }).then(handleResponse),
 };
+// ══════════════════════════════════════════════════════════
+//  REMPLACEMENT de adminSupportApi dans src/admin/services/api.js
+//  Ajouter la méthode createConversation
+// ══════════════════════════════════════════════════════════
 
-// ── Support Admin ─────────────────────────────────────────
 export const adminSupportApi = {
+
+  // ← NOUVEAU : l'admin crée une conversation vers un partenaire
+  createConversation: (data) =>
+    fetch(`${BASE}/admin/support/conversations`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(data),   // { id_partenaire, sujet, premier_message? }
+    }).then(handleResponse),
+
   listConversations: (statut = "") => {
     const q = statut ? `?statut=${statut}` : "";
-    return fetch(`${BASE}/admin/support/conversations${q}`, { headers: authHeaders() }).then(handleResponse);
+    return fetch(`${BASE}/admin/support/conversations${q}`, {
+      headers: authHeaders(),
+    }).then(handleResponse);
   },
+
   getConversation: (id) =>
-    fetch(`${BASE}/admin/support/conversations/${id}`, { headers: authHeaders() }).then(handleResponse),
+    fetch(`${BASE}/admin/support/conversations/${id}`, {
+      headers: authHeaders(),
+    }).then(handleResponse),
+
   acceptConversation: (id) =>
     fetch(`${BASE}/admin/support/conversations/${id}/accept`, {
-      method: "PATCH", headers: authHeaders(),
+      method:  "PATCH",
+      headers: authHeaders(),
     }).then(handleResponse),
+
   closeConversation: (id) =>
     fetch(`${BASE}/admin/support/conversations/${id}/close`, {
-      method: "PATCH", headers: authHeaders(),
+      method:  "PATCH",
+      headers: authHeaders(),
     }).then(handleResponse),
+
   sendMessage: (id, contenu) =>
     fetch(`${BASE}/admin/support/conversations/${id}/messages`, {
-      method: "POST", headers: authHeaders(), body: JSON.stringify({ contenu }),
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify({ contenu }),
     }).then(handleResponse),
+
   getNotifications: () =>
-    fetch(`${BASE}/support/notifications`, { headers: authHeaders() }).then(handleResponse),
+    fetch(`${BASE}/support/notifications`, {
+      headers: authHeaders(),
+    }).then(handleResponse),
+
   markAllRead: () =>
     fetch(`${BASE}/support/notifications/read-all`, {
-      method: "PATCH", headers: authHeaders(),
+      method:  "PATCH",
+      headers: authHeaders(),
     }).then(handleResponse),
+
   markRead: (id) =>
     fetch(`${BASE}/support/notifications/${id}/read`, {
-      method: "PATCH", headers: authHeaders(),
+      method:  "PATCH",
+      headers: authHeaders(),
     }).then(handleResponse),
 };
