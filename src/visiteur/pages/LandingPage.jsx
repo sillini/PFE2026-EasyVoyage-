@@ -5,6 +5,7 @@ import HeroSlider            from "../components/sections/HeroSlider";
 import SearchBar             from "../components/sections/SearchBar";
 import HotelsSection         from "../components/sections/HotelsSection";
 import VoyagesSection        from "../components/sections/VoyagesSection";
+import AProposSection        from "../components/sections/AProposSection";   // ← NOUVEAU
 import ResultatsPage         from "./ResultatsPage";
 import HotelDetailPage       from "./HotelDetailPage";
 import VoyageDetailPage      from "./VoyageDetailPage";
@@ -26,7 +27,7 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
   const [authTab,          setAuthTab]          = useState("login");
   const [showProfil,       setShowProfil]       = useState(false);
   const [profilDefaultTab, setProfilDefaultTab] = useState("profil");
-  const [showDemande,      setShowDemande]      = useState(false);   // ← nouveau
+  const [showDemande,      setShowDemande]      = useState(false);
 
   // ── Pages détail ───────────────────────────────────────
   const [hotelDetail,      setHotelDetail]      = useState(null);
@@ -39,9 +40,25 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
   const [voyageReservData, setVoyageReservData] = useState(null);
 
   // ── Helpers ────────────────────────────────────────────
-  const openAuth    = (tab = "login") => { setAuthTab(tab); setShowAuth(true); };
-  const handleLogin = (data) => { setShowAuth(false); onLogin(data); };
+  const openAuth     = (tab = "login") => { setAuthTab(tab); setShowAuth(true); };
+  const handleLogin  = (data) => { setShowAuth(false); onLogin(data); };
   const clearDetails = () => { setHotelDetail(null); setVoyageDetail(null); };
+
+  const goToHotel = (hotel) => {
+    clearDetails();
+    setShowResults(false);
+    setShowProfil(false);
+    setHotelDetail(typeof hotel === "object" ? hotel : { id: hotel });
+    window.scrollTo(0, 0);
+  };
+
+  const goToVoyage = (voyage) => {
+    clearDetails();
+    setShowResults(false);
+    setShowProfil(false);
+    setVoyageDetail(typeof voyage === "object" ? voyage : { id: voyage });
+    window.scrollTo(0, 0);
+  };
 
   // ── Handlers hôtel ─────────────────────────────────────
   const handleHotelClick = (hotel) => {
@@ -127,13 +144,18 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
         <HeroSlider />
         <SearchBar onSearch={handleSearch} />
         <HotelsSection
+          isClient={isClient}
           onReserver={handleHotelClick}
           searchParams={searchParams}
+          onLoginRequired={() => openAuth("login")}
         />
         <VoyagesSection
+          isClient={isClient}
           onReserver={handleVoyageClick}
           searchParams={searchParams}
+          onLoginRequired={() => openAuth("login")}
         />
+        <AProposSection />     {/* ← NOUVEAU */}
         <Footer />
       </>
     );
@@ -152,8 +174,9 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
         isClient={isClient}
         user={user}
         onLogout={onLogout}
-        onProfilClick={() => { setProfilDefaultTab("profil"); setShowProfil(true); }}
+        onProfilClick={()       => { setProfilDefaultTab("profil");       setShowProfil(true); }}
         onReservationsClick={() => { setProfilDefaultTab("reservations"); setShowProfil(true); }}
+        onFavorisClick={()      => { setProfilDefaultTab("favoris");      setShowProfil(true); }}
         onPartenaireClick={() => setShowDemande(true)}
       />
 
@@ -195,6 +218,8 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
           defaultTab={profilDefaultTab}
           onClose={() => setShowProfil(false)}
           onLogout={onLogout}
+          onVoirHotel={(id)  => goToHotel(id)}
+          onVoirVoyage={(id) => goToVoyage(id)}
         />
       )}
 

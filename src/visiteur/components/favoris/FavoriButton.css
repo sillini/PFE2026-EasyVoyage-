@@ -1,0 +1,82 @@
+/* ── FavoriButton.css ──────────────────────────────────── */
+
+.fav-btn {
+  position:        relative;
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  border:          none;
+  cursor:          pointer;
+  border-radius:   50%;
+  background:      rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  box-shadow:      0 2px 8px rgba(0,0,0,0.15);
+  transition:      transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  flex-shrink:     0;
+}
+
+/* Tailles */
+.fav-btn--sm { width: 30px; height: 30px; }
+.fav-btn--md { width: 38px; height: 38px; }
+
+.fav-btn:hover:not(:disabled) {
+  transform:  scale(1.12);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+}
+.fav-btn:active:not(:disabled) { transform: scale(0.92); }
+.fav-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Icône */
+.fav-icon {
+  width:      52%;
+  height:     52%;
+  color:      #bbb;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* État actif — rouge */
+.fav-btn--active            { background: #fff0f0; }
+.fav-btn--active .fav-icon  { color: #E74C3C; }
+
+/* Animation d'ajout (pulse + burst) */
+.fav-btn--burst .fav-icon {
+  animation: fav-pulse 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes fav-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); }
+  70%  { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+
+/* Particules burst */
+.fav-burst {
+  position:    absolute;
+  inset:       0;
+  pointer-events: none;
+}
+
+.fav-particle {
+  position:  absolute;
+  top:       50%;
+  left:      50%;
+  width:     5px;
+  height:    5px;
+  border-radius: 50%;
+  background: #E74C3C;
+  transform-origin: center;
+  animation: fav-particle-fly 0.55s ease-out forwards;
+}
+
+.fav-particle--0 { --angle: 0deg;   --dist: 14px; background: #E74C3C; }
+.fav-particle--1 { --angle: 60deg;  --dist: 12px; background: #F39C12; }
+.fav-particle--2 { --angle: 120deg; --dist: 14px; background: #E74C3C; }
+.fav-particle--3 { --angle: 180deg; --dist: 12px; background: #C0392B; }
+.fav-particle--4 { --angle: 240deg; --dist: 14px; background: #F39C12; }
+.fav-particle--5 { --angle: 300deg; --dist: 12px; background: #E74C3C; }
+
+@keyframes fav-particle-fly {
+  0%   { opacity: 1; transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--dist))); }
+}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { RECAPTCHA_SITE_KEY } from "../../../config/auth";
 import "./DemandePartenaireModal.css";
 
 const BASE = "http://localhost:8000/api/v1";
@@ -17,12 +18,50 @@ const EMPTY = {
   site_web: "", adresse: "", message: "",
 };
 
+// ══ reCAPTCHA v2 ══════════════════════════════════════════
+function ReCaptcha({ onVerify }) {
+  const ref = useRef();
+  const widgetId = useRef(null);
+
+  useEffect(() => {
+    const render = () => {
+      if (window.grecaptcha && ref.current && widgetId.current === null) {
+        widgetId.current = window.grecaptcha.render(ref.current, {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback:           (tok) => onVerify(tok),
+          "expired-callback": ()    => onVerify(null),
+        });
+      }
+    };
+
+    if (window.grecaptcha?.render) { render(); return; }
+
+    if (!document.getElementById("rc-script")) {
+      window._rcReady = render;
+      const s = document.createElement("script");
+      s.id    = "rc-script";
+      s.src   = "https://www.google.com/recaptcha/api.js?onload=_rcReady&render=explicit";
+      s.async = true;
+      s.defer = true;
+      document.head.appendChild(s);
+    } else {
+      window._rcReady = render;
+    }
+
+    return () => { widgetId.current = null; };
+  }, []);
+
+  return <div ref={ref} className="dpm-recaptcha" />;
+}
+
+// ══ Composant principal ════════════════════════════════════
 export default function DemandePartenaireModal({ onClose }) {
   const [step,    setStep]    = useState(0);
   const [form,    setForm]    = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
   const [success, setSuccess] = useState(false);
+  const [captcha, setCaptcha] = useState(null);   // ← token reCAPTCHA
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -32,9 +71,11 @@ export default function DemandePartenaireModal({ onClose }) {
                    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
 
   const canNext1 = form.nom_entreprise.trim().length >= 2 &&
-                   form.type_partenaire;
+                   form.type_partenaire &&
+                   !!captcha;   // ← captcha obligatoire
 
   const handleSubmit = async () => {
+    if (!captcha) { setError("Veuillez valider le captcha"); return; }
     setLoading(true);
     setError(null);
     try {
@@ -43,9 +84,9 @@ export default function DemandePartenaireModal({ onClose }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          site_web: form.site_web || undefined,
-          adresse:  form.adresse  || undefined,
-          message:  form.message  || undefined,
+          site_web:  form.site_web  || undefined,
+          adresse:   form.adresse   || undefined,
+          message:   form.message   || undefined,
           telephone: form.telephone || undefined,
         }),
       });
@@ -179,6 +220,9 @@ export default function DemandePartenaireModal({ onClose }) {
                   rows={3}
                 />
               </div>
+
+              {/* ── reCAPTCHA v2 ── */}
+              <ReCaptcha onVerify={setCaptcha} />
 
               {error && <div className="dpm-error">{error}</div>}
 

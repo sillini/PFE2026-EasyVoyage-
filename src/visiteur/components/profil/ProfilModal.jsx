@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import "./ProfilModal.css";
+import TabFavoris from "./TabFavoris";
 
 const API = "http://localhost:8000/api/v1";
 
@@ -102,7 +103,6 @@ function TabProfil({ user, onUpdate }) {
 
   return (
     <div className="pm-tab-content">
-      {/* Card infos perso */}
       <div className="pm-card">
         <div className="pm-card-stripe blue"/>
         <div className="pm-card-hd">
@@ -153,7 +153,6 @@ function TabProfil({ user, onUpdate }) {
         </form>
       </div>
 
-      {/* Card infos compte */}
       <div className="pm-card">
         <div className="pm-card-stripe gold"/>
         <div className="pm-card-hd">
@@ -191,13 +190,11 @@ function TabProfil({ user, onUpdate }) {
 //  ONGLET : SÉCURITÉ
 // ══════════════════════════════════════════════════════════════════
 function TabSecurite({ user, onUpdate }) {
-  // Email
   const [eStep, setES] = useState(0);
   const [nEmail, setNE] = useState("");
   const [eCode,  setEC] = useState("");
   const [eLoad,  setEL] = useState(false);
   const [eMsg,   setEM] = useState(null);
-  // Mot de passe
   const [pStep, setPS] = useState(0);
   const [pCode, setPC] = useState("");
   const [nPwd,  setNP] = useState("");
@@ -240,7 +237,6 @@ function TabSecurite({ user, onUpdate }) {
 
   return (
     <div className="pm-tab-content">
-      {/* Email */}
       <div className="pm-card">
         <div className="pm-card-stripe gold"/>
         <div className="pm-card-hd">
@@ -284,7 +280,6 @@ function TabSecurite({ user, onUpdate }) {
         </div>
       </div>
 
-      {/* Mot de passe */}
       <div className="pm-card">
         <div className="pm-card-stripe red"/>
         <div className="pm-card-hd">
@@ -343,7 +338,7 @@ function TabSecurite({ user, onUpdate }) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  ONGLET : MES RÉSERVATIONS — complet
+//  ONGLET : MES RÉSERVATIONS
 // ══════════════════════════════════════════════════════════════════
 const STATUT_CFG = {
   CONFIRMEE:  { label:"Confirmée",   cls:"confirmed", icon:"✅" },
@@ -352,9 +347,9 @@ const STATUT_CFG = {
 };
 
 function ReservationCard({ resa, onAnnuler, onPdf }) {
-  const [expanded, setExpanded]   = useState(false);
+  const [expanded,   setExpanded]   = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [downloading, setDL]      = useState(false);
+  const [downloading, setDL]        = useState(false);
   const s   = STATUT_CFG[resa.statut] || { label:resa.statut, cls:"pending", icon:"❓" };
   const isV = !!resa.id_voyage;
   const nuits = nbNuits(resa.date_debut, resa.date_fin);
@@ -366,7 +361,6 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
     try { await onAnnuler(resa.id); }
     finally { setCancelling(false); }
   };
-
   const handlePdf = async () => {
     setDL(true);
     try { await onPdf(resa.id, resa.numero_facture); }
@@ -375,14 +369,12 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
 
   return (
     <div className={`pm-resa-card ${expanded?"expanded":""}`}>
-      {/* Ligne principale */}
       <div className="pm-resa-main" onClick={()=>setExpanded(!expanded)}>
         <div className="pm-resa-type-ico">
           {isV
             ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
             : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
         </div>
-
         <div className="pm-resa-summary">
           <div className="pm-resa-top-row">
             <span className="pm-resa-id">#{resa.id}</span>
@@ -394,12 +386,10 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
             <span className="pm-resa-nuits">{isV?`${nuits}j`:`${nuits} nuit${nuits>1?"s":""}`}</span>
           </div>
         </div>
-
         <div className="pm-resa-right-col">
           <span className={`pm-statut-badge ${s.cls}`}>{s.icon} {s.label}</span>
           <span className="pm-resa-montant">{parseFloat(resa.total_ttc).toFixed(2)} DT</span>
         </div>
-
         <button className="pm-resa-chevron" onClick={e=>{e.stopPropagation();setExpanded(!expanded);}}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polyline points={expanded?"18 15 12 9 6 15":"6 9 12 15 18 9"}/>
@@ -407,7 +397,6 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
         </button>
       </div>
 
-      {/* Détails expandés */}
       {expanded && (
         <div className="pm-resa-details">
           <div className="pm-resa-detail-grid">
@@ -455,7 +444,6 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
             ))}
           </div>
 
-          {/* Actions */}
           <div className="pm-resa-actions">
             {resa.numero_facture && (
               <button className="pm-resa-btn pm-resa-btn-pdf" onClick={handlePdf} disabled={downloading}>
@@ -500,10 +488,9 @@ function TabReservations() {
   const handleAnnuler = async (id) => {
     try {
       await apiFetch(`${API}/reservations/${id}/annuler`, { method:"POST" });
-      load(); // Recharger
+      load();
     } catch(e) { alert("Erreur : " + e.message); }
   };
-
   const handlePdf = async (id, numFacture) => {
     try {
       const token = localStorage.getItem("access_token");
@@ -521,17 +508,15 @@ function TabReservations() {
   };
 
   const FILTERS = [
-    { key:"all",        label:"Toutes" },
-    { key:"CONFIRMEE",  label:"Confirmées" },
-    { key:"ANNULEE",    label:"Annulées" },
-    { key:"TERMINEE",   label:"Terminées" },
+    { key:"all",       label:"Toutes"      },
+    { key:"CONFIRMEE", label:"Confirmées"  },
+    { key:"ANNULEE",   label:"Annulées"    },
+    { key:"TERMINEE",  label:"Terminées"   },
   ];
-
   const totalPages = Math.ceil(total / PER_PAGE);
 
   return (
     <div className="pm-tab-content">
-      {/* Filtres */}
       <div className="pm-resa-filters">
         {FILTERS.map(f => (
           <button key={f.key} className={`pm-filter-btn ${filter===f.key?"on":""}`}
@@ -587,15 +572,48 @@ function TabReservations() {
 // ══════════════════════════════════════════════════════════════════
 //  MODAL PRINCIPAL
 // ══════════════════════════════════════════════════════════════════
-export default function ProfilModal({ user: init, onClose, onLogout , defaultTab = "profil" }) {
+export default function ProfilModal({
+  user: init,
+  onClose,
+  onLogout,
+  defaultTab    = "profil",
+  onVoirHotel   = null,   // (id) => void  — navigation vers fiche hôtel
+  onVoirVoyage  = null,   // (id) => void  — navigation vers fiche voyage
+}) {
   const [user, setUser] = useState(init);
   const [tab,  setTab]  = useState(defaultTab);
   const initiales = ((user?.prenom?.[0]||"")+(user?.nom?.[0]||"")).toUpperCase();
 
   const TABS = [
-    { id:"profil",       label:"Mon profil",   icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg> },
-    { id:"securite",     label:"Sécurité",     icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
-    { id:"reservations", label:"Réservations", icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+    {
+      id:    "profil",
+      label: "Mon profil",
+      icon:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+               <circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/>
+             </svg>,
+    },
+    {
+      id:    "securite",
+      label: "Sécurité",
+      icon:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+             </svg>,
+    },
+    {
+      id:    "favoris",
+      label: "Favoris",
+      icon:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+             </svg>,
+    },
+    {
+      id:    "reservations",
+      label: "Réservations",
+      icon:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+               <rect x="3" y="4" width="18" height="18" rx="2"/>
+               <line x1="3" y1="10" x2="21" y2="10"/>
+             </svg>,
+    },
   ];
 
   return (
@@ -633,6 +651,12 @@ export default function ProfilModal({ user: init, onClose, onLogout , defaultTab
         <div className="pm-content">
           {tab==="profil"       && <TabProfil       user={user} onUpdate={setUser}/>}
           {tab==="securite"     && <TabSecurite     user={user} onUpdate={setUser}/>}
+          {tab==="favoris"      && (
+            <TabFavoris
+              onVoirHotel={onVoirHotel   ? (id) => { onClose(); onVoirHotel(id);  } : null}
+              onVoirVoyage={onVoirVoyage ? (id) => { onClose(); onVoirVoyage(id); } : null}
+            />
+          )}
           {tab==="reservations" && <TabReservations/>}
         </div>
 

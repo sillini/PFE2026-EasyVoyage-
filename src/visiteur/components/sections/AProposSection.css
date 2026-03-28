@@ -1,0 +1,309 @@
+/* ════════════════════════════════════════════════════════════
+   À PROPOS SECTION — EasyVoyage
+════════════════════════════════════════════════════════════ */
+
+.ap-root {
+  padding: 100px 0 112px;
+  background: linear-gradient(160deg, #060F1C 0%, #0A1628 40%, #0F2235 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Décos de fond */
+.ap-bg-deco-1 {
+  position: absolute; top: -120px; right: -80px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,151,58,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.ap-bg-deco-2 {
+  position: absolute; bottom: -80px; left: -60px;
+  width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,63,99,0.25) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.ap-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+}
+
+/* ── Eyebrow label ──────────────────────────────────────── */
+.ap-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 16px; border-radius: 20px; margin-bottom: 16px;
+  background: rgba(196,151,58,0.12); border: 1px solid rgba(196,151,58,0.28);
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 800;
+  color: #C4973A; text-transform: uppercase; letter-spacing: 0.8px;
+}
+.ap-eyebrow svg { width: 13px; height: 13px; }
+
+/* ── HERO ────────────────────────────────────────────────── */
+.ap-hero {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 64px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.ap-hero-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2.9rem; font-weight: 700; color: white;
+  line-height: 1.1; margin-bottom: 22px;
+}
+.ap-hero-title em { font-style: normal; color: #C4973A; }
+
+.ap-hero-text {
+  font-family: 'Lato', sans-serif; font-size: 0.93rem;
+  color: rgba(255,255,255,0.55); line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.ap-hero-cta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+/* Boutons */
+.ap-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 28px; text-decoration: none;
+  background: linear-gradient(135deg, #B8842A, #C4973A);
+  font-family: 'Lato', sans-serif; font-size: 0.88rem; font-weight: 800;
+  color: white; transition: all 0.22s;
+  box-shadow: 0 6px 20px rgba(196,151,58,0.4);
+}
+.ap-btn-primary svg { width: 14px; height: 14px; transition: transform 0.22s; }
+.ap-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(196,151,58,0.55);
+}
+.ap-btn-primary:hover svg { transform: translateX(4px); }
+
+.ap-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 28px; border-radius: 28px; text-decoration: none;
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  font-family: 'Lato', sans-serif; font-size: 0.88rem; font-weight: 700;
+  color: rgba(255,255,255,0.7); transition: all 0.22s;
+}
+.ap-btn-secondary:hover {
+  border-color: rgba(196,151,58,0.5);
+  color: #C4973A;
+  background: rgba(196,151,58,0.07);
+}
+
+/* Carte Tunisie */
+.ap-hero-right {
+  display: flex; justify-content: center; align-items: center;
+}
+.ap-carte-wrap {
+  position: relative; width: 280px; height: 340px;
+}
+.ap-carte-bg {
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(196,151,58,0.15);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.ap-carte-svg { width: 200px; height: 260px; }
+
+/* Badges flottants sur la carte */
+.ap-badge-1, .ap-badge-2 {
+  position: absolute;
+  font-family: 'Lato', sans-serif; font-size: 0.72rem; font-weight: 700;
+  padding: 6px 12px; border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.ap-badge-1 {
+  top: -14px; left: 20px;
+  background: linear-gradient(135deg, #B8842A, #C4973A);
+  color: white;
+}
+.ap-badge-2 {
+  bottom: -14px; right: 20px;
+  background: rgba(26,63,99,0.9);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+}
+
+/* ── STATS ───────────────────────────────────────────────── */
+.ap-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 88px;
+  padding: 32px 40px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+}
+
+.ap-stat-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 0;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.ap-stat-card:last-child { border-right: none; }
+
+.ap-stat-icon { font-size: 1.5rem; line-height: 1; }
+.ap-stat-valeur {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem; font-weight: 700; color: #C4973A;
+  line-height: 1;
+}
+.ap-stat-label {
+  font-family: 'Lato', sans-serif; font-size: 0.78rem;
+  color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Section heads ───────────────────────────────────────── */
+.ap-section-head {
+  text-align: center; margin-bottom: 44px;
+}
+.ap-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 700; color: white;
+  margin: 0;
+}
+
+/* ── VALEURS ─────────────────────────────────────────────── */
+.ap-valeurs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 88px;
+}
+
+.ap-valeur-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 28px 22px;
+  transition: all 0.28s cubic-bezier(0.22,1,0.36,1);
+}
+.ap-valeur-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(196,151,58,0.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+}
+
+.ap-valeur-ico {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(196,151,58,0.12);
+  border: 1px solid rgba(196,151,58,0.22);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  color: #C4973A;
+}
+.ap-valeur-ico svg { width: 22px; height: 22px; }
+
+.ap-valeur-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 700; color: white;
+  margin: 0 0 10px;
+}
+.ap-valeur-desc {
+  font-family: 'Lato', sans-serif; font-size: 0.82rem;
+  color: rgba(255,255,255,0.45); line-height: 1.7;
+  margin: 0;
+}
+
+/* ── ÉQUIPE ──────────────────────────────────────────────── */
+.ap-equipe-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 88px;
+}
+
+.ap-membre-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+.ap-membre-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(196,151,58,0.2);
+  background: rgba(255,255,255,0.06);
+}
+
+.ap-membre-avatar {
+  width: 60px; height: 60px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700; color: white;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.ap-membre-info { display: flex; flex-direction: column; gap: 4px; }
+.ap-membre-nom {
+  font-family: 'Lato', sans-serif; font-size: 0.88rem;
+  font-weight: 700; color: white;
+}
+.ap-membre-role {
+  font-family: 'Lato', sans-serif; font-size: 0.75rem;
+  color: rgba(255,255,255,0.4); line-height: 1.4;
+}
+
+/* ── CTA BANNER ──────────────────────────────────────────── */
+.ap-cta-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 32px;
+  padding: 40px 48px;
+  background: linear-gradient(135deg, rgba(196,151,58,0.12), rgba(196,151,58,0.06));
+  border: 1px solid rgba(196,151,58,0.25);
+  border-radius: 22px;
+}
+
+.ap-cta-left h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: white;
+  margin: 0 0 8px;
+}
+.ap-cta-left p {
+  font-family: 'Lato', sans-serif; font-size: 0.88rem;
+  color: rgba(255,255,255,0.5); margin: 0;
+}
+
+.ap-btn-lg {
+  padding: 16px 36px !important;
+  font-size: 0.95rem !important;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .ap-valeurs-grid { grid-template-columns: repeat(2, 1fr); }
+  .ap-equipe-grid  { grid-template-columns: repeat(2, 1fr); }
+  .ap-stats        { grid-template-columns: repeat(2, 1fr); }
+  .ap-stats .ap-stat-card:nth-child(2) { border-right: none; }
+}
+
+@media (max-width: 900px) {
+  .ap-hero { grid-template-columns: 1fr; gap: 40px; }
+  .ap-hero-right { display: none; }
+}
+
+@media (max-width: 640px) {
+  .ap-container    { padding: 0 16px; }
+  .ap-root         { padding: 64px 0 72px; }
+  .ap-valeurs-grid { grid-template-columns: 1fr; }
+  .ap-equipe-grid  { grid-template-columns: repeat(2, 1fr); }
+  .ap-stats        { grid-template-columns: repeat(2, 1fr); padding: 20px; }
+  .ap-hero-title   { font-size: 2.2rem; }
+  .ap-cta-banner   { flex-direction: column; text-align: center; padding: 28px 24px; }
+}
