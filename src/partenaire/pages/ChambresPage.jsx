@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { hotelsApi, chambresApi, tarifsApi, imagesApi } from "../services/api";
-import ChambreModal from "../components/chambres/ChambreModal";
-import TarifModal from "../components/chambres/TarifModal";
+import ChambreModal    from "../components/chambres/ChambreModal";
+import TarifModal      from "../components/chambres/TarifModal";
 import DisponibilitePage from "./DisponibilitePage";
 import "./ChambresPage.css";
 
+// ── Hôtel item ────────────────────────────────────────────
 function HotelItem({ hotel, isActive, onClick }) {
   const [mainImg, setMainImg] = useState(null);
-
   useEffect(() => {
-    imagesApi.list(hotel.id).then((data) => {
+    imagesApi.list(hotel.id).then(data => {
       const imgs = Array.isArray(data) ? data : data?.items || [];
-      const principale = imgs.find((i) => i.type === "PRINCIPALE") || imgs[0];
-      if (principale) setMainImg(principale.url);
+      const p = imgs.find(i => i.type === "PRINCIPALE") || imgs[0];
+      if (p) setMainImg(p.url);
     }).catch(() => {});
   }, [hotel.id]);
 
@@ -25,11 +25,12 @@ function HotelItem({ hotel, isActive, onClick }) {
         <span className="hotel-item-nom">{hotel.nom}</span>
         <span className="hotel-item-pays">{hotel.ville || hotel.pays}</span>
       </div>
-      <span className="hotel-item-stars">{"★".repeat(hotel.etoiles)}</span>
+      <span className="hotel-item-stars">{"★".repeat(hotel.etoiles || 0)}</span>
     </button>
   );
 }
 
+// ── Chambre card ──────────────────────────────────────────
 function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
   return (
     <div className={`chambre-card ${isSelected ? "selected" : ""}`}>
@@ -42,18 +43,19 @@ function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
           {chambre.capacite} personne{chambre.capacite > 1 ? "s" : ""}
         </div>
         {chambre.description && <p className="chambre-desc">{chambre.description}</p>}
-        {chambre.prix_min && (
+        {chambre.prix_min != null && (
           <div className="chambre-prix-tag">
             <span className="prix-label">Tarif courant</span>
             <span className="prix-val">
               {chambre.prix_min === chambre.prix_max
-                ? `${chambre.prix_min?.toFixed(0)} TND/nuit`
-                : `${chambre.prix_min?.toFixed(0)} – ${chambre.prix_max?.toFixed(0)} TND/nuit`}
+                ? `${Number(chambre.prix_min).toFixed(0)} TND/nuit`
+                : `${Number(chambre.prix_min).toFixed(0)} – ${Number(chambre.prix_max).toFixed(0)} TND/nuit`}
             </span>
           </div>
         )}
@@ -78,15 +80,18 @@ function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
   );
 }
 
+// ── Tarif row — design carte avec icône calendrier ────────
 function TarifRow({ tarif, onEdit, onDelete }) {
-  const now = new Date();
-  const debut = new Date(tarif.date_debut);
-  const fin   = new Date(tarif.date_fin);
+  const now        = new Date();
+  const debut      = new Date(tarif.date_debut);
+  const fin        = new Date(tarif.date_fin);
   const isActive   = debut <= now && fin >= now;
   const isExpired  = fin < now;
   const isUpcoming = debut > now;
 
-  const fmt = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  const fmt = d => new Date(d).toLocaleDateString("fr-FR", {
+    day: "2-digit", month: "short", year: "numeric",
+  });
 
   return (
     <div className={`tarif-row ${isActive ? "active-tarif" : ""} ${isExpired ? "expired" : ""}`}>
@@ -95,7 +100,8 @@ function TarifRow({ tarif, onEdit, onDelete }) {
           <div className="tarif-periode-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
               <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
           </div>
@@ -142,77 +148,101 @@ function TarifRow({ tarif, onEdit, onDelete }) {
   );
 }
 
+// ── Page principale ───────────────────────────────────────
 export default function ChambresPage() {
-  const [hotels, setHotels] = useState([]);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [chambres, setChambres] = useState([]);
-  const [selectedChambre, setSelectedChambre] = useState(null);
-  const [tarifs, setTarifs] = useState([]);
-  const [typesChambres, setTypesChambres] = useState([]);
-  const [typesReservation, setTypesReservation] = useState([]);
-  const [loadingHotels, setLoadingHotels] = useState(true);
-  const [loadingChambres, setLoadingChambres] = useState(false);
-  const [loadingTarifs, setLoadingTarifs] = useState(false);
+  const [hotels,           setHotels]          = useState([]);
+  const [selectedHotel,    setSelectedHotel]   = useState(null);
+  const [chambres,         setChambres]        = useState([]);
+  const [selectedChambre,  setSelectedChambre] = useState(null);
+  const [tarifs,           setTarifs]          = useState([]);
+  const [typesChambres,    setTypesChambres]   = useState([]);
+  const [typesReservation, setTypesReservation]= useState([]);
+
+  const [loadingHotels,    setLoadingHotels]   = useState(true);
+  const [loadingChambres,  setLoadingChambres] = useState(false);
+  const [loadingTarifs,    setLoadingTarifs]   = useState(false);
+  const [errorHotels,      setErrorHotels]     = useState("");
+  const [errorChambres,    setErrorChambres]   = useState("");
+  const [errorTarifs,      setErrorTarifs]     = useState("");
+
   const [chambreModal, setChambreModal] = useState({ open: false, data: null });
-  const [tarifModal, setTarifModal] = useState({ open: false, data: null });
-  const [showDispo, setShowDispo] = useState(false);
+  const [tarifModal,   setTarifModal]   = useState({ open: false, data: null });
+  const [showDispo,    setShowDispo]    = useState(false);
 
   useEffect(() => { loadInit(); }, []);
 
   const loadInit = async () => {
     setLoadingHotels(true);
+    setErrorHotels("");
     try {
       const [hotelsData, typCh, typRes] = await Promise.all([
-        hotelsApi.list(),
+        // ✅ mesHotels() → GET /hotels/mes-hotels (filtre par JWT)
+        hotelsApi.mesHotels(),
         hotelsApi.listTypesChambre(),
         hotelsApi.listTypesReservation(),
       ]);
-      const list = hotelsData.items || [];
+      const list = hotelsData?.items || [];
       setHotels(list);
       setTypesChambres(typCh || []);
       setTypesReservation(typRes || []);
-      if (list.length > 0) { setSelectedHotel(list[0]); loadChambres(list[0].id); }
-    } finally { setLoadingHotels(false); }
+      if (list.length > 0) {
+        setSelectedHotel(list[0]);
+        loadChambres(list[0].id);
+      }
+    } catch (err) {
+      setErrorHotels(err.message || "Erreur chargement hôtels");
+    } finally {
+      setLoadingHotels(false);
+    }
   };
 
-  const loadChambres = async (hotelId) => {
-    setLoadingChambres(true); setSelectedChambre(null); setTarifs([]);
+  const loadChambres = async hotelId => {
+    setLoadingChambres(true); setErrorChambres(""); setSelectedChambre(null); setTarifs([]);
     try {
       const data = await chambresApi.list(hotelId);
-      setChambres(data.items || []);
-    } finally { setLoadingChambres(false); }
+      setChambres(data?.items || []);
+    } catch (err) {
+      setErrorChambres(err.message || "Erreur chargement chambres");
+    } finally {
+      setLoadingChambres(false);
+    }
   };
 
   const loadTarifs = async (hotelId, chambreId) => {
-    setLoadingTarifs(true);
+    setLoadingTarifs(true); setErrorTarifs("");
     try {
       const data = await tarifsApi.list(hotelId, chambreId);
-      setTarifs(data.items || []);
-    } finally { setLoadingTarifs(false); }
+      setTarifs(data?.items || []);
+    } catch (err) {
+      setErrorTarifs(err.message || "Erreur chargement tarifs");
+    } finally {
+      setLoadingTarifs(false);
+    }
   };
 
-  const handleSelectHotel = (hotel) => { setSelectedHotel(hotel); loadChambres(hotel.id); };
-  const handleSelectChambre = (chambre) => { setSelectedChambre(chambre); loadTarifs(selectedHotel.id, chambre.id); };
+  const handleSelectHotel   = hotel   => { setSelectedHotel(hotel); loadChambres(hotel.id); };
+  const handleSelectChambre = chambre => { setSelectedChambre(chambre); loadTarifs(selectedHotel.id, chambre.id); };
 
-  const handleSaveChambre = async (form) => {
+  const handleSaveChambre = async form => {
     if (chambreModal.data) await chambresApi.update(selectedHotel.id, chambreModal.data.id, form);
-    else await chambresApi.create(selectedHotel.id, form);
+    else                   await chambresApi.create(selectedHotel.id, form);
     await loadChambres(selectedHotel.id);
   };
 
-  const handleSaveTarif = async (form) => {
+  const handleSaveTarif = async form => {
     if (tarifModal.data) await tarifsApi.update(selectedHotel.id, selectedChambre.id, tarifModal.data.id, form);
-    else await tarifsApi.create(selectedHotel.id, selectedChambre.id, form);
+    else                 await tarifsApi.create(selectedHotel.id, selectedChambre.id, form);
     await loadTarifs(selectedHotel.id, selectedChambre.id);
   };
 
-  const handleDeleteTarif = async (tarif) => {
+  const handleDeleteTarif = async tarif => {
     if (!confirm("Supprimer ce tarif ?")) return;
-    await tarifsApi.delete(selectedHotel.id, selectedChambre.id, tarif.id);
-    await loadTarifs(selectedHotel.id, selectedChambre.id);
+    try {
+      await tarifsApi.delete(selectedHotel.id, selectedChambre.id, tarif.id);
+      await loadTarifs(selectedHotel.id, selectedChambre.id);
+    } catch (err) { alert("Erreur : " + err.message); }
   };
 
-  // ── Page disponibilités
   if (showDispo && selectedHotel) {
     return (
       <DisponibilitePage
@@ -244,7 +274,7 @@ export default function ChambresPage() {
       </div>
 
       <div className="chambres-layout">
-        {/* Colonne 1 — Hôtels */}
+        {/* ── Col 1 Hôtels ── */}
         <div className="col-hotels">
           <div className="col-header">
             <div className="col-header-left">
@@ -252,16 +282,23 @@ export default function ChambresPage() {
               <span className="col-count">{hotels.length}</span>
             </div>
           </div>
-          {loadingHotels ? <div className="col-loading"><span className="mini-spinner" /></div>
-          : hotels.length === 0 ? <div className="col-empty"><span>🏨</span><p>Aucun hôtel</p></div>
-          : <div className="hotel-list">
-              {hotels.map((h) => (
-                <HotelItem key={h.id} hotel={h} isActive={selectedHotel?.id === h.id} onClick={() => handleSelectHotel(h)} />
+          {loadingHotels ? (
+            <div className="col-loading"><span className="mini-spinner" /></div>
+          ) : errorHotels ? (
+            <div className="col-error">⚠️ {errorHotels} <button onClick={loadInit}>↺</button></div>
+          ) : hotels.length === 0 ? (
+            <div className="col-empty"><span>🏨</span><p>Aucun hôtel</p></div>
+          ) : (
+            <div className="hotel-list">
+              {hotels.map(h => (
+                <HotelItem key={h.id} hotel={h} isActive={selectedHotel?.id === h.id}
+                  onClick={() => handleSelectHotel(h)} />
               ))}
-            </div>}
+            </div>
+          )}
         </div>
 
-        {/* Colonne 2 — Chambres */}
+        {/* ── Col 2 Chambres ── */}
         <div className="col-chambres">
           <div className="col-header">
             <div className="col-header-left">
@@ -271,25 +308,32 @@ export default function ChambresPage() {
             {selectedHotel && (
               <button className="btn-col-add" onClick={() => setChambreModal({ open: true, data: null })}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Ajouter
               </button>
             )}
           </div>
-          {!selectedHotel ? <div className="col-empty"><span>👆</span><p>Sélectionnez un hôtel</p></div>
-          : loadingChambres ? <div className="col-loading"><span className="mini-spinner" /></div>
-          : chambres.length === 0 ? (
+          {!selectedHotel ? (
+            <div className="col-empty"><span>👆</span><p>Sélectionnez un hôtel</p></div>
+          ) : loadingChambres ? (
+            <div className="col-loading"><span className="mini-spinner" /></div>
+          ) : errorChambres ? (
+            <div className="col-error">⚠️ {errorChambres} <button onClick={() => loadChambres(selectedHotel.id)}>↺</button></div>
+          ) : chambres.length === 0 ? (
             <div className="col-empty">
               <span>🛏️</span><p>Aucune chambre</p>
-              <button className="btn-col-add-empty" onClick={() => setChambreModal({ open: true, data: null })}>Ajouter une chambre</button>
+              <button className="btn-col-add-empty" onClick={() => setChambreModal({ open: true, data: null })}>
+                Ajouter une chambre
+              </button>
             </div>
           ) : (
             <div className="chambres-list">
-              {chambres.map((ch) => (
+              {chambres.map(ch => (
                 <ChambreCard key={ch.id} chambre={ch}
                   isSelected={selectedChambre?.id === ch.id}
-                  onEdit={(c) => setChambreModal({ open: true, data: c })}
+                  onEdit={c => setChambreModal({ open: true, data: c })}
                   onSelectTarifs={handleSelectChambre}
                 />
               ))}
@@ -297,34 +341,43 @@ export default function ChambresPage() {
           )}
         </div>
 
-        {/* Colonne 3 — Tarifs */}
+        {/* ── Col 3 Tarifs ── */}
         <div className="col-tarifs">
           <div className="col-header">
             <div className="col-header-left">
               <span className="col-title">Tarifs</span>
-              {selectedChambre && <span className="tarifs-chambre-name">{selectedChambre.type_chambre?.nom}</span>}
+              {selectedChambre && (
+                <span className="tarifs-chambre-name">{selectedChambre.type_chambre?.nom}</span>
+              )}
             </div>
             {selectedChambre && (
               <button className="btn-col-add" onClick={() => setTarifModal({ open: true, data: null })}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
                 Ajouter
               </button>
             )}
           </div>
-          {!selectedChambre ? <div className="col-empty"><span>👆</span><p>Sélectionnez une chambre</p></div>
-          : loadingTarifs ? <div className="col-loading"><span className="mini-spinner" /></div>
-          : tarifs.length === 0 ? (
+          {!selectedChambre ? (
+            <div className="col-empty"><span>👆</span><p>Sélectionnez une chambre</p></div>
+          ) : loadingTarifs ? (
+            <div className="col-loading"><span className="mini-spinner" /></div>
+          ) : errorTarifs ? (
+            <div className="col-error">⚠️ {errorTarifs} <button onClick={() => loadTarifs(selectedHotel.id, selectedChambre.id)}>↺</button></div>
+          ) : tarifs.length === 0 ? (
             <div className="col-empty">
               <span>💰</span><p>Aucun tarif défini</p>
-              <button className="btn-col-add-empty" onClick={() => setTarifModal({ open: true, data: null })}>Ajouter un tarif</button>
+              <button className="btn-col-add-empty" onClick={() => setTarifModal({ open: true, data: null })}>
+                Ajouter un tarif
+              </button>
             </div>
           ) : (
             <div className="tarifs-list">
-              {tarifs.map((t) => (
+              {tarifs.map(t => (
                 <TarifRow key={t.id} tarif={t}
-                  onEdit={(t) => setTarifModal({ open: true, data: t })}
+                  onEdit={t => setTarifModal({ open: true, data: t })}
                   onDelete={handleDeleteTarif}
                 />
               ))}
@@ -335,11 +388,13 @@ export default function ChambresPage() {
 
       {chambreModal.open && (
         <ChambreModal chambre={chambreModal.data} typesChambres={typesChambres}
-          onClose={() => setChambreModal({ open: false, data: null })} onSave={handleSaveChambre} />
+          onClose={() => setChambreModal({ open: false, data: null })}
+          onSave={handleSaveChambre} />
       )}
       {tarifModal.open && (
         <TarifModal tarif={tarifModal.data} typesReservation={typesReservation}
-          onClose={() => setTarifModal({ open: false, data: null })} onSave={handleSaveTarif} />
+          onClose={() => setTarifModal({ open: false, data: null })}
+          onSave={handleSaveTarif} />
       )}
     </div>
   );

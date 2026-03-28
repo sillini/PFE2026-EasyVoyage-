@@ -28,7 +28,7 @@ async function handleResponse(res) {
 
 // ── Réservations ──────────────────────────────────────────
 export const reservationsApi = {
-  list:    (params = {}) => {
+  list: (params = {}) => {
     const q = new URLSearchParams({ page: 1, per_page: 20, ...params });
     return fetch(`${BASE}/reservations?${q}`, { headers: authHeaders() }).then(handleResponse);
   },
@@ -50,20 +50,20 @@ export const hotelsAdminApi = {
     const q = new URLSearchParams({ page: 1, per_page: 100, actif_only: 0, ...params });
     return fetch(`${BASE}/hotels?${q}`, { headers: authHeaders() }).then(handleResponse);
   },
-  get:    (id)       => fetch(`${BASE}/hotels/${id}`, { headers: authHeaders() }).then(handleResponse),
-  create: (data)     => fetch(`${BASE}/hotels`, { method: "POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
-  update: (id, data) => fetch(`${BASE}/hotels/${id}`, { method: "PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
-  toggle: (id, actif) => fetch(`${BASE}/hotels/${id}/toggle`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ actif }) }).then(handleResponse),
+  get:            (id)           => fetch(`${BASE}/hotels/${id}`, { headers: authHeaders() }).then(handleResponse),
+  create:         (data)         => fetch(`${BASE}/hotels`, { method: "POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  update:         (id, data)     => fetch(`${BASE}/hotels/${id}`, { method: "PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  toggle:         (id, actif)    => fetch(`${BASE}/hotels/${id}/toggle`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ actif }) }).then(handleResponse),
   toggleFeatured: (id, mis_en_avant) => fetch(`${BASE}/hotels/admin/${id}/featured`, { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ mis_en_avant }) }).then(handleResponse),
-  delete: (id) => fetch(`${BASE}/hotels/${id}`, { method: "DELETE", headers: authHeaders() }).then(handleResponse),
+  delete:         (id)           => fetch(`${BASE}/hotels/${id}`, { method: "DELETE", headers: authHeaders() }).then(handleResponse),
 };
 
 // ── Villes vedettes ────────────────────────────────────────
 export const villesVedettesApi = {
-  list:   ()           => fetch(`${BASE}/hotels/admin/villes-vedettes`, { headers: authHeaders() }).then(handleResponse),
-  create: (data)       => fetch(`${BASE}/hotels/admin/villes-vedettes`, { method:"POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
-  update: (id, data)   => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method:"PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
-  delete: (id)         => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method:"DELETE", headers: authHeaders() }).then(handleResponse),
+  list:   ()         => fetch(`${BASE}/hotels/admin/villes-vedettes`, { headers: authHeaders() }).then(handleResponse),
+  create: (data)     => fetch(`${BASE}/hotels/admin/villes-vedettes`, { method: "POST", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  update: (id, data) => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method: "PUT", headers: authHeaders(), body: JSON.stringify(data) }).then(handleResponse),
+  delete: (id)       => fetch(`${BASE}/hotels/admin/villes-vedettes/${id}`, { method: "DELETE", headers: authHeaders() }).then(handleResponse),
 };
 
 // ── Voyages ───────────────────────────────────────────────
@@ -133,6 +133,39 @@ export const facturesAdminApi = {
   telechargerPdf: (id) => fetch(`${BASE}/factures/${id}/pdf`, { headers: authHeaders() }),
 };
 
+// ── Finances ──────────────────────────────────────────────
+export const financesAdminApi = {
+  dashboard: () =>
+    fetch(`${BASE}/finances/dashboard`, { headers: authHeaders() }).then(handleResponse),
+
+  revenus: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(`${BASE}/finances/revenus?${q}`, { headers: authHeaders() }).then(handleResponse);
+  },
+
+  commissions: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(`${BASE}/finances/commissions?${q}`, { headers: authHeaders() }).then(handleResponse);
+  },
+
+  soldesPartenaires: () =>
+    fetch(`${BASE}/finances/soldes-partenaires`, { headers: authHeaders() }).then(handleResponse),
+
+  payer: (id_partenaire, note = "") =>
+    fetch(`${BASE}/finances/payer/${id_partenaire}`, {
+      method: "POST", headers: authHeaders(),
+      body: JSON.stringify({ note }),
+    }).then(handleResponse),
+
+  paiements: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(`${BASE}/finances/paiements?${q}`, { headers: authHeaders() }).then(handleResponse);
+  },
+
+  clientsRentables: (limit = 50) =>
+    fetch(`${BASE}/finances/clients-rentables?limit=${limit}`, { headers: authHeaders() }).then(handleResponse),
+};
+
 // ── Profil Admin ──────────────────────────────────────────
 export const profilApi = {
   get: () => fetch(`${BASE}/auth/me`, { headers: authHeaders() }).then(handleResponse),
@@ -185,19 +218,15 @@ export const heroSlidesApi = {
       method: "DELETE", headers: authHeaders(),
     }).then(handleResponse),
 };
-// ══════════════════════════════════════════════════════════
-//  REMPLACEMENT de adminSupportApi dans src/admin/services/api.js
-//  Ajouter la méthode createConversation
-// ══════════════════════════════════════════════════════════
 
+// ── Support Admin ─────────────────────────────────────────
 export const adminSupportApi = {
 
-  // ← NOUVEAU : l'admin crée une conversation vers un partenaire
   createConversation: (data) =>
     fetch(`${BASE}/admin/support/conversations`, {
       method:  "POST",
       headers: authHeaders(),
-      body:    JSON.stringify(data),   // { id_partenaire, sujet, premier_message? }
+      body:    JSON.stringify(data),
     }).then(handleResponse),
 
   listConversations: (statut = "") => {

@@ -8,6 +8,7 @@ const PAGE_META = {
   partenaires:           { title: "Partenaires",             subtitle: "Gestion des comptes partenaires" },
   "demandes-partenaire": { title: "Demandes partenaires",    subtitle: "Demandes d'inscription reçues depuis la landing page" },
   clients:               { title: "Clients",                  subtitle: "Gestion des comptes clients" },
+  finances:              { title: "Finances",                subtitle: "Revenus, commissions partenaires & facturation" },
   marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
   factures:              { title: "Factures",                subtitle: "Historique et gestion des factures" },
   agent:                 { title: "Agent IA",                subtitle: "Assistant intelligent d'administration" },

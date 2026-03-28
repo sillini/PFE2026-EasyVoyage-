@@ -1,44 +1,38 @@
 import { useState, useEffect } from "react";
 import { hotelsApi, imagesApi } from "../services/api";
-import HotelModal from "../components/hotels/HotelModal";
-import ImageManager from "../components/hotels/ImageManager";
-import HotelDetail from "./HotelDetail";
+import HotelModal    from "../components/hotels/HotelModal";
+import ImageManager  from "../components/hotels/ImageManager";
+import HotelDetail   from "./HotelDetail";
 import "./MesHotels.css";
 
+// ── Étoiles ───────────────────────────────────────────────
 function StarRating({ count }) {
   return (
     <div className="star-rating">
-      {[1,2,3,4,5].map((n) => (
+      {[1,2,3,4,5].map(n => (
         <span key={n} className={n <= count ? "star filled" : "star"}>★</span>
       ))}
     </div>
   );
 }
 
+// ── Carte hôtel ───────────────────────────────────────────
 function HotelCard({ hotel, onEdit, onImages, onView }) {
-  const mainImage = hotel.images?.find((i) => i.type === "PRINCIPALE")?.url
-    || hotel.images?.[0]?.url
-    || null;
+  const mainImage =
+    hotel.images?.find(i => i.type === "PRINCIPALE")?.url ||
+    hotel.images?.[0]?.url || null;
 
   return (
     <div className="hotel-card">
-      {/* Image — cliquable */}
       <div className="hotel-card-image" onClick={() => onView(hotel)} style={{ cursor: "pointer" }}>
-        {mainImage ? (
-          <img src={mainImage} alt={hotel.nom} loading="lazy" />
-        ) : (
-          <div className="hotel-card-no-img">
-            <span>🏨</span>
-            <p>Aucune photo</p>
-          </div>
-        )}
-        <div className="hotel-card-badge">
-          <StarRating count={hotel.etoiles} />
-        </div>
+        {mainImage
+          ? <img src={mainImage} alt={hotel.nom} loading="lazy" />
+          : <div className="hotel-card-no-img"><span>🏨</span><p>Aucune photo</p></div>
+        }
+        <div className="hotel-card-badge"><StarRating count={hotel.etoiles} /></div>
         {!hotel.actif && <div className="hotel-inactive-tag">Inactif</div>}
       </div>
 
-      {/* Infos — cliquables */}
       <div className="hotel-card-body" onClick={() => onView(hotel)} style={{ cursor: "pointer" }}>
         <h3 className="hotel-card-nom">{hotel.nom}</h3>
         <div className="hotel-card-location">
@@ -48,21 +42,16 @@ function HotelCard({ hotel, onEdit, onImages, onView }) {
           </svg>
           {hotel.ville || hotel.pays}
         </div>
-
         {hotel.note_moyenne > 0 && (
           <div className="hotel-card-note">
             <span className="note-star">★</span>
-            <span className="note-val">{hotel.note_moyenne}</span>
+            <span className="note-val">{hotel.note_moyenne.toFixed(1)}</span>
             <span className="note-label">/5</span>
           </div>
         )}
-
-        {hotel.description && (
-          <p className="hotel-card-desc">{hotel.description}</p>
-        )}
+        {hotel.description && <p className="hotel-card-desc">{hotel.description}</p>}
       </div>
 
-      {/* Actions */}
       <div className="hotel-card-actions">
         <button className="btn-action btn-images" onClick={() => onImages(hotel)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -84,15 +73,16 @@ function HotelCard({ hotel, onEdit, onImages, onView }) {
   );
 }
 
+// ── Page principale ───────────────────────────────────────
 export default function MesHotels() {
-  const [hotels, setHotels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [editHotel, setEditHotel] = useState(null);
-  const [imagesHotel, setImagesHotel] = useState(null);
+  const [hotels,          setHotels]          = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [error,           setError]           = useState("");
+  const [showModal,       setShowModal]       = useState(false);
+  const [editHotel,       setEditHotel]       = useState(null);
+  const [imagesHotel,     setImagesHotel]     = useState(null);
   const [selectedHotelId, setSelectedHotelId] = useState(null);
-  const [search, setSearch] = useState("");
+  const [search,          setSearch]          = useState("");
 
   useEffect(() => { loadHotels(); }, []);
 
@@ -100,17 +90,17 @@ export default function MesHotels() {
     setLoading(true);
     setError("");
     try {
-      const data = await hotelsApi.list();
-      const hotelsList = data.items || [];
+      // ✅ CORRECTION : mesHotels() → GET /hotels/mes-hotels
+      // Filtre par JWT → retourne UNIQUEMENT les hôtels du partenaire connecté
+      // ❌ AVANT : hotelsApi.list() → GET /hotels → retourne TOUS les hôtels
+      const data = await hotelsApi.mesHotels({ actif_only: 0, per_page: 100 });
+      const hotelsList = data?.items || [];
 
-      // Charger les images pour chaque hôtel
       const hotelsWithImages = await Promise.all(
-        hotelsList.map(async (hotel) => {
+        hotelsList.map(async hotel => {
           try {
             const imgData = await imagesApi.list(hotel.id);
-            const images = Array.isArray(imgData)
-              ? imgData
-              : imgData?.items || [];
+            const images  = Array.isArray(imgData) ? imgData : imgData?.items || [];
             return { ...hotel, images };
           } catch {
             return { ...hotel, images: [] };
@@ -120,27 +110,23 @@ export default function MesHotels() {
 
       setHotels(hotelsWithImages);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Impossible de charger vos hôtels");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async (form) => {
-    if (editHotel) {
-      await hotelsApi.update(editHotel.id, form);
-    } else {
-      await hotelsApi.create(form);
-    }
+  const handleSave = async form => {
+    if (editHotel) await hotelsApi.update(editHotel.id, form);
+    else           await hotelsApi.create(form);
     await loadHotels();
   };
 
-  const openAdd = () => { setEditHotel(null); setShowModal(true); };
-  const openEdit = (hotel) => { setEditHotel(hotel); setShowModal(true); };
-  const openImages = (hotel) => setImagesHotel(hotel);
-  const openDetail = (hotel) => setSelectedHotelId(hotel.id);
+  const openAdd    = ()    => { setEditHotel(null); setShowModal(true); };
+  const openEdit   = hotel => { setEditHotel(hotel); setShowModal(true); };
+  const openImages = hotel => setImagesHotel(hotel);
+  const openDetail = hotel => setSelectedHotelId(hotel.id);
 
-  // ── Si un hôtel est sélectionné → afficher sa page détail
   if (selectedHotelId) {
     return (
       <HotelDetail
@@ -150,7 +136,7 @@ export default function MesHotels() {
     );
   }
 
-  const filtered = hotels.filter((h) =>
+  const filtered = hotels.filter(h =>
     h.nom.toLowerCase().includes(search.toLowerCase()) ||
     (h.ville || h.pays || "").toLowerCase().includes(search.toLowerCase())
   );
@@ -167,7 +153,8 @@ export default function MesHotels() {
         </div>
         <button className="btn-add-hotel" onClick={openAdd}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
           Ajouter un hôtel
         </button>
@@ -176,17 +163,19 @@ export default function MesHotels() {
       {/* Barre de recherche */}
       <div className="hotels-search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
           placeholder="Rechercher par nom ou ville..."
         />
         {search && (
           <button onClick={() => setSearch("")} className="search-clear">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
         )}
@@ -200,7 +189,7 @@ export default function MesHotels() {
         </div>
       )}
 
-      {error && (
+      {!loading && error && (
         <div className="hotels-error">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"/>
@@ -224,7 +213,8 @@ export default function MesHotels() {
           {!search && (
             <button className="btn-add-hotel" onClick={openAdd}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
               Ajouter mon premier hôtel
             </button>
@@ -235,7 +225,7 @@ export default function MesHotels() {
       {/* Grille */}
       {!loading && !error && filtered.length > 0 && (
         <div className="hotels-grid">
-          {filtered.map((hotel) => (
+          {filtered.map(hotel => (
             <HotelCard
               key={hotel.id}
               hotel={hotel}
@@ -255,7 +245,6 @@ export default function MesHotels() {
           onSave={handleSave}
         />
       )}
-
       {imagesHotel && (
         <ImageManager
           hotel={imagesHotel}

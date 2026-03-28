@@ -11,6 +11,7 @@ import AdminVoyages            from "./admin/pages/AdminVoyages";
 import AdminPartenaires        from "./admin/pages/AdminPartenaires";
 import AdminDemandesPartenaire from "./admin/pages/AdminDemandesPartenaire";
 import AdminClients            from "./admin/pages/AdminClients";
+import AdminFinances           from "./admin/pages/AdminFinances";
 import AdminMarketing          from "./admin/pages/AdminMarketing";
 import AdminFactures           from "./admin/pages/AdminFactures";
 import AdminAgentIA            from "./admin/pages/AdminAgentIA";
@@ -26,7 +27,7 @@ import ChambresPage          from "./partenaire/pages/ChambresPage";
 import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
 import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
-import MesReservations       from "./partenaire/pages/MesReservations";   // ← AJOUTÉ
+import MesReservations       from "./partenaire/pages/MesReservations";
 
 import "./App.css";
 
@@ -113,6 +114,7 @@ export default function App() {
             />
           );
         case "clients":         return <AdminClients />;
+        case "finances":        return <AdminFinances />;
         case "marketing":       return <AdminMarketing />;
         case "factures":        return <AdminFactures />;
         case "agent":           return <AdminAgentIA />;
@@ -139,7 +141,7 @@ export default function App() {
     switch (activePage) {
       case "hotels":        return <MesHotels />;
       case "chambres":      return <ChambresPage />;
-      case "reservations":  return <MesReservations />;   // ← AJOUTÉ
+      case "reservations":  return <MesReservations />;
       case "profil":        return <PartenaireProfil />;
       case "support":       return <PartenaireSupportPage currentUserId={user?.id}/>;
       default:              return <PlaceholderPage page={activePage} />;

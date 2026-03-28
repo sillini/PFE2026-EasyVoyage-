@@ -20,7 +20,6 @@ function ImageCarousel({ images }) {
 
   return (
     <div className="carousel">
-      {/* Image principale */}
       <div className="carousel-main">
         <img
           key={current}
@@ -28,20 +27,13 @@ function ImageCarousel({ images }) {
           alt={`Photo ${current + 1}`}
           className="carousel-img"
         />
-        {/* Overlay gradient */}
         <div className="carousel-overlay" />
-
-        {/* Badge type */}
         <div className="carousel-badge">
           {images[current].type === "PRINCIPALE" ? "⭐ Principale" : images[current].type}
         </div>
-
-        {/* Compteur */}
         <div className="carousel-counter">
           {current + 1} / {images.length}
         </div>
-
-        {/* Flèches */}
         {images.length > 1 && (
           <>
             <button className="carousel-btn prev" onClick={prev}>
@@ -58,12 +50,11 @@ function ImageCarousel({ images }) {
         )}
       </div>
 
-      {/* Miniatures */}
       {images.length > 1 && (
         <div className="carousel-thumbs">
           {images.map((img, i) => (
             <button
-              key={img.id}
+              key={img.id || i}
               className={`thumb ${i === current ? "active" : ""}`}
               onClick={() => setCurrent(i)}
             >
@@ -89,18 +80,21 @@ function Stars({ count, size = "md" }) {
 
 // ── Carte avis ────────────────────────────────────────────
 function AvisCard({ avis }) {
+  const dateStr = avis.date || avis.created_at;
   return (
     <div className="avis-card">
       <div className="avis-header">
         <div className="avis-avatar">
-          {avis.id_client?.toString().slice(-2)}
+          {avis.client?.prenom?.[0] || avis.id_client?.toString().slice(-2) || "?"}
         </div>
         <div className="avis-meta">
-          <span className="avis-client">Client #{avis.id_client}</span>
+          <span className="avis-client">
+            {avis.client ? `${avis.client.prenom} ${avis.client.nom}` : `Client #${avis.id_client}`}
+          </span>
           <span className="avis-date">
-            {new Date(avis.date).toLocaleDateString("fr-FR", {
+            {dateStr ? new Date(dateStr).toLocaleDateString("fr-FR", {
               day: "numeric", month: "long", year: "numeric",
-            })}
+            }) : "—"}
           </span>
         </div>
         <div className="avis-note-badge">
@@ -116,36 +110,46 @@ function AvisCard({ avis }) {
 
 // ── Page principale ───────────────────────────────────────
 export default function HotelDetail({ hotelId, onBack }) {
-  const [hotel, setHotel] = useState(null);
-  const [images, setImages] = useState([]);
-  const [avis, setAvis] = useState([]);
+  const [hotel,   setHotel]   = useState(null);
+  const [images,  setImages]  = useState([]);
+  const [avis,    setAvis]    = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
 
-  useEffect(() => {
-    loadAll();
-  }, [hotelId]);
+  useEffect(() => { loadAll(); }, [hotelId]);
 
   const loadAll = async () => {
     setLoading(true);
     setError("");
     try {
-      const [hotelData, imgData, avisData] = await Promise.all([
-        hotelsApi.get(hotelId),
+      // ✅ D'abord charger l'hôtel seul — c'est le plus important
+      const hotelData = await hotelsApi.get(hotelId);
+      setHotel(hotelData);
+
+      // ✅ Ensuite charger images et avis indépendamment
+      // allSettled : même si l'un échoue, l'autre s'affiche quand même
+      const [imgResult, avisResult] = await Promise.allSettled([
         imagesApi.list(hotelId),
         hotelsApi.getAvis(hotelId),
       ]);
-      setHotel(hotelData);
-      const imgs = Array.isArray(imgData) ? imgData : imgData?.items || [];
-      // Mettre PRINCIPALE en premier
-      const sorted = [
-        ...imgs.filter((i) => i.type === "PRINCIPALE"),
-        ...imgs.filter((i) => i.type !== "PRINCIPALE"),
-      ];
-      setImages(sorted);
-      setAvis(Array.isArray(avisData) ? avisData : avisData?.items || []);
+
+      if (imgResult.status === "fulfilled") {
+        const imgData = imgResult.value;
+        const imgs    = Array.isArray(imgData) ? imgData : imgData?.items || [];
+        setImages([
+          ...imgs.filter(i => i.type === "PRINCIPALE"),
+          ...imgs.filter(i => i.type !== "PRINCIPALE"),
+        ]);
+      }
+
+      if (avisResult.status === "fulfilled") {
+        const avisData = avisResult.value;
+        setAvis(Array.isArray(avisData) ? avisData : avisData?.items || []);
+      }
+
     } catch (err) {
-      setError(err.message);
+      // Seul hotelsApi.get() peut déclencher cette erreur
+      setError(err.message || "Impossible de charger les détails de l'hôtel");
     } finally {
       setLoading(false);
     }
@@ -160,6 +164,12 @@ export default function HotelDetail({ hotelId, onBack }) {
 
   if (error) return (
     <div className="detail-error">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+        width="40" height="40" style={{ color: "#E05252" }}>
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
       <p>{error}</p>
       <button onClick={onBack}>← Retour</button>
     </div>
@@ -193,7 +203,7 @@ export default function HotelDetail({ hotelId, onBack }) {
               </svg>
               <div>
                 <span className="quick-label">Adresse</span>
-                <span className="quick-value">{hotel.adresse}</span>
+                <span className="quick-value">{hotel.adresse || "—"}</span>
               </div>
             </div>
             <div className="quick-item">
@@ -244,7 +254,9 @@ export default function HotelDetail({ hotelId, onBack }) {
             {/* Note globale */}
             <div className="detail-note-global">
               <div className="note-circle">
-                <span className="note-num">{noteGlobale > 0 ? noteGlobale.toFixed(1) : "—"}</span>
+                <span className="note-num">
+                  {noteGlobale > 0 ? noteGlobale.toFixed(1) : "—"}
+                </span>
                 <span className="note-max">/5</span>
               </div>
               <div className="note-details">
@@ -267,7 +279,6 @@ export default function HotelDetail({ hotelId, onBack }) {
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" y1="13" x2="8" y2="13"/>
                   <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
                 </svg>
                 Description
               </h3>
@@ -294,7 +305,9 @@ export default function HotelDetail({ hotelId, onBack }) {
             </div>
             <div className="stat-box">
               <span className="stat-icon">📊</span>
-              <span className="stat-num">{noteGlobale > 0 ? noteGlobale.toFixed(1) : "—"}</span>
+              <span className="stat-num">
+                {noteGlobale > 0 ? noteGlobale.toFixed(1) : "—"}
+              </span>
               <span className="stat-lbl">Note moy.</span>
             </div>
           </div>
@@ -306,9 +319,10 @@ export default function HotelDetail({ hotelId, onBack }) {
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
               Avis clients
-              {avis.length > 0 && <span className="avis-count-badge">{avis.length}</span>}
+              {avis.length > 0 && (
+                <span className="avis-count-badge">{avis.length}</span>
+              )}
             </h3>
-
             {avis.length === 0 ? (
               <div className="no-avis">
                 <span>💬</span>
@@ -316,7 +330,7 @@ export default function HotelDetail({ hotelId, onBack }) {
               </div>
             ) : (
               <div className="avis-list">
-                {avis.map((a) => <AvisCard key={a.id} avis={a} />)}
+                {avis.map(a => <AvisCard key={a.id} avis={a} />)}
               </div>
             )}
           </div>
