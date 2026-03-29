@@ -335,3 +335,26 @@
 .tarif-btn-edit svg, .tarif-btn-delete svg { width: 13px; height: 13px; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+/* ── Ajouter à la fin de ChambresPage.css ─────────────────── */
+ 
+.chambre-stock-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  background: rgba(26,63,99,0.06);
+  border: 1px solid rgba(26,63,99,0.15);
+  border-radius: 8px; margin-bottom: 10px;
+  font-family: 'Lato', sans-serif; font-size: 0.82rem; color: #1A3F63;
+}
+.chambre-stock-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+.chambre-stock-badge strong { font-size: 1rem; font-weight: 800; }
+.chambre-stock-badge span   { color: #4A6FA5; }
+ 
+.btn-edit-chambre {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; background: white;
+  border: 1.5px solid #E8EDF5; border-radius: 9px;
+  font-family: 'Lato', sans-serif; font-size: 0.8rem; font-weight: 600;
+  color: #1A3F63; cursor: pointer; transition: all 0.2s;
+}
+.btn-edit-chambre:hover { border-color: #C4973A; color: #C4973A; }
+.btn-edit-chambre svg { width: 13px; height: 13px; }

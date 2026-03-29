@@ -28,10 +28,21 @@ async function post(url, body) {
 }
 
 export const hotelDetailApi = {
-  getHotel:    id         => get(`${BASE}/hotels/${id}`),
-  getImages:   id         => get(`${BASE}/hotels/${id}/images`),
-  getChambres: id         => get(`${BASE}/hotels/${id}/chambres?per_page=50`),
-  getTarifs:   (hId, cId) => get(`${BASE}/hotels/${hId}/chambres/${cId}/tarifs?per_page=50`),
-  getAvis:     id         => get(`${BASE}/hotels/${id}/avis?per_page=20&page=1`),
-  postAvis:    (id, data) => post(`${BASE}/hotels/${id}/avis`, data),
+  getHotel:    id => get(`${BASE}/hotels/${id}`),
+  getImages:   id => get(`${BASE}/hotels/${id}/images`),
+
+  // Toutes les chambres actives (sans filtre période) — contient nb_chambres
+  getChambres: id => get(`${BASE}/hotels/${id}/chambres?per_page=50`),
+
+  // ── Disponibilités publiques filtrées par période ──────────────────────────
+  // Retourne nb_disponibles / nb_total par type de chambre
+  // Les types dont nb_disponibles == 0 sont masqués automatiquement côté public
+  getChambresDisponibles: (id, dateDebut, dateFin) => {
+    const q = new URLSearchParams({ date_debut: dateDebut, date_fin: dateFin });
+    return get(`${BASE}/hotels/${id}/disponibilites/public?${q}`);
+  },
+
+  getTarifs:  (hId, cId) => get(`${BASE}/hotels/${hId}/chambres/${cId}/tarifs?per_page=50`),
+  getAvis:    id         => get(`${BASE}/hotels/${id}/avis?per_page=20&page=1`),
+  postAvis:   (id, data) => post(`${BASE}/hotels/${id}/avis`, data),
 };

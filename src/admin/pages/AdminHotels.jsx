@@ -293,7 +293,7 @@ export default function AdminHotels() {
             <div className="ah-filter-field">
               <label>Nom / Prénom du partenaire</label>
               <input value={partNom} onChange={e=>setPartNom(e.target.value)}
-                placeholder="Ex: Ahmed Ben Ali..." className="ah-filter-input"/>
+                placeholder="Ex: Ahmed Sillini" className="ah-filter-input"/>
             </div>
             <div className="ah-filter-field">
               <label>Email du partenaire</label>

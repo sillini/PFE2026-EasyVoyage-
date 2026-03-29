@@ -30,15 +30,27 @@ function HotelItem({ hotel, isActive, onClick }) {
   );
 }
 
-// ── Chambre card ──────────────────────────────────────────
+// ── Chambre card — affiche 1 TYPE avec son stock ──────────
 function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
   return (
-    <div className={`chambre-card ${isSelected ? "selected" : ""}`}>
+    <div className={`chambre-card ${isSelected ? "selected" : ""}`}
+      onClick={() => onSelectTarifs(chambre)}>
       <div className="chambre-card-header">
         <span className="chambre-type-badge">{chambre.type_chambre?.nom || "—"}</span>
         {!chambre.actif && <span className="chambre-inactif">Inactif</span>}
       </div>
       <div className="chambre-card-body">
+        {/* Badge stock total */}
+        <div className="chambre-stock-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <strong>{chambre.nb_chambres ?? 1}</strong>
+          <span>chambre{(chambre.nb_chambres ?? 1) > 1 ? "s" : ""} au total</span>
+        </div>
         <div className="chambre-capacite">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -46,7 +58,7 @@ function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          {chambre.capacite} personne{chambre.capacite > 1 ? "s" : ""}
+          {chambre.capacite} personne{chambre.capacite > 1 ? "s" : ""} / chambre
         </div>
         {chambre.description && <p className="chambre-desc">{chambre.description}</p>}
         {chambre.prix_min != null && (
@@ -61,14 +73,16 @@ function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
         )}
       </div>
       <div className="chambre-card-actions">
-        <button className={`btn-tarifs ${isSelected ? "active" : ""}`} onClick={() => onSelectTarifs(chambre)}>
+        <button className={`btn-tarifs ${isSelected ? "active" : ""}`}
+          onClick={e => { e.stopPropagation(); onSelectTarifs(chambre); }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="12" y1="1" x2="12" y2="23"/>
             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
           Tarifs
         </button>
-        <button className="btn-edit-chambre" onClick={() => onEdit(chambre)}>
+        <button className="btn-edit-chambre"
+          onClick={e => { e.stopPropagation(); onEdit(chambre); }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -80,13 +94,13 @@ function ChambreCard({ chambre, isSelected, onEdit, onSelectTarifs }) {
   );
 }
 
-// ── Tarif row — design carte avec icône calendrier ────────
+// ── Tarif row ─────────────────────────────────────────────
 function TarifRow({ tarif, onEdit, onDelete }) {
-  const now        = new Date();
-  const debut      = new Date(tarif.date_debut);
-  const fin        = new Date(tarif.date_fin);
-  const isActive   = debut <= now && fin >= now;
-  const isExpired  = fin < now;
+  const now       = new Date();
+  const debut     = new Date(tarif.date_debut);
+  const fin       = new Date(tarif.date_fin);
+  const isActive  = debut <= now && fin >= now;
+  const isExpired = fin < now;
   const isUpcoming = debut > now;
 
   const fmt = d => new Date(d).toLocaleDateString("fr-FR", {
@@ -99,7 +113,7 @@ function TarifRow({ tarif, onEdit, onDelete }) {
         <div className="tarif-periode-row">
           <div className="tarif-periode-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
               <line x1="16" y1="2" x2="16" y2="6"/>
               <line x1="8" y1="2" x2="8" y2="6"/>
               <line x1="3" y1="10" x2="21" y2="10"/>
@@ -120,7 +134,6 @@ function TarifRow({ tarif, onEdit, onDelete }) {
           </span>
         </div>
       </div>
-
       <div className="tarif-prix-block">
         <span className="prix-montant">{parseFloat(tarif.prix).toFixed(0)}</span>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
@@ -128,7 +141,6 @@ function TarifRow({ tarif, onEdit, onDelete }) {
           <span className="prix-per-night">/nuit</span>
         </div>
       </div>
-
       <div className="tarif-actions">
         <button className="tarif-btn-edit" onClick={() => onEdit(tarif)} title="Modifier">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -150,20 +162,20 @@ function TarifRow({ tarif, onEdit, onDelete }) {
 
 // ── Page principale ───────────────────────────────────────
 export default function ChambresPage() {
-  const [hotels,           setHotels]          = useState([]);
-  const [selectedHotel,    setSelectedHotel]   = useState(null);
-  const [chambres,         setChambres]        = useState([]);
-  const [selectedChambre,  setSelectedChambre] = useState(null);
-  const [tarifs,           setTarifs]          = useState([]);
-  const [typesChambres,    setTypesChambres]   = useState([]);
-  const [typesReservation, setTypesReservation]= useState([]);
+  const [hotels,           setHotels]           = useState([]);
+  const [selectedHotel,    setSelectedHotel]    = useState(null);
+  const [chambres,         setChambres]         = useState([]);
+  const [selectedChambre,  setSelectedChambre]  = useState(null);
+  const [tarifs,           setTarifs]           = useState([]);
+  const [typesChambres,    setTypesChambres]    = useState([]);
+  const [typesReservation, setTypesReservation] = useState([]);
 
-  const [loadingHotels,    setLoadingHotels]   = useState(true);
-  const [loadingChambres,  setLoadingChambres] = useState(false);
-  const [loadingTarifs,    setLoadingTarifs]   = useState(false);
-  const [errorHotels,      setErrorHotels]     = useState("");
-  const [errorChambres,    setErrorChambres]   = useState("");
-  const [errorTarifs,      setErrorTarifs]     = useState("");
+  const [loadingHotels,   setLoadingHotels]   = useState(true);
+  const [loadingChambres, setLoadingChambres] = useState(false);
+  const [loadingTarifs,   setLoadingTarifs]   = useState(false);
+  const [errorHotels,     setErrorHotels]     = useState("");
+  const [errorChambres,   setErrorChambres]   = useState("");
+  const [errorTarifs,     setErrorTarifs]     = useState("");
 
   const [chambreModal, setChambreModal] = useState({ open: false, data: null });
   const [tarifModal,   setTarifModal]   = useState({ open: false, data: null });
@@ -172,11 +184,9 @@ export default function ChambresPage() {
   useEffect(() => { loadInit(); }, []);
 
   const loadInit = async () => {
-    setLoadingHotels(true);
-    setErrorHotels("");
+    setLoadingHotels(true); setErrorHotels("");
     try {
       const [hotelsData, typCh, typRes] = await Promise.all([
-        // ✅ mesHotels() → GET /hotels/mes-hotels (filtre par JWT)
         hotelsApi.mesHotels(),
         hotelsApi.listTypesChambre(),
         hotelsApi.listTypesReservation(),
@@ -253,12 +263,15 @@ export default function ChambresPage() {
     );
   }
 
+  // Total chambres physiques
+  const totalChambresPhysiques = chambres.reduce((s, c) => s + (c.nb_chambres ?? 1), 0);
+
   return (
     <div className="chambres-page">
       <div className="chambres-header">
         <div>
           <h1 className="chambres-title">Chambres & Tarifs</h1>
-          <p className="chambres-subtitle">Gérez vos chambres et grilles tarifaires</p>
+          <p className="chambres-subtitle">Gérez vos types de chambres et grilles tarifaires</p>
         </div>
         {selectedHotel && (
           <button className="btn-dispo" onClick={() => setShowDispo(true)}>
@@ -298,12 +311,19 @@ export default function ChambresPage() {
           )}
         </div>
 
-        {/* ── Col 2 Chambres ── */}
+        {/* ── Col 2 Types de chambres ── */}
         <div className="col-chambres">
           <div className="col-header">
             <div className="col-header-left">
-              <span className="col-title">Chambres</span>
-              {selectedHotel && <span className="col-count">{chambres.length}</span>}
+              <span className="col-title">Types de chambres</span>
+              {selectedHotel && chambres.length > 0 && (
+                <span className="col-count">
+                  {chambres.length} type{chambres.length > 1 ? "s" : ""}
+                  <span style={{ color: "#8A9BB0", marginLeft: 4 }}>
+                    · {totalChambresPhysiques} chambre{totalChambresPhysiques > 1 ? "s" : ""}
+                  </span>
+                </span>
+              )}
             </div>
             {selectedHotel && (
               <button className="btn-col-add" onClick={() => setChambreModal({ open: true, data: null })}>
@@ -323,9 +343,9 @@ export default function ChambresPage() {
             <div className="col-error">⚠️ {errorChambres} <button onClick={() => loadChambres(selectedHotel.id)}>↺</button></div>
           ) : chambres.length === 0 ? (
             <div className="col-empty">
-              <span>🛏️</span><p>Aucune chambre</p>
+              <span>🛏️</span><p>Aucun type de chambre</p>
               <button className="btn-col-add-empty" onClick={() => setChambreModal({ open: true, data: null })}>
-                Ajouter une chambre
+                Ajouter un type
               </button>
             </div>
           ) : (
@@ -361,7 +381,7 @@ export default function ChambresPage() {
             )}
           </div>
           {!selectedChambre ? (
-            <div className="col-empty"><span>👆</span><p>Sélectionnez une chambre</p></div>
+            <div className="col-empty"><span>👆</span><p>Sélectionnez un type de chambre</p></div>
           ) : loadingTarifs ? (
             <div className="col-loading"><span className="mini-spinner" /></div>
           ) : errorTarifs ? (
