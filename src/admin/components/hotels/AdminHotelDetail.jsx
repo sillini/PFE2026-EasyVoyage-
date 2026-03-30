@@ -90,7 +90,7 @@ function Stars({ n }) {
   );
 }
 
-// ── Carte dispo par TYPE de chambre (logique stock) ───────
+// ── Carte dispo par TYPE de chambre ───────────────────────
 function TypeDispoCard({ chambre }) {
   const nbTotal        = chambre.nb_total       ?? 0;
   const nbDisponibles  = chambre.nb_disponibles ?? 0;
@@ -105,8 +105,6 @@ function TypeDispoCard({ chambre }) {
     <div className={`ahd-dispo-card ${chambre.disponible ? "dispo" : "occupe"}`}>
       <div className={`ahd-dispo-bar ${chambre.disponible ? "dispo" : "occupe"}`} />
       <div className="ahd-dispo-card-body">
-
-        {/* En-tête */}
         <div className="ahd-dispo-card-header">
           <span className="ahd-chambre-type">
             {chambre.type_chambre?.nom || `Type #${chambre.chambre_id}`}
@@ -117,26 +115,18 @@ function TypeDispoCard({ chambre }) {
           </span>
         </div>
 
-        {/* Barre de progression */}
         <div style={{ margin: "8px 0 4px" }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4,
-            fontFamily: "'Lato',sans-serif" }}>
-            <span style={{ fontSize: "1.2rem", fontWeight: 800, color: barColor,
-              fontFamily: "'Cormorant Garamond',serif" }}>{nbDisponibles}</span>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4, fontFamily: "'Lato',sans-serif" }}>
+            <span style={{ fontSize: "1.2rem", fontWeight: 800, color: barColor, fontFamily: "'Cormorant Garamond',serif" }}>{nbDisponibles}</span>
             <span style={{ fontSize: "0.78rem", color: "#8A9BB0" }}>/ {nbTotal} disponibles</span>
           </div>
           <div style={{ height: 5, background: "#F0F4F8", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${pct}%`, background: barColor,
-              borderRadius: 3, transition: "width 0.4s" }} />
+            <div style={{ height: "100%", width: `${pct}%`, background: barColor, borderRadius: 3, transition: "width 0.4s" }} />
           </div>
         </div>
 
-        {/* Badge invisible visiteurs */}
         {toutesOccupees && (
-          <div style={{ marginTop: 6, padding: "4px 8px",
-            background: "rgba(224,82,82,0.08)", border: "1px solid rgba(224,82,82,0.2)",
-            borderRadius: 6, fontFamily: "'Lato',sans-serif", fontSize: "0.72rem",
-            fontWeight: 700, color: "#C0392B" }}>
+          <div style={{ marginTop: 6, padding: "4px 8px", background: "rgba(224,82,82,0.08)", border: "1px solid rgba(224,82,82,0.2)", borderRadius: 6, fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", fontWeight: 700, color: "#C0392B" }}>
             🚫 Invisible pour visiteurs
           </div>
         )}
@@ -147,47 +137,24 @@ function TypeDispoCard({ chambre }) {
           </div>
         )}
 
-        {/* ── Réservations actives avec N° FACTURE ou VOUCHER ── */}
         {nbReservees > 0 && chambre.occupations?.length > 0 && (
           <div className="ahd-occupations" style={{ marginTop: 8 }}>
-            <div style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem",
-              fontWeight: 700, color: "#E05252", textTransform: "uppercase",
-              letterSpacing: "0.3px", marginBottom: 6,
-              display: "flex", alignItems: "center", gap: 5 }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                style={{ width: 12, height: 12 }}>
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <div style={{ fontFamily: "'Lato',sans-serif", fontSize: "0.72rem", fontWeight: 700, color: "#E05252", textTransform: "uppercase", letterSpacing: "0.3px", marginBottom: 6, display: "flex", alignItems: "center", gap: 5 }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 12, height: 12 }}>
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
               {nbReservees} réservation{nbReservees > 1 ? "s" : ""} active{nbReservees > 1 ? "s" : ""}
             </div>
-
             {chambre.occupations.map((o, i) => {
               const isVisiteur = o.source === "visiteur";
               return (
                 <div key={i} className="ahd-occ">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
                   </svg>
-                  {fmt(o.date_debut)}
-                  <span>→</span>
-                  {fmt(o.date_fin)}
-                  {/* N° facture (client) ou N° voucher (visiteur) */}
+                  {fmt(o.date_debut)}<span>→</span>{fmt(o.date_fin)}
                   {o.numero_ref && (
-                    <span style={{
-                      marginLeft: "auto",
-                      fontFamily: "'Lato',sans-serif",
-                      fontSize: "0.7rem",
-                      fontWeight: 700,
-                      padding: "2px 7px",
-                      borderRadius: 10,
-                      whiteSpace: "nowrap",
-                      background: isVisiteur ? "rgba(43,95,142,0.08)"        : "rgba(196,151,58,0.1)",
-                      border:     isVisiteur ? "1px solid rgba(43,95,142,0.2)" : "1px solid rgba(196,151,58,0.25)",
-                      color:      isVisiteur ? "#2B5F8E"                      : "#9A6E10",
-                    }}>
+                    <span style={{ marginLeft: "auto", fontFamily: "'Lato',sans-serif", fontSize: "0.7rem", fontWeight: 700, padding: "2px 7px", borderRadius: 10, whiteSpace: "nowrap", background: isVisiteur ? "rgba(43,95,142,0.08)" : "rgba(196,151,58,0.1)", border: isVisiteur ? "1px solid rgba(43,95,142,0.2)" : "1px solid rgba(196,151,58,0.25)", color: isVisiteur ? "#2B5F8E" : "#9A6E10" }}>
                       {isVisiteur ? "👤" : "🏷️"} {o.numero_ref}
                     </span>
                   )}
@@ -197,6 +164,137 @@ function TypeDispoCard({ chambre }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+//  ONGLET AVIS — avec suppression admin
+// ══════════════════════════════════════════════════════════
+function AvisTab({ avis, hotelId, onDeleted }) {
+  const [confirmId,  setConfirmId]  = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [errMsg,     setErrMsg]     = useState("");
+
+  const handleDelete = async (avisId) => {
+    setDeletingId(avisId);
+    setErrMsg("");
+    try {
+      const res = await fetch(`${BASE}/hotels/${hotelId}/avis/${avisId}`, {
+        method:  "DELETE",
+        headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+      });
+      if (!res.ok && res.status !== 204) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.detail || `Erreur ${res.status}`);
+      }
+      onDeleted(avisId);
+      setConfirmId(null);
+    } catch (e) {
+      setErrMsg(e.message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  if (avis.length === 0) {
+    return (
+      <div className="ahd-empty">
+        <span>⭐</span>
+        <p>Aucun avis pour cet hôtel</p>
+      </div>
+    );
+  }
+
+  const avgNote = (avis.reduce((s, a) => s + a.note, 0) / avis.length).toFixed(1);
+
+  return (
+    <div className="ahd-avis-list">
+      {/* Résumé */}
+      <div className="ahd-avis-summary">
+        <span className="ahd-avis-total">{avis.length} avis</span>
+        <span className="ahd-avis-avg">★ {avgNote} / 5</span>
+      </div>
+
+      {avis.map(a => (
+        <div key={a.id} className={`ahd-avis-card ${confirmId === a.id ? "ahd-avis-confirming" : ""}`}>
+          <div className="ahd-avis-header">
+            <div className="ahd-avis-avatar">
+              {(a.client?.prenom?.[0] || "?").toUpperCase()}
+            </div>
+            <div className="ahd-avis-meta">
+              <span className="ahd-avis-name">
+                {a.client?.prenom || "Client"} {a.client?.nom || ""}
+              </span>
+              <span className="ahd-avis-date">
+                {new Date(a.date || a.created_at).toLocaleDateString("fr-FR", {
+                  day: "2-digit", month: "short", year: "numeric",
+                })}
+              </span>
+            </div>
+            <Stars n={a.note} />
+
+            {/* Bouton supprimer — visible seulement si pas en mode confirmation */}
+            {confirmId !== a.id && (
+              <button
+                className="ahd-avis-del-btn"
+                onClick={() => { setConfirmId(a.id); setErrMsg(""); }}
+                title="Supprimer cet avis"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6M14 11v6"/>
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {a.commentaire && (
+            <p className="ahd-avis-text">{a.commentaire}</p>
+          )}
+
+          {/* Zone de confirmation inline */}
+          {confirmId === a.id && (
+            <div className="ahd-avis-confirm-zone">
+              <p className="ahd-avis-confirm-msg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Supprimer définitivement cet avis ?
+              </p>
+              {errMsg && <p className="ahd-avis-err">{errMsg}</p>}
+              <div className="ahd-avis-confirm-btns">
+                <button
+                  className="ahd-avis-cancel-btn"
+                  onClick={() => { setConfirmId(null); setErrMsg(""); }}
+                  disabled={deletingId === a.id}
+                >
+                  Annuler
+                </button>
+                <button
+                  className="ahd-avis-confirm-btn"
+                  onClick={() => handleDelete(a.id)}
+                  disabled={deletingId === a.id}
+                >
+                  {deletingId === a.id ? (
+                    <span className="ahd-spin-xs" />
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    </svg>
+                  )}
+                  {deletingId === a.id ? "Suppression…" : "Confirmer la suppression"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -272,12 +370,10 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
     return matchSearch && matchCap && matchType;
   });
 
-  // Stats globales dispo — basées sur le stock
   const totalDispos    = dispoResult?.chambres?.reduce((s, c) => s + (c.nb_disponibles ?? 0), 0) ?? 0;
   const totalChambres  = dispoResult?.chambres?.reduce((s, c) => s + (c.nb_total ?? 0), 0) ?? 0;
   const totalReservees = totalChambres - totalDispos;
-
-  const mainImg = images[0]?.url;
+  const mainImg        = images[0]?.url;
 
   if (loading) return (
     <div className="ahd-loading">
@@ -298,6 +394,7 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
   );
   if (!hotel) return null;
 
+  // L'onglet avis affiche le nombre actuel (mis à jour après suppression)
   const TABS = [
     { id: "info",     label: "Informations",                  icon: "🏨" },
     { id: "chambres", label: `Chambres (${chambres.length})`, icon: "🛏️" },
@@ -454,12 +551,9 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
                   <div className="ahd-card">
                     <h3 className="ahd-card-title">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <line x1="8" y1="6" x2="21" y2="6"/>
-                        <line x1="8" y1="12" x2="21" y2="12"/>
-                        <line x1="8" y1="18" x2="21" y2="18"/>
-                        <line x1="3" y1="6" x2="3.01" y2="6"/>
-                        <line x1="3" y1="12" x2="3.01" y2="12"/>
-                        <line x1="3" y1="18" x2="3.01" y2="18"/>
+                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                        <line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/>
+                        <line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
                       </svg>
                       Description
                     </h3>
@@ -548,14 +642,10 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
                       </span>
                     </div>
                     <div className="ahd-chambre-body">
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6,
-                        fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#1A3F63" strokeWidth="1.8"
-                          style={{ width: 14, height: 14 }}>
-                          <rect x="3" y="3" width="7" height="7" rx="1"/>
-                          <rect x="14" y="3" width="7" height="7" rx="1"/>
-                          <rect x="3" y="14" width="7" height="7" rx="1"/>
-                          <rect x="14" y="14" width="7" height="7" rx="1"/>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, fontFamily: "'Lato',sans-serif", fontSize: "0.82rem" }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#1A3F63" strokeWidth="1.8" style={{ width: 14, height: 14 }}>
+                          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                         </svg>
                         <strong style={{ color: "#1A3F63" }}>{ch.nb_chambres ?? 1}</strong>
                         <span style={{ color: "#8A9BB0" }}>chambre{(ch.nb_chambres ?? 1) > 1 ? "s" : ""} au total</span>
@@ -632,16 +722,13 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
             </div>
 
             {dispoError && (
-              <div style={{ color: "#E05252", padding: "12px 16px",
-                background: "rgba(224,82,82,0.08)", borderRadius: 10,
-                fontFamily: "'Lato',sans-serif", fontSize: "0.88rem" }}>
+              <div style={{ color: "#E05252", padding: "12px 16px", background: "rgba(224,82,82,0.08)", borderRadius: 10, fontFamily: "'Lato',sans-serif", fontSize: "0.88rem" }}>
                 ⚠️ {dispoError}
               </div>
             )}
 
             {dispoResult && (
               <>
-                {/* Stats — basées sur le STOCK, pas le nombre de types */}
                 <div className="ahd-dispo-summary">
                   {[
                     { cls: "dispo",  num: totalDispos,    lbl: "Chambres dispo." },
@@ -654,8 +741,6 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
                     </div>
                   ))}
                 </div>
-
-                {/* Grille des types avec barre de progression et N° facture/voucher */}
                 <div className="ahd-dispo-grid">
                   {dispoResult.chambres?.map(ch => (
                     <TypeDispoCard key={ch.chambre_id} chambre={ch} />
@@ -673,33 +758,13 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
           </div>
         )}
 
-        {/* ══ AVIS ══ */}
+        {/* ══ AVIS — avec suppression admin ══ */}
         {activeTab === "avis" && (
-          <div className="ahd-avis-list">
-            {avis.length === 0 ? (
-              <div className="ahd-empty"><span>⭐</span><p>Aucun avis pour cet hôtel</p></div>
-            ) : (
-              avis.map(a => (
-                <div key={a.id} className="ahd-avis-card">
-                  <div className="ahd-avis-header">
-                    <div className="ahd-avis-avatar">
-                      {(a.client?.prenom?.[0] || "?").toUpperCase()}
-                    </div>
-                    <div className="ahd-avis-meta">
-                      <span className="ahd-avis-name">{a.client?.prenom || "Client"} {a.client?.nom || ""}</span>
-                      <span className="ahd-avis-date">
-                        {new Date(a.date || a.created_at).toLocaleDateString("fr-FR", {
-                          day: "2-digit", month: "short", year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    <Stars n={a.note} />
-                  </div>
-                  {a.commentaire && <p className="ahd-avis-text">{a.commentaire}</p>}
-                </div>
-              ))
-            )}
-          </div>
+          <AvisTab
+            avis={avis}
+            hotelId={hotelId}
+            onDeleted={(id) => setAvis(prev => prev.filter(a => a.id !== id))}
+          />
         )}
       </div>
     </div>

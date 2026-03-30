@@ -207,7 +207,6 @@ function StepSucces({ result, onClose }) {
 //  FLOW PRINCIPAL — CLIENT UNIQUEMENT
 // ══════════════════════════════════════════════════════════
 export default function VoyageReservationFlow({ data, user, onClose }) {
-  // Seul un CLIENT authentifié peut réserver un voyage
   const steps   = ["recap", "paiement", "succes"];
   const [step,    setStep]    = useState("recap");
   const [loading, setLoading] = useState(false);
@@ -229,7 +228,11 @@ export default function VoyageReservationFlow({ data, user, onClose }) {
   const handlePay = async () => {
     setError(""); setLoading(true);
     try {
-      // 1. Créer réservation voyage (CLIENT uniquement via token JWT)
+      // ── 1. Créer la réservation voyage ──────────────────────────────────────
+      // On envoie maintenant nb_adultes + nb_enfants :
+      //   - calcul côté backend : total_ttc = prix_base × (nb_adultes + nb_enfants)
+      //   - vérification capacité disponible
+      //   - stocké pour incrémenter/décrémenter nb_inscrits au paiement/annulation
       const r1 = await fetch(`${API}/reservations/voyage`, {
         method:  "POST",
         headers: authHeaders(),
@@ -237,12 +240,14 @@ export default function VoyageReservationFlow({ data, user, onClose }) {
           id_voyage:  data.voyage.id,
           date_debut: data.voyage.date_depart,
           date_fin:   data.voyage.date_retour,
+          nb_adultes: data.adultes,
+          nb_enfants: data.enfants,
         }),
       });
       const resa = await r1.json();
       if (!r1.ok) throw new Error(resa.detail || "Erreur création réservation");
 
-      // 2. Payer → génère la facture
+      // ── 2. Payer → génère la facture + incrémente nb_inscrits du voyage ─────
       const r2 = await fetch(`${API}/reservations/${resa.id}/paiement`, {
         method:  "POST",
         headers: authHeaders(),

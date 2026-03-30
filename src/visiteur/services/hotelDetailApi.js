@@ -34,11 +34,14 @@ export const hotelDetailApi = {
   // Toutes les chambres actives (sans filtre période) — contient nb_chambres
   getChambres: id => get(`${BASE}/hotels/${id}/chambres?per_page=50`),
 
-  // ── Disponibilités publiques filtrées par période ──────────────────────────
-  // Retourne nb_disponibles / nb_total par type de chambre
-  // Les types dont nb_disponibles == 0 sont masqués automatiquement côté public
-  getChambresDisponibles: (id, dateDebut, dateFin) => {
+  // ── Disponibilités publiques filtrées par période ET capacité ─────────────
+  // capaciteMin = adultes + enfants → ne retourne que les chambres qui peuvent
+  // accueillir le nombre de personnes demandé
+  getChambresDisponibles: (id, dateDebut, dateFin, capaciteMin = null) => {
     const q = new URLSearchParams({ date_debut: dateDebut, date_fin: dateFin });
+    if (capaciteMin && capaciteMin > 0) {
+      q.set("capacite_min", String(capaciteMin));
+    }
     return get(`${BASE}/hotels/${id}/disponibilites/public?${q}`);
   },
 

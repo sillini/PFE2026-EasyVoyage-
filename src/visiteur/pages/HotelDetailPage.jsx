@@ -70,7 +70,7 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
   const [dateFin,   setDateFin]   = useState(addDays(todayStr(), 2));
   const [adultes,   setAdultes]   = useState(2);
   const [enfants,   setEnfants]   = useState(0);
-  const [chambres,  setChambres]  = useState([]);   // types avec stock et nb_disponibles
+  const [chambres,  setChambres]  = useState([]);
   const [tarifMap,  setTarifMap]  = useState({});
   const [selected,  setSelected]  = useState(null);
   const [loading,   setLoading]   = useState(false);
@@ -79,18 +79,24 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
   const search = async () => {
     if (dateFin <= dateDebut) { alert("La date de départ doit être après l'arrivée"); return; }
     setLoading(true); setSearched(true); setSelected(null);
+
+    // ── Capacité minimale requise = adultes + enfants ────────────────────
+    const nbPersonnes = adultes + enfants;
+
     try {
-      // ── ÉTAPE 1 : disponibilités publiques par période ───────────────────
-      // Chaque élément = 1 type de chambre avec nb_total, nb_disponibles, nb_reservees
-      // Les types dont nb_disponibles == 0 sont masqués automatiquement par le backend
-      const dispoData = await hotelDetailApi.getChambresDisponibles(hotelId, dateDebut, dateFin);
+      // ── ÉTAPE 1 : disponibilités publiques par période + filtre capacité ─
+      // On envoie nbPersonnes → le backend ne retourne que les chambres
+      // dont capacite >= nbPersonnes (ex: 2 adultes + 2 enfants = 4 → chambre ≥ 4 pers.)
+      const dispoData  = await hotelDetailApi.getChambresDisponibles(
+        hotelId, dateDebut, dateFin, nbPersonnes
+      );
       const dispoTypes = dispoData.chambres || [];
 
-      // ── ÉTAPE 2 : détails complets (pour infos type_chambre, description…) ─
-      const allData = await hotelDetailApi.getChambres(hotelId);
+      // ── ÉTAPE 2 : détails complets (type_chambre, description…) ─────────
+      const allData     = await hotelDetailApi.getChambres(hotelId);
       const allChambres = allData.items || allData || [];
 
-      // Merger dispo + détails : on se base sur chambre_id de la réponse dispo
+      // Merger dispo + détails
       const merged = dispoTypes.map(dispo => {
         const full = allChambres.find(c => c.id === dispo.chambre_id) || {};
         return {
@@ -99,7 +105,6 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
           nb_disponibles: dispo.nb_disponibles ?? 0,
           nb_total:       dispo.nb_total       ?? full.nb_chambres ?? 1,
           disponible:     dispo.disponible,
-          // Garder les infos de type depuis full si disponibles
           type_chambre:   full.type_chambre || dispo.type_chambre,
           capacite:       full.capacite     || dispo.capacite,
           description:    full.description  || dispo.description,
@@ -108,11 +113,15 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
         };
       });
 
-      setChambres(merged);
+      // ── Double sécurité côté client : exclure les chambres insuffisantes ─
+      // (au cas où le backend ne supporterait pas encore capacite_min)
+      const filtered = merged.filter(ch => (ch.capacite || 0) >= nbPersonnes);
 
-      // ── ÉTAPE 3 : tarifs par type ────────────────────────────────────────
+      setChambres(filtered);
+
+      // ── ÉTAPE 3 : tarifs par chambre filtrée ─────────────────────────────
       const map = {};
-      await Promise.all(merged.map(async c => {
+      await Promise.all(filtered.map(async c => {
         try {
           const t = await hotelDetailApi.getTarifs(hotelId, c.id);
           map[c.id] = t.items || t || [];
@@ -131,7 +140,7 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
   const handleReserver = () => {
     if (!selected) return;
     const tarifs = tarifMap[selected.id] || [];
-    const prix = getPrixChambre(tarifs, dateDebut, dateFin);
+    const prix   = getPrixChambre(tarifs, dateDebut, dateFin);
     onSelectChambre({ chambre: selected, prix, dateDebut, dateFin, adultes, enfants, nuits });
   };
 
@@ -196,7 +205,8 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
         <div className="hd-chambres-list">
           {chambres.length === 0 ? (
             <div className="hd-no-chambre">
-              Aucune chambre disponible pour ces dates. Essayez d'autres dates.
+              Aucune chambre disponible pour {adultes + enfants} personne{adultes + enfants > 1 ? "s" : ""}
+              {" "}sur ces dates. Essayez d'autres dates ou modifiez le nombre de voyageurs.
             </div>
           ) : (
             <>
@@ -221,7 +231,6 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
                     <div className="hd-ch-info">
                       <div className="hd-ch-nom">
                         {ch.type_chambre?.nom || "Chambre"} ({ch.capacite} Pers.)
-                        {/* Afficher le nombre de chambres disponibles */}
                         <span className="hd-badge-dispo">
                           {ch.nb_disponibles} disponible{ch.nb_disponibles > 1 ? "s" : ""}
                         </span>

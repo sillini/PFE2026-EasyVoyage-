@@ -19,9 +19,9 @@ function fmt(d) {
   return new Date(d).toLocaleDateString("fr-FR", { day:"2-digit", month:"short", year:"numeric" });
 }
 
-// ══════════════════════════════════════════════════════════
-//  MODAL SLIDE
-// ══════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
+   MODAL SLIDE
+══════════════════════════════════════════════════════════ */
 function SlideModal({ slide, onClose, onSave }) {
   const isEdit = !!slide;
   const [form, setForm] = useState({
@@ -64,10 +64,10 @@ function SlideModal({ slide, onClose, onSave }) {
   return (
     <div className="hsm-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="hsm-box">
-        <div className="hsm-topbar"/>
+        <div className="hsm-ridge" />
         <div className="hsm-header">
           <div className="hsm-header-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <rect x="2" y="3" width="20" height="14" rx="2"/>
               <path d="M8 21h8"/><path d="M12 17v4"/>
               <polyline points="2 10 7 6 11 9 16 5 22 10"/>
@@ -78,7 +78,7 @@ function SlideModal({ slide, onClose, onSave }) {
             <p>{isEdit ? "Mettre à jour les informations" : "Ajouter un slide au carousel"}</p>
           </div>
           <button className="hsm-close" onClick={onClose}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="13" height="13">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
@@ -86,7 +86,6 @@ function SlideModal({ slide, onClose, onSave }) {
 
         <form onSubmit={handleSubmit} className="hsm-form">
 
-          {/* Zone image */}
           <div className="hsm-section-label">Image du slide</div>
           <div className={`hsm-upload ${preview?"has-preview":""}`} onClick={() => fileRef.current?.click()}>
             {preview ? (
@@ -112,13 +111,12 @@ function SlideModal({ slide, onClose, onSave }) {
             {uploading && (
               <div className="hsm-upload-loading">
                 <div className="hsm-spin"/>
-                <span>Upload en cours...</span>
+                <span>Upload en cours…</span>
               </div>
             )}
             <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} hidden/>
           </div>
 
-          {/* Champs */}
           <div className="hsm-section-label">Informations du slide</div>
           <div className="hsm-row">
             <div className="hsm-field">
@@ -165,7 +163,7 @@ function SlideModal({ slide, onClose, onSave }) {
 
           {error && (
             <div className="hsm-error">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
                 <line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
@@ -177,9 +175,9 @@ function SlideModal({ slide, onClose, onSave }) {
             <button type="button" className="hsm-btn-cancel" onClick={onClose}>Annuler</button>
             <button type="submit" className="hsm-btn-save" disabled={saving||uploading}>
               {saving ? <span className="hsm-spin"/> : (
-                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="13" height="13">
                   <polyline points="20 6 9 17 4 12"/>
-                </svg>{isEdit?"Enregistrer":"Créer le slide"}</>
+                </svg>{isEdit?"Enregistrer les modifications":"Créer le slide"}</>
               )}
             </button>
           </div>
@@ -189,9 +187,9 @@ function SlideModal({ slide, onClose, onSave }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════
-//  PREVIEW SLIDER
-// ══════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
+   PREVIEW SLIDER
+══════════════════════════════════════════════════════════ */
 function SliderPreview({ slides }) {
   const actifs = slides.filter(s => s.actif).sort((a,b) => a.ordre - b.ordre);
   const [idx, setIdx] = useState(0);
@@ -205,7 +203,7 @@ function SliderPreview({ slides }) {
   if (actifs.length === 0) {
     return (
       <div className="hsp-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" width="32" height="32">
           <rect x="2" y="3" width="20" height="14" rx="2"/>
           <polyline points="2 10 7 6 11 9 16 5 22 10"/>
         </svg>
@@ -220,7 +218,7 @@ function SliderPreview({ slides }) {
     <div className="hsp-root">
       <div className="hsp-header">
         <span className="hsp-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="14" height="14">
             <circle cx="12" cy="12" r="10"/>
             <path d="M10 15l5-3-5-3v6z" fill="currentColor" stroke="none"/>
           </svg>
@@ -234,17 +232,12 @@ function SliderPreview({ slides }) {
       </div>
       <div className="hsp-frame">
         {actifs.map((s, i) => (
-          <div key={s.id}
-            className="hsp-slide"
-            style={{
-              backgroundImage: `url(${s.image_url})`,
-              opacity: i === idx ? 1 : 0,
-              zIndex: i === idx ? 1 : 0,
-            }}
+          <div key={s.id} className="hsp-slide"
+            style={{ backgroundImage:`url(${s.image_url})`, opacity: i===idx?1:0, zIndex: i===idx?1:0 }}
           />
         ))}
         <div className="hsp-overlay"/>
-        <div className="hsp-content" style={{ zIndex: 2 }}>
+        <div className="hsp-content" style={{ zIndex:2 }}>
           {slide.tag && <span className="hsp-tag">{slide.tag}</span>}
           <h3 className="hsp-titre">{slide.titre}</h3>
           {slide.sous_titre && <p className="hsp-sous">{slide.sous_titre}</p>}
@@ -253,10 +246,10 @@ function SliderPreview({ slides }) {
         {actifs.length > 1 && (
           <>
             <button className="hsp-arrow left" onClick={() => setIdx(i => (i-1+actifs.length)%actifs.length)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <button className="hsp-arrow right" onClick={() => setIdx(i => (i+1)%actifs.length)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           </>
         )}
@@ -265,36 +258,38 @@ function SliderPreview({ slides }) {
   );
 }
 
-// ══════════════════════════════════════════════════════════
-//  CARD SLIDE
-// ══════════════════════════════════════════════════════════
-function SlideCard({ slide, onEdit, onDelete, onToggle }) {
+/* ══════════════════════════════════════════════════════════
+   CARD SLIDE
+══════════════════════════════════════════════════════════ */
+function SlideCard({ slide, onEdit, onDelete, onToggle, index }) {
   const [toggling, setToggling] = useState(false);
   const [confirm,  setConfirm]  = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const handleToggle = async (e) => {
-    e.stopPropagation();
-    setToggling(true);
+    e.stopPropagation(); setToggling(true);
     try { await onToggle(slide.id, !slide.actif); } finally { setToggling(false); }
   };
-
   const handleDelete = async () => {
     setDeleting(true);
     try { await onDelete(slide.id); } finally { setDeleting(false); }
   };
 
   return (
-    <div className={`hsc-card ${slide.actif?"":"hsc-inactif"}`}>
+    <div className={`hsc-card ${slide.actif?"":"hsc-inactif"}`}
+      style={{ animationDelay:`${index*0.07}s` }}>
+
+      {/* Image */}
       <div className="hsc-img-wrap">
         <img src={slide.image_url} alt={slide.titre}/>
         <div className="hsc-img-overlay">
           {slide.tag && <span className="hsc-tag">{slide.tag}</span>}
-          <span className="hsc-ordre-badge">Ordre #{slide.ordre}</span>
+          <span className="hsc-ordre">Ordre #{slide.ordre}</span>
         </div>
         <div className={`hsc-status-bar ${slide.actif?"actif":"inactif"}`}/>
       </div>
 
+      {/* Corps */}
       <div className="hsc-body">
         <div className="hsc-body-top">
           <h3 className="hsc-titre">{slide.titre}</h3>
@@ -303,20 +298,17 @@ function SlideCard({ slide, onEdit, onDelete, onToggle }) {
           </span>
         </div>
         {slide.sous_titre && <p className="hsc-sous">{slide.sous_titre}</p>}
-
         <div className="hsc-meta">
           <div className="hsc-meta-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="11" height="11">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
             Créé le {fmt(slide.created_at)}
           </div>
           {slide.updated_at !== slide.created_at && (
             <div className="hsc-meta-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <polyline points="1 4 1 10 7 10"/>
-                <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="11" height="11">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
               </svg>
               Modifié le {fmt(slide.updated_at)}
             </div>
@@ -324,9 +316,10 @@ function SlideCard({ slide, onEdit, onDelete, onToggle }) {
         </div>
       </div>
 
+      {/* Footer */}
       <div className="hsc-footer">
         <button className="hsc-btn hsc-btn-edit" onClick={() => onEdit(slide)}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
           </svg>
@@ -336,33 +329,51 @@ function SlideCard({ slide, onEdit, onDelete, onToggle }) {
         <button className={`hsc-btn ${slide.actif?"hsc-btn-deact":"hsc-btn-act"}`}
           onClick={handleToggle} disabled={toggling}>
           {toggling ? <span className="hsc-spin"/> : slide.actif ? (
-            <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+            <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+              <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
             </svg>Désactiver</>
           ) : (
-            <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
               <circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/>
             </svg>Activer</>
           )}
         </button>
 
-        
+        <div className="hsc-del-zone" onClick={e => e.stopPropagation()}>
+          {!confirm ? (
+            <button className="hsc-btn hsc-btn-del" onClick={() => setConfirm(true)} title="Supprimer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+              </svg>
+            </button>
+          ) : (
+            <div className="hsc-confirm">
+              <span>Supprimer ?</span>
+              <button className="hsc-confirm-yes" onClick={handleDelete} disabled={deleting}>
+                {deleting ? "…" : "Oui"}
+              </button>
+              <button className="hsc-confirm-no" onClick={() => setConfirm(false)}>Non</button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// ══════════════════════════════════════════════════════════
-//  PAGE PRINCIPALE
-// ══════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
+   PAGE PRINCIPALE
+══════════════════════════════════════════════════════════ */
 export default function AdminHeroSlides() {
-  const [slides,  setSlides]  = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState("");
-  const [modal,   setModal]   = useState(null);
+  const [slides,       setSlides]       = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState("");
+  const [modal,        setModal]        = useState(null);
   const [filterStatut, setFilterStatut] = useState("tous");
-  const [search, setSearch]   = useState("");
-  const [showPreview, setShowPreview] = useState(true);
+  const [search,       setSearch]       = useState("");
+  const [showPreview,  setShowPreview]  = useState(true);
 
   useEffect(() => { load(); }, []);
 
@@ -373,12 +384,11 @@ export default function AdminHeroSlides() {
     finally { setLoading(false); }
   };
 
-  const handleSave = async (data) => {
+  const handleSave   = async (data) => {
     if (modal && modal !== "new") await heroSlidesApi.update(modal.id, data);
     else await heroSlidesApi.create(data);
     await load();
   };
-
   const handleToggle = async (id, actif) => { await heroSlidesApi.toggle(id, actif); await load(); };
   const handleDelete = async (id)         => { await heroSlidesApi.delete(id); await load(); };
 
@@ -398,100 +408,148 @@ export default function AdminHeroSlides() {
   return (
     <div className="hs-page">
 
-      {/* Header */}
-      <div className="hs-header">
-        <div>
-          <h1 className="hs-title">Hero Slides</h1>
-          <p className="hs-subtitle">
-            {actifs.length} slide{actifs.length>1?"s":""} actif{actifs.length>1?"s":""} sur {slides.length} total
+      {/* ── Header ──────────────────────────────────────── */}
+      <header className="hs-page-header">
+        <div className="hs-title-block">
+          <div className="hs-eyebrow">
+            <span className="hs-eyebrow-dot" />
+            Carousel de la page d'accueil
+          </div>
+          <h1 className="hs-page-title">Hero Slides</h1>
+          <p className="hs-page-desc">
+            {actifs.length} slide{actifs.length>1?"s":""} actif{actifs.length>1?"s":""} sur {slides.length} au total
           </p>
         </div>
         <div className="hs-header-actions">
           <button className={`hs-btn-preview ${showPreview?"active":""}`}
             onClick={() => setShowPreview(!showPreview)}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
             {showPreview ? "Masquer" : "Prévisualiser"}
           </button>
           <button className="hs-btn-add" onClick={() => setModal("new")}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="15" height="15">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             Ajouter un slide
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Stats */}
-      <div className="hs-stats">
+      {/* ── KPI Cards ───────────────────────────────────── */}
+      <div className="hs-kpi-grid">
         {[
-          { num:slides.length,  lbl:"Total",   cls:"blue",  icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="2 10 7 6 11 9 16 5 22 10"/></svg> },
-          { num:actifs.length,  lbl:"Actifs",  cls:"green", icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/></svg> },
-          { num:inactifs.length,lbl:"Inactifs",cls:"red",   icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
-        ].map(s => (
-          <div key={s.lbl} className={`hs-stat hs-stat-${s.cls}`}>
-            <div className={`hs-stat-icon hs-icon-${s.cls}`}>{s.icon}</div>
-            <div><span className="hs-stat-num">{s.num}</span><span className="hs-stat-lbl">{s.lbl}</span></div>
+          {
+            color:"blue", val:slides.length, lbl:"Total", sub:"slides créés",
+            icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="2 10 7 6 11 9 16 5 22 10"/></svg>
+          },
+          {
+            color:"green", val:actifs.length, lbl:"Actifs", sub:"affichés sur le site",
+            icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/></svg>
+          },
+          {
+            color:"slate", val:inactifs.length, lbl:"Inactifs", sub:"masqués",
+            icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          },
+        ].map((k,i) => (
+          <div key={i} className={`hs-kpi-card hs-kpi-${k.color}`}>
+            <div className="hs-kpi-icon">{k.icon}</div>
+            <div className="hs-kpi-body">
+              <span className="hs-kpi-val">{k.val}</span>
+              <span className="hs-kpi-lbl">{k.lbl}</span>
+              <span className="hs-kpi-sub">{k.sub}</span>
+            </div>
+            <div className="hs-kpi-deco" />
           </div>
         ))}
       </div>
 
-      {/* Prévisualisation */}
+      {/* ── Prévisualisation ────────────────────────────── */}
       {showPreview && !loading && <SliderPreview slides={slides}/>}
 
-      {/* Notice */}
+      {/* ── Notice ──────────────────────────────────────── */}
       <div className="hs-notice">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
           <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
         Les slides <strong>actifs</strong> s'affichent dans le <strong>Hero Slider</strong> de la page visiteur, triés par ordre croissant. L'ordre 0 s'affiche en premier.
       </div>
 
-      {/* Toolbar filtres */}
+      {/* ── Toolbar ─────────────────────────────────────── */}
       <div className="hs-toolbar">
         <div className="hs-tabs">
           {[["tous","Tous",slides.length],["actif","Actifs",actifs.length],["inactif","Inactifs",inactifs.length]].map(([val,lbl,nb]) => (
             <button key={val} className={`hs-tab ${filterStatut===val?"active":""}`}
               onClick={() => setFilterStatut(val)}>
-              <span className={`hs-tab-dot ${val}`}/>
-              {lbl} <span className="hs-tab-count">{nb}</span>
+              <span className={`hs-tab-dot hs-td-${val}`}/>
+              {lbl}
+              <span className="hs-tab-count">{nb}</span>
             </button>
           ))}
         </div>
-        <div className="hs-search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <div className="hs-toolbar-spacer" />
+        <label className="hs-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher un slide..."/>
-          {search && <button className="hs-clear" onClick={()=>setSearch("")}>✕</button>}
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Rechercher un slide…"/>
+          {search && (
+            <button className="hs-search-clear" onClick={() => setSearch("")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="10" height="10">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          )}
+        </label>
+        <div className="hs-result-pill">
+          <span className="hs-rp-num">{filtered.length}</span>
+          <span className="hs-rp-lbl">résultat{filtered.length>1?"s":""}</span>
         </div>
-        <span className="hs-count">{filtered.length} résultat{filtered.length>1?"s":""}</span>
       </div>
 
-      {/* États */}
-      {loading && <div className="hs-state"><div className="hs-spinner"/><p>Chargement...</p></div>}
-      {error   && <div className="hs-error-bar">{error}<button onClick={load}>Réessayer</button></div>}
+      {/* ── États ───────────────────────────────────────── */}
+      {loading && (
+        <div className="hs-state-box">
+          <div className="hs-loader"><div className="hs-loader-ring"/><div className="hs-loader-ring hs-lr2"/></div>
+          <p>Chargement des slides…</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="hs-error-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          {error}
+          <button onClick={load}>Réessayer</button>
+        </div>
+      )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div className="hs-state">
-          <span style={{fontSize:"2.5rem"}}>🖼️</span>
+        <div className="hs-state-box">
+          <div className="hs-empty-icon">🖼️</div>
           <h3>{search?"Aucun résultat":"Aucun slide"}</h3>
-          <p>{search?"Modifiez votre recherche":"Ajoutez votre premier slide"}</p>
-          {!search && <button className="hs-btn-add" onClick={()=>setModal("new")}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>Ajouter un slide</button>}
+          <p>{search?"Modifiez votre recherche":"Ajoutez votre premier slide hero"}</p>
+          {!search && (
+            <button className="hs-btn-add" onClick={() => setModal("new")}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Ajouter un slide
+            </button>
+          )}
         </div>
       )}
 
       {!loading && !error && filtered.length > 0 && (
         <div className="hs-grid">
-          {filtered.map(s => (
-            <SlideCard key={s.id} slide={s}
-              onEdit={s => setModal(s)}
+          {filtered.map((s, i) => (
+            <SlideCard key={s.id} slide={s} index={i}
+              onEdit={s  => setModal(s)}
               onToggle={handleToggle}
               onDelete={handleDelete}
             />

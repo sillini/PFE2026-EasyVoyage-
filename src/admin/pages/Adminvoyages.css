@@ -375,3 +375,226 @@
 
 @keyframes avSpin { to { transform:rotate(360deg); } }
 @keyframes avFadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+
+
+/* ════════════════════════════════════════════════════════════
+   AJOUTS AdminVoyages.css
+   → Coller à la FIN de votre fichier AdminVoyages.css existant
+════════════════════════════════════════════════════════════ */
+
+/* ── Stats : grille 6 colonnes ──────────────────────────── */
+.av-stats {
+  grid-template-columns: repeat(6, 1fr);
+}
+@media (max-width: 1400px) { .av-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .av-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px)  { .av-stats { grid-template-columns: 1fr; } }
+
+/* ── Mini jauge dans les cards ──────────────────────────── */
+.av-mini-jauge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+.av-mini-jauge-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.av-mini-jauge-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+.av-mini-jauge-txt {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  min-width: 38px;
+  text-align: right;
+}
+
+/* ── Badge places restantes ────────────────────────────── */
+.av-places-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  margin-bottom: 6px;
+}
+.av-places-badge svg {
+  width: 12px;
+  height: 12px;
+}
+.av-places-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.av-places-badge.complet {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ── Badge "Complet" sur l'image ───────────────────────── */
+.av-complet-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 3;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.88);
+  backdrop-filter: blur(6px);
+  color: white;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+/* ── Toolbar : toolbar-right ───────────────────────────── */
+.av-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.av-owner-tabs {
+  display: flex;
+  gap: 4px;
+}
+.av-owner-btn {
+  padding: 8px 14px;
+  border: 1.5px solid #DDE3EC;
+  border-radius: 10px;
+  background: white;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #8A9BB0;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.av-owner-btn:hover { border-color: #1A3F63; color: #1A3F63; }
+.av-owner-btn.active {
+  border-color: #1A3F63;
+  background: rgba(26, 63, 99, 0.07);
+  color: #1A3F63;
+  font-weight: 700;
+}
+.av-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #EEF2F7;
+  border: 1.5px solid transparent;
+  border-radius: 11px;
+  padding: 0 14px;
+  transition: all 0.22s;
+  min-width: 200px;
+}
+.av-search-box:focus-within {
+  border-color: #1A3F63;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(26, 63, 99, 0.08);
+}
+.av-search-box svg { width: 15px; height: 15px; color: #8A9BB0; flex-shrink: 0; }
+.av-search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 0;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.88rem;
+  color: #1C2E42;
+  background: transparent;
+}
+.av-search-box input::placeholder { color: #B0BEC8; }
+.av-btn-filter {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  background: #EEF2F7;
+  border: 1.5px solid transparent;
+  border-radius: 11px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #8A9BB0;
+  cursor: pointer;
+  transition: all 0.22s;
+  position: relative;
+}
+.av-btn-filter:hover,
+.av-btn-filter.active { background: white; color: #1A3F63; border-color: #DDE3EC; }
+.av-btn-filter svg { width: 14px; height: 14px; }
+
+/* ── Filtres panel ──────────────────────────────────────── */
+.av-filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.av-filter-field { display: flex; flex-direction: column; gap: 6px; }
+.av-filter-field label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #8A9BB0;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.av-filter-field input {
+  padding: 9px 13px;
+  border: 1.5px solid #DDE3EC;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.87rem;
+  color: #1C2E42;
+  background: #F8FAFC;
+  outline: none;
+  transition: all 0.2s;
+}
+.av-filter-field input:focus {
+  border-color: #1A3F63;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(26, 63, 99, 0.08);
+}
+.av-filter-clear {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: rgba(192, 57, 43, 0.07);
+  border: 1.5px solid rgba(192, 57, 43, 0.2);
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #C0392B;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.av-filter-clear:hover { background: rgba(192, 57, 43, 0.13); }
+
+/* ── Hero infos : couleurs état places ─────────────────── */
+.vdp-hero-complet  { color: #dc2626 !important; font-weight: 700; }
+.vdp-hero-warning  { color: #d97706 !important; font-weight: 700; }

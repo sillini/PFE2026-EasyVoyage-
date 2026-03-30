@@ -68,11 +68,18 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
   const [enfants, setEnfants] = useState(0);
   const [error,   setError]   = useState("");
 
-  const isExpired   = new Date(voyage.date_retour) < new Date();
+  const isExpired = new Date(voyage.date_retour) < new Date();
   const nbPersonnes = adultes + enfants;
-  const placesRestantes = Math.max(0, (voyage.capacite_max || 0) - (voyage.nb_inscrits || 0));
-  const isComplet   = placesRestantes <= 0;
-  const total       = parseFloat(voyage.prix_base) * nbPersonnes;
+
+  // ── Places restantes : utilise places_restantes si fourni par l'API,
+  //    sinon calcule depuis capacite_max - nb_inscrits ──────────────────
+  const placesRestantes =
+    typeof voyage.places_restantes === "number"
+      ? voyage.places_restantes
+      : Math.max(0, (voyage.capacite_max || 0) - (voyage.nb_inscrits || 0));
+
+  const isComplet = placesRestantes <= 0;
+  const total     = parseFloat(voyage.prix_base) * nbPersonnes;
 
   const handleReserver = () => {
     setError("");
@@ -80,7 +87,12 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
     if (nbPersonnes > placesRestantes) {
       setError(`Seulement ${placesRestantes} place(s) disponible(s).`); return;
     }
-    onReserver({ voyage, adultes, enfants, prix: { total, prix_par_pers: parseFloat(voyage.prix_base) } });
+    onReserver({
+      voyage,
+      adultes,
+      enfants,
+      prix: { total, prix_par_pers: parseFloat(voyage.prix_base) },
+    });
   };
 
   return (
@@ -96,7 +108,8 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
         <div className="vdp-resa-date-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
           <div>
             <div className="vdp-resa-date-label">Départ</div>
@@ -109,7 +122,8 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
         <div className="vdp-resa-date-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
           <div>
             <div className="vdp-resa-date-label">Retour</div>
@@ -156,7 +170,7 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
 
       {error && <div className="vdp-resa-error">{error}</div>}
 
-      {/* Places */}
+      {/* Badge places restantes */}
       {!isExpired && !isComplet && (
         <div className="vdp-places-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -181,7 +195,6 @@ function ReservationSection({ voyage, isClient, onReserver, onLoginRequired }) {
           </svg>
         </button>
       ) : (
-        /* Visiteur non connecté */
         <div className="vdp-login-required">
           <button className="vdp-btn-login" onClick={onLoginRequired}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -232,6 +245,13 @@ export default function VoyageDetailPage({ voyageId, isClient, user, onBack, onR
   const statusLbl = isExpired ? "Terminé" : isOngoing ? "En cours" : "À venir";
   const statusCls = isExpired ? "expired" : isOngoing ? "ongoing" : "upcoming";
 
+  // Places restantes pour l'affichage dans les infos pratiques
+  const nbInscrits      = voyage.nb_inscrits || 0;
+  const placesRestantes =
+    typeof voyage.places_restantes === "number"
+      ? voyage.places_restantes
+      : Math.max(0, voyage.capacite_max - nbInscrits);
+
   return (
     <div className="vdp-root">
       {/* Breadcrumb */}
@@ -263,7 +283,8 @@ export default function VoyageDetailPage({ voyageId, isClient, user, onBack, onR
           <span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
             {fmtDate(voyage.date_depart)} → {fmtDate(voyage.date_retour)}
           </span>
@@ -280,6 +301,19 @@ export default function VoyageDetailPage({ voyageId, isClient, user, onBack, onR
             </svg>
             {voyage.capacite_max} personnes max
           </span>
+          {/* Places restantes dans le hero */}
+          {!isExpired && (
+            <span className={placesRestantes === 0 ? "vdp-hero-complet" : placesRestantes <= 3 ? "vdp-hero-warning" : ""}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              {placesRestantes === 0
+                ? "Complet"
+                : `${placesRestantes} place${placesRestantes > 1 ? "s" : ""} restante${placesRestantes > 1 ? "s" : ""}`}
+            </span>
+          )}
         </div>
       </div>
 
@@ -306,12 +340,18 @@ export default function VoyageDetailPage({ voyageId, isClient, user, onBack, onR
           {/* Infos pratiques */}
           <div className="vdp-infos-grid">
             {[
-              { icon: "✈️", label: "Destination",     val: voyage.destination },
-              { icon: "📅", label: "Départ",          val: fmtDate(voyage.date_depart) },
-              { icon: "🏁", label: "Retour",          val: fmtDate(voyage.date_retour) },
-              { icon: "⏱️", label: "Durée",           val: `${voyage.duree} jour${voyage.duree > 1 ? "s" : ""}`, accent: true },
-              { icon: "👥", label: "Capacité max",    val: `${voyage.capacite_max} pers.` },
-              { icon: "💰", label: "Prix / personne", val: `${parseFloat(voyage.prix_base).toFixed(2)} DT`, accent: true },
+              { icon: "✈️", label: "Destination",       val: voyage.destination },
+              { icon: "📅", label: "Départ",            val: fmtDate(voyage.date_depart) },
+              { icon: "🏁", label: "Retour",            val: fmtDate(voyage.date_retour) },
+              { icon: "⏱️", label: "Durée",             val: `${voyage.duree} jour${voyage.duree > 1 ? "s" : ""}`, accent: true },
+              { icon: "👥", label: "Capacité max",      val: `${voyage.capacite_max} pers.` },
+              { icon: "✅", label: "Inscrits",          val: `${nbInscrits} pers.` },
+              { icon: placesRestantes === 0 ? "🔴" : "🟢",
+                label: "Places restantes",
+                val: placesRestantes === 0 ? "Complet" : `${placesRestantes} place${placesRestantes > 1 ? "s" : ""}`,
+                accent: placesRestantes > 0,
+              },
+              { icon: "💰", label: "Prix / personne",   val: `${parseFloat(voyage.prix_base).toFixed(2)} DT`, accent: true },
             ].map(({ icon, label, val, accent }) => (
               <div key={label} className={`vdp-info-card ${accent ? "accent" : ""}`}>
                 <div className="vdp-info-icon">{icon}</div>
