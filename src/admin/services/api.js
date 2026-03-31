@@ -135,6 +135,7 @@ export const facturesAdminApi = {
 
 // ── Finances ──────────────────────────────────────────────
 export const financesAdminApi = {
+  // ── Existants ───────────────────────────────────────────
   dashboard: () =>
     fetch(`${BASE}/finances/dashboard`, { headers: authHeaders() }).then(handleResponse),
 
@@ -164,6 +165,29 @@ export const financesAdminApi = {
 
   clientsRentables: (limit = 50) =>
     fetch(`${BASE}/finances/clients-rentables?limit=${limit}`, { headers: authHeaders() }).then(handleResponse),
+
+  // ── Nouveaux : drill-down partenaires ────────────────────
+  partenaires: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(`${BASE}/finances/partenaires?${q}`, { headers: authHeaders() }).then(handleResponse);
+  },
+
+  hotelsPartenaire: (id_partenaire) =>
+    fetch(`${BASE}/finances/partenaires/${id_partenaire}/hotels`, { headers: authHeaders() }).then(handleResponse),
+
+  reservationsHotel: (id_partenaire, id_hotel, params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(
+      `${BASE}/finances/partenaires/${id_partenaire}/hotels/${id_hotel}/reservations?${q}`,
+      { headers: authHeaders() }
+    ).then(handleResponse);
+  },
+
+  // ── Nouveau : classement clients + visiteurs ─────────────
+  classementClients: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetch(`${BASE}/finances/classement-clients?${q}`, { headers: authHeaders() }).then(handleResponse);
+  },
 };
 
 // ── Profil Admin ──────────────────────────────────────────
