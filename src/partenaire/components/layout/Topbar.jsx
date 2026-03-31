@@ -5,6 +5,7 @@ const PAGE_TITLES = {
   hotels:       { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
   chambres:     { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
   reservations: { title: "Réservations",       subtitle: "Consultez les réservations de vos établissements" },
+  finances:     { title: "Finances",           subtitle: "Vos revenus, réservations et demandes de retrait" },
   marketing:    { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },
   support:      { title: "Support",            subtitle: "Vos échanges avec l'équipe" },
   agent:        { title: "Agent IA",           subtitle: "Votre assistant intelligent" },

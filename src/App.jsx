@@ -28,6 +28,7 @@ import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
 import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
 import MesReservations       from "./partenaire/pages/MesReservations";
+import PartenaireFinances    from "./partenaire/pages/PartenaireFinances";
 
 import "./App.css";
 
@@ -142,6 +143,7 @@ export default function App() {
       case "hotels":        return <MesHotels />;
       case "chambres":      return <ChambresPage />;
       case "reservations":  return <MesReservations />;
+      case "finances":      return <PartenaireFinances />;
       case "profil":        return <PartenaireProfil />;
       case "support":       return <PartenaireSupportPage currentUserId={user?.id}/>;
       default:              return <PlaceholderPage page={activePage} />;

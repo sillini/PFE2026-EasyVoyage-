@@ -1,0 +1,549 @@
+/* ═══════════════════════════════════════════════════
+   PartenaireFinances.css
+   Design cohérent avec AdminFinances.css
+   Palette : bleu marine #1A3F63, or #C4973A, teal, purple
+   ═══════════════════════════════════════════════════ */
+
+.pf-page {
+  padding: 28px 32px;
+  background: #F0F4F8;
+  min-height: 100vh;
+  font-family: 'Lato', 'Segoe UI', system-ui, sans-serif;
+  color: #1C2B3A;
+}
+
+/* ── KPI Row ────────────────────────────────────────── */
+.pf-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) { .pf-kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .pf-kpi-row { grid-template-columns: 1fr; } }
+
+.pf-kpi {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 2px 12px rgba(26,63,99,.07);
+  border-top: 3px solid transparent;
+  transition: transform .15s, box-shadow .15s;
+}
+.pf-kpi:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,63,99,.11); }
+
+.pf-kpi--blue   { border-top-color: #1A3F63; }
+.pf-kpi--teal   { border-top-color: #0F6E56; }
+.pf-kpi--purple { border-top-color: #6B21A8; }
+.pf-kpi--gold   { border-top-color: #C4973A; }
+
+.pf-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: #7A8FA6;
+}
+
+.pf-kpi-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1A3F63;
+  letter-spacing: -.5px;
+  line-height: 1.1;
+}
+
+.pf-kpi-sub {
+  font-size: 12px;
+  color: #7A8FA6;
+}
+
+.pf-kpi-evo.pos { color: #15803D; font-weight: 700; }
+.pf-kpi-evo.neg { color: #C0392B; font-weight: 700; }
+
+/* ── Tabs ───────────────────────────────────────────── */
+.pf-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 2px 12px rgba(26,63,99,.07);
+  flex-wrap: wrap;
+}
+
+.pf-tab {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #7A8FA6;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.pf-tab-icon {
+  font-size: 14px;
+  opacity: .7;
+}
+
+.pf-tab:hover { background: #F5F8FB; color: #1A3F63; }
+
+.pf-tab--on {
+  background: #1A3F63;
+  color: #fff;
+  font-weight: 700;
+}
+
+.pf-tab--on .pf-tab-icon { opacity: 1; }
+
+/* ── Content area ───────────────────────────────────── */
+.pf-content {
+  animation: pf-fadein .2s ease;
+}
+@keyframes pf-fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Cards ──────────────────────────────────────────── */
+.pf-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(26,63,99,.07);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.pf-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #DDE5EE;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pf-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A3F63;
+  margin: 0;
+}
+
+/* ── Grid deux colonnes ─────────────────────────────── */
+.pf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 900px) { .pf-grid-2 { grid-template-columns: 1fr; } }
+
+/* ── Table ──────────────────────────────────────────── */
+.pf-table-wrap {
+  overflow-x: auto;
+}
+
+.pf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pf-table thead tr {
+  background: #F8FAFC;
+  border-bottom: 2px solid #DDE5EE;
+}
+
+.pf-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #7A8FA6;
+  white-space: nowrap;
+}
+
+.pf-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #EDF2F7;
+  vertical-align: middle;
+}
+
+.pf-table tbody tr:last-child td { border-bottom: none; }
+.pf-table tbody tr:hover { background: #F5F8FB; }
+
+/* ── Pills / Badges ─────────────────────────────────── */
+.pf-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pf-pill--paid    { background: #D4EDDA; color: #155724; }
+.pf-pill--wait    { background: #FFF3CD; color: #856404; }
+.pf-pill--cancel  { background: #FEE2E2; color: #991B1B; }
+.pf-pill--client  { background: #DBEAFE; color: #1E40AF; }
+.pf-pill--visitor { background: #F3E8FF; color: #6B21A8; }
+
+/* ── Spinner ────────────────────────────────────────── */
+.pf-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+}
+
+.pf-spin {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #DDE5EE;
+  border-top-color: #1A3F63;
+  border-radius: 50%;
+  animation: pf-spin .7s linear infinite;
+}
+
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+/* ── Pagination ─────────────────────────────────────── */
+.pf-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px;
+  font-size: 13px;
+  color: #7A8FA6;
+}
+
+.pf-pagination button {
+  padding: 6px 14px;
+  border: 1.5px solid #DDE5EE;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+
+.pf-pagination button:hover:not(:disabled) {
+  border-color: #1A3F63;
+  color: #1A3F63;
+}
+
+.pf-pagination button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Empty ──────────────────────────────────────────── */
+.pf-empty {
+  text-align: center;
+  padding: 48px 32px;
+  color: #7A8FA6;
+  font-size: 14px;
+}
+
+/* ── Toolbar / Search ───────────────────────────────── */
+.pf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pf-search {
+  padding: 8px 14px;
+  border: 1.5px solid #DDE5EE;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1C2B3A;
+  background: #fff;
+  outline: none;
+  min-width: 220px;
+  font-family: inherit;
+  transition: border-color .15s;
+}
+
+.pf-search:focus { border-color: #2B5F8E; }
+
+.pf-select {
+  padding: 8px 12px;
+  border: 1.5px solid #DDE5EE;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1C2B3A;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── Breadcrumb ─────────────────────────────────────── */
+.pf-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.pf-bc-btn {
+  background: none;
+  border: none;
+  color: #2B5F8E;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 0;
+  font-family: inherit;
+}
+
+.pf-bc-sep   { color: #7A8FA6; }
+.pf-bc-curr  { color: #1C2B3A; font-weight: 600; }
+
+/* ── Hotel card (liste mes hôtels) ──────────────────── */
+.pf-hotel-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #EDF2F7;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+.pf-hotel-row:last-child { border-bottom: none; }
+.pf-hotel-row:hover { background: #F5F8FB; }
+
+.pf-hotel-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #1A3F63;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: -1px;
+}
+
+.pf-hotel-info { flex: 1; min-width: 0; }
+.pf-hotel-name { font-size: 14px; font-weight: 700; color: #1A3F63; margin: 0 0 2px; }
+.pf-hotel-ville { font-size: 12px; color: #7A8FA6; margin: 0; }
+
+.pf-hotel-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.pf-hotel-stat { text-align: right; }
+.pf-hotel-stat-val { display: block; font-size: 14px; font-weight: 700; color: #1A3F63; }
+.pf-hotel-stat-lbl { display: block; font-size: 11px; color: #7A8FA6; }
+
+.pf-hotel-arrow {
+  color: #7A8FA6;
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: transform .15s, color .15s;
+}
+
+.pf-hotel-row:hover .pf-hotel-arrow {
+  transform: translateX(3px);
+  color: #1A3F63;
+}
+
+@media (max-width: 700px) {
+  .pf-hotel-stats { display: none; }
+  .pf-page { padding: 14px 16px; }
+}
+
+/* ── Demande retrait form ───────────────────────────── */
+.pf-retrait-wrap {
+  max-width: 520px;
+}
+
+.pf-retrait-solde {
+  background: #F0F4F8;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pf-retrait-solde-lbl { font-size: 13px; color: #7A8FA6; }
+.pf-retrait-solde-val { font-size: 22px; font-weight: 800; color: #1A3F63; }
+
+.pf-field { margin-bottom: 16px; }
+.pf-field label { display: block; font-size: 12px; font-weight: 700; color: #1A3F63; margin-bottom: 6px; }
+
+.pf-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #DDE5EE;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1C2B3A;
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.pf-input:focus { border-color: #2B5F8E; }
+
+.pf-btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: #1A3F63;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, transform .1s;
+}
+.pf-btn-submit:hover { background: #2B5F8E; }
+.pf-btn-submit:active { transform: scale(.98); }
+.pf-btn-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+.pf-alert-success {
+  background: #D4EDDA;
+  color: #155724;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.pf-alert-error {
+  background: #FEE2E2;
+  color: #991B1B;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* ── Chart bar ──────────────────────────────────────── */
+.pf-chart-container {
+  padding: 20px 20px 8px;
+  overflow-x: auto;
+}
+
+.pf-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 140px;
+  padding-bottom: 24px;
+  position: relative;
+  min-width: 400px;
+}
+
+.pf-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.pf-bar {
+  width: 100%;
+  max-width: 36px;
+  border-radius: 4px 4px 0 0;
+  background: #2B5F8E;
+  transition: background .2s;
+  cursor: pointer;
+  min-height: 4px;
+}
+
+.pf-bar:hover { background: #C4973A; }
+.pf-bar--current { background: #1A3F63; }
+
+.pf-bar-lbl {
+  position: absolute;
+  bottom: -20px;
+  font-size: 10px;
+  color: #7A8FA6;
+  white-space: nowrap;
+}
+
+/* ── Donut simple ───────────────────────────────────── */
+.pf-donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pf-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #1C2B3A;
+}
+
+.pf-donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf-donut-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Ref chip ───────────────────────────────────────── */
+.pf-ref {
+  background: #EFF2F7;
+  color: #2B5F8E;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+/* ── Amount ─────────────────────────────────────────── */
+.pf-amt { font-weight: 700; color: #1A3F63; }
+.pf-amt-part { font-weight: 700; color: #27AE60; }
