@@ -1,0 +1,324 @@
+/* ══════════════════════════════════════════════════════
+   ReservationsTable.css — Tableau réservations avancé
+   ══════════════════════════════════════════════════════ */
+
+/* ── Conteneur principal ─────────────────────────────── */
+.rs-container {
+  overflow: visible;
+}
+
+/* ── Barre de contrôle (search + filtres) ────────────── */
+.rs-control-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--c-border);
+  flex-wrap: wrap;
+  background: #FAFCFF;
+}
+
+/* ── SearchBar ───────────────────────────────────────── */
+.rs-searchbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 220px;
+}
+.rs-search-input-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+.rs-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-muted);
+  width: 16px; height: 16px;
+  pointer-events: none;
+}
+.rs-search-input {
+  width: 100%;
+  padding: 8px 32px 8px 34px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.rs-search-input:focus {
+  border-color: var(--c-blue2);
+  box-shadow: 0 0 0 3px rgba(43,95,142,.08);
+}
+.rs-search-clear {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--c-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.rs-search-clear:hover { color: var(--c-red); }
+.rs-search-count {
+  font-size: 12px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.rs-search-count b { color: var(--c-blue); }
+
+/* ── Filtres toggle ──────────────────────────────────── */
+.rs-filters-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.rs-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.rs-filters-toggle:hover,
+.rs-filters-toggle.open   { border-color: var(--c-blue2); color: var(--c-blue); }
+.rs-filters-toggle.active { border-color: var(--c-blue); background: #EEF4FB; color: var(--c-blue); font-weight: 700; }
+.rs-filter-badge {
+  background: var(--c-blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 99px;
+  min-width: 18px;
+  text-align: center;
+}
+.rs-chevron { transition: transform .2s; color: var(--c-muted); }
+.rs-chevron.up { transform: rotate(180deg); }
+
+.rs-reset-btn {
+  padding: 7px 12px;
+  border: 1.5px solid var(--c-red);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-red);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.rs-reset-btn:hover { background: #FEE2E2; }
+
+/* ── Panneau filtres déroulant ───────────────────────── */
+.rs-filters-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 200;
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 16px 18px;
+  min-width: 480px;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: rs-slidedown .15s ease;
+}
+@keyframes rs-slidedown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rs-filters-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.rs-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 140px;
+}
+.rs-filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--c-muted);
+}
+.rs-btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.rs-btn-choice {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1.5px solid var(--c-border);
+  border-radius: 99px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: all .12s;
+  white-space: nowrap;
+}
+.rs-btn-choice:hover { border-color: var(--c-blue2); color: var(--c-blue); }
+.rs-btn-choice.on    { border-color: var(--c-blue); background: var(--c-blue); color: #fff; font-weight: 700; }
+.rs-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-client   { background: #1E40AF; }
+.dot-visiteur { background: #6B21A8; }
+
+.rs-date-input,
+.rs-number-input {
+  padding: 7px 10px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.rs-date-input:focus,
+.rs-number-input:focus { border-color: var(--c-blue2); }
+
+/* ── Barre résumé filtrée ────────────────────────────── */
+.rs-summary-bar {
+  padding: 8px 20px;
+  background: #EEF4FB;
+  border-bottom: 1px solid var(--c-border);
+  font-size: 12px;
+  color: var(--c-muted);
+}
+.rs-summary-bar b { color: var(--c-blue); }
+.rs-summary-text { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+/* ── Tableau ─────────────────────────────────────────── */
+.rs-table-wrap {
+  overflow-x: auto;
+}
+.rs-table {
+  min-width: 900px;
+}
+.rs-th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.rs-th-sortable:hover { color: var(--c-blue); }
+.rs-sort-neutral { color: var(--c-border); font-size: 11px; margin-left: 3px; }
+.rs-sort-active  { color: var(--c-blue);   font-size: 11px; margin-left: 3px; font-weight: 800; }
+
+/* Ligne visiteur légèrement différenciée */
+.rs-row-visiteur { background: #FDFAFF; }
+.rs-row-visiteur:hover { background: #F5EEFF; }
+
+/* ── Cellules spéciales ──────────────────────────────── */
+.rs-person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rs-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-blue2), var(--c-blue));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+  flex-shrink: 0;
+}
+.rs-person-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.rs-email-link {
+  font-size: 12px;
+  color: var(--c-blue2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rs-email-link:hover { text-decoration: underline; }
+.rs-periode {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.rs-arrow { color: var(--c-muted); font-size: 10px; }
+.rs-montant { color: var(--c-blue); font-size: 13px; }
+.rs-taux {
+  background: #EFF2F7;
+  color: var(--c-blue2);
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.rs-paid-date {
+  font-size: 12px;
+  color: var(--c-green);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rs-ville {
+  font-size: 14px;
+  color: var(--c-muted);
+  font-weight: 400;
+}
+
+/* ── Empty state ─────────────────────────────────────── */
+.rs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--c-muted);
+  gap: 8px;
+}
+.rs-empty span { font-size: 28px; }
+.rs-empty p    { font-size: 14px; margin: 0; }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rs-filters-panel { min-width: 320px; right: auto; left: 0; }
+  .rs-control-bar   { flex-direction: column; }
+  .rs-email-link    { max-width: 120px; overflow: hidden; text-overflow: ellipsis; display: block; }
+}

@@ -1,0 +1,234 @@
+/* ══════════════════════════════════════════════
+   TabSoldes.css — Onglet Soldes à payer
+   ══════════════════════════════════════════════ */
+
+/* ── KPIs ────────────────────────────────────── */
+.sl-kpis {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* ── Contrôles ───────────────────────────────── */
+.sl-controls {
+  margin-bottom: 16px;
+}
+.sl-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Search */
+.sl-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 400px;
+}
+.sl-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-muted);
+  pointer-events: none;
+}
+.sl-search-input {
+  width: 100%;
+  padding: 8px 32px 8px 32px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.sl-search-input:focus {
+  border-color: var(--c-blue2);
+  box-shadow: 0 0 0 3px rgba(43,95,142,.07);
+}
+.sl-search-clear {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--c-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.sl-search-clear:hover { color: var(--c-red); }
+
+/* Bouton filtres */
+.sl-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.sl-filter-btn:hover,
+.sl-filter-btn.open   { border-color: var(--c-blue2); color: var(--c-blue); }
+.sl-filter-btn.active { border-color: var(--c-blue); background: #EEF4FB; color: var(--c-blue); font-weight: 700; }
+.sl-filter-badge {
+  background: var(--c-blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.sl-reset-btn {
+  padding: 7px 12px;
+  border: 1.5px solid var(--c-red);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-red);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.sl-reset-btn:hover { background: #FEE2E2; }
+.sl-count {
+  font-size: 12px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.sl-count b { color: var(--c-blue); }
+
+/* Panneau filtres */
+.sl-filters-panel {
+  margin-top: 10px;
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: sl-fadein .15s ease;
+}
+@keyframes sl-fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sl-filter-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sl-filter-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+.sl-btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.sl-btn-choice {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border: 1.5px solid var(--c-border);
+  border-radius: 99px;
+  background: transparent;
+  font-size: 12px;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: all .12s;
+  white-space: nowrap;
+}
+.sl-btn-choice:hover { border-color: var(--c-blue2); color: var(--c-blue); }
+.sl-btn-choice.on    { border-color: var(--c-blue); background: var(--c-blue); color: #fff; font-weight: 700; }
+.sl-sort-dir { opacity: .8; font-size: 11px; }
+.sl-dir-btn  { background: #F5F8FB !important; color: var(--c-blue2) !important; border-color: var(--c-blue2) !important; }
+.sl-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.sl-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sl-filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--c-muted);
+}
+.sl-num-input {
+  padding: 7px 10px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.sl-num-input:focus { border-color: var(--c-blue2); }
+
+/* ── Tableau ─────────────────────────────────── */
+.sl-table-wrap { overflow-x: auto; }
+.sl-th-sort {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sl-th-sort:hover { color: var(--c-blue); }
+.sl-sort-neutral { color: var(--c-border); font-size: 11px; margin-left: 3px; }
+.sl-sort-active  { color: var(--c-blue);   font-size: 11px; margin-left: 3px; font-weight: 800; }
+
+/* ── Détail commissions ──────────────────────── */
+.sl-comm-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+.sl-comm-breakdown {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.sl-comm-tag {
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tag-client   { background: #DBEAFE; color: #1E40AF; }
+.tag-visiteur { background: #F3E8FF; color: #6B21A8; }
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 768px) {
+  .sl-filter-grid { grid-template-columns: repeat(2, 1fr); }
+  .sl-kpis        { grid-template-columns: 1fr !important; }
+}

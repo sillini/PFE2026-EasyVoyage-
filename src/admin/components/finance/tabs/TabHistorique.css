@@ -1,0 +1,231 @@
+/* ══════════════════════════════════════════════════
+   TabHistorique.css
+   ══════════════════════════════════════════════════ */
+
+/* ── Barre de contrôle ───────────────────────────── */
+.th-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+/* ── Recherche ───────────────────────────────────── */
+.th-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+}
+.th-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-muted);
+  pointer-events: none;
+}
+.th-search-input {
+  width: 100%;
+  padding: 9px 34px 9px 34px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s, box-shadow .15s;
+}
+.th-search-input:focus {
+  border-color: var(--c-blue2);
+  box-shadow: 0 0 0 3px rgba(43,95,142,.08);
+}
+.th-search-clear {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--c-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color .12s;
+}
+.th-search-clear:hover { color: var(--c-red); }
+
+/* ── Bouton filtres ──────────────────────────────── */
+.th-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.th-filter-btn:hover,
+.th-filter-btn.open   { border-color: var(--c-blue2); color: var(--c-blue); }
+.th-filter-btn.active { border-color: var(--c-blue); background: #EEF4FB; color: var(--c-blue); font-weight: 700; }
+.th-filter-badge {
+  background: var(--c-blue);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 99px;
+  min-width: 18px;
+  text-align: center;
+}
+.th-chevron { transition: transform .2s; color: var(--c-muted); }
+.th-chevron.up { transform: rotate(180deg); }
+
+.th-reset-btn {
+  padding: 8px 13px;
+  border: 1.5px solid var(--c-red);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-red);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.th-reset-btn:hover { background: #FEE2E2; }
+
+/* ── Panneau filtres avancés ─────────────────────── */
+.th-filters-panel {
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  animation: th-fadein .15s ease;
+}
+@keyframes th-fadein {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
+.th-filter-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.th-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.th-filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--c-muted);
+}
+.th-date-input,
+.th-num-input {
+  padding: 8px 10px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--c-text);
+  background: var(--c-surface);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.th-date-input:focus,
+.th-num-input:focus { border-color: var(--c-blue2); }
+
+/* ── Résumé ──────────────────────────────────────── */
+.th-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--c-muted);
+  border-bottom: 1px solid var(--c-border);
+}
+.th-summary b         { color: var(--c-blue); }
+.th-summary-filtered  { color: var(--c-gold); font-style: italic; margin-left: 4px; }
+.th-summary-total     { font-weight: 600; }
+.th-summary-total b   { color: var(--c-green); font-size: 15px; }
+
+/* ── Tableau ─────────────────────────────────────── */
+.th-table-card { overflow-x: auto; }
+.th-table      { min-width: 840px; }
+
+/* Cellules */
+.th-avatar    { background: linear-gradient(135deg, var(--c-blue2), var(--c-blue)); }
+.th-name      { font-size: 13px; color: var(--c-text); }
+.th-email-link {
+  display: block;
+  font-size: 11px;
+  color: var(--c-blue2);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+.th-email-link:hover { text-decoration: underline; }
+.th-tel-link {
+  display: block;
+  font-size: 11px;
+  color: var(--c-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.th-tel-link:hover { color: var(--c-blue); }
+.th-entreprise {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.th-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.th-montant {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--c-green);
+}
+.th-note {
+  font-size: 12px;
+  color: var(--c-muted);
+  font-style: italic;
+  max-width: 160px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.th-date {
+  font-size: 12px;
+  color: var(--c-text);
+  white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .th-filter-row { grid-template-columns: repeat(2, 1fr); }
+  .th-search-wrap { max-width: 100%; }
+}
