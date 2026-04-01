@@ -2,8 +2,6 @@
  * src/partenaire/services/financesPartenaireApi.js
  * ==================================================
  * Couche d'accès à l'API Finance — Espace Partenaire.
- * Toutes les routes pointent vers /finances-partenaire/...
- * Le JWT du partenaire connecté est envoyé automatiquement.
  */
 
 const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
@@ -23,30 +21,31 @@ const post = (url, body = {}) =>
     body: JSON.stringify(body),
   }).then((r) => r.json());
 
-// ── Dashboard ────────────────────────────────────────────
-export const fetchPartDashboard = () =>
-  get("/finances-partenaire/dashboard");
+export const fetchPartDashboard    = ()                                    => get("/finances-partenaire/dashboard");
+export const fetchPartRevenus      = (annee)                               => get(`/finances-partenaire/revenus?annee=${annee}`);
+export const fetchPartHotels       = ()                                    => get("/finances-partenaire/mes-hotels");
+export const fetchPartPaiements    = (page = 1, perPage = 20)              => get(`/finances-partenaire/paiements?page=${page}&per_page=${perPage}`);
+export const fetchMesDemandes      = (page = 1, perPage = 20)              => get(`/finances-partenaire/mes-demandes?page=${page}&per_page=${perPage}`);
+export const postDemandeRetrait    = (montant, note = "")                  => post("/finances-partenaire/demande-retrait", { montant, note });
 
-// ── Revenus mensuels (graphique) ─────────────────────────
-export const fetchPartRevenus = (annee) =>
-  get(`/finances-partenaire/revenus?annee=${annee}`);
-
-// ── Mes hôtels ───────────────────────────────────────────
-export const fetchPartHotels = () =>
-  get("/finances-partenaire/mes-hotels");
-
-// ── Réservations d'un hôtel (drill-down) ─────────────────
 export const fetchPartReservations = (idHotel, page, perPage, statut, search) => {
   const q = new URLSearchParams({ page, per_page: perPage });
   if (statut && statut.trim()) q.set("statut", statut);
   if (search && search.trim()) q.set("search", search.trim());
   return get(`/finances-partenaire/mes-hotels/${idHotel}/reservations?${q}`);
 };
-
-// ── Paiements reçus ───────────────────────────────────────
-export const fetchPartPaiements = (page, perPage) =>
-  get(`/finances-partenaire/paiements?page=${page}&per_page=${perPage}`);
-
-// ── Demande de retrait ────────────────────────────────────
-export const postDemandeRetrait = (montant, note = "") =>
-  post("/finances-partenaire/demande-retrait", { montant, note });
+// ── Télécharger facture PDF ────────────────────────────────
+export const downloadFacturePdf = async (paiementId) => {
+  const res = await fetch(
+    `${BASE}/finances-partenaire/paiements/${paiementId}/pdf`,
+    { headers: authHeaders() }
+  );
+  if (!res.ok) throw new Error("PDF indisponible");
+  const blob = await res.blob();
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `facture_paiement_${paiementId}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
+};

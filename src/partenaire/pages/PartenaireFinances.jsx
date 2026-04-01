@@ -2,38 +2,40 @@
  * src/partenaire/pages/PartenaireFinances.jsx
  * =============================================
  * Page principale Finance — Espace Partenaire.
- * Orchestre les 4 onglets : Vue globale, Mes hôtels, Paiements reçus, Demande de retrait.
+ * Onglets : Vue globale | Mes hôtels | Paiements reçus | Demandes de retrait
  */
 import { useState, useEffect } from "react";
-import TabVueGlobale      from "../components/finances/TabVueGlobale.jsx";
-import TabMesHotels       from "../components/finances/TabMesHotels.jsx";
-import TabPaiements       from "../components/finances/TabPaiements.jsx";
-import TabDemandeRetrait  from "../components/finances/TabDemandeRetrait.jsx";
+import TabVueGlobale     from "../components/finances/TabVueGlobale.jsx";
+import TabMesHotels      from "../components/finances/TabMesHotels.jsx";
+import TabPaiements      from "../components/finances/TabPaiements.jsx";
+import TabDemandeRetrait from "../components/finances/TabDemandeRetrait.jsx";
 import { fetchPartDashboard } from "../services/financesPartenaireApi.js";
 import "./PartenaireFinances.css";
 
 const TABS = [
-  { id: "globale",  label: "Vue globale",         icon: "◎" },
-  { id: "hotels",   label: "Mes hôtels",           icon: "▦" },
-  { id: "paiements",label: "Paiements reçus",      icon: "↓" },
-  { id: "retrait",  label: "Demande de retrait",   icon: "⇥" },
+  { id: "globale",   label: "Vue globale",           icon: "◎" },
+  { id: "hotels",    label: "Mes hôtels",             icon: "▦" },
+  { id: "paiements", label: "Paiements reçus",        icon: "↓" },
+  { id: "retrait",   label: "Demandes de retrait",    icon: "⇥" },
 ];
 
+const fmt = (n) =>
+  new Intl.NumberFormat("fr-TN", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n ?? 0);
+
 export default function PartenaireFinances() {
-  const [tab,  setTab]  = useState("globale");
-  const [dash, setDash] = useState(null);
+  const [tab,         setTab]         = useState("globale");
+  const [dash,        setDash]        = useState(null);
   const [loadingDash, setLoadingDash] = useState(true);
 
-  useEffect(() => {
+  const reloadDash = () => {
     setLoadingDash(true);
     fetchPartDashboard()
       .then(setDash)
       .catch(console.error)
       .finally(() => setLoadingDash(false));
-  }, []);
+  };
 
-  const fmt = (n) =>
-    new Intl.NumberFormat("fr-TN", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(n ?? 0);
+  useEffect(() => { reloadDash(); }, []);
 
   return (
     <div className="pf-page">
@@ -45,7 +47,7 @@ export default function PartenaireFinances() {
           <span className="pf-kpi-value">
             {loadingDash ? "—" : `${fmt(dash?.solde_disponible)} DT`}
           </span>
-          <span className="pf-kpi-sub">à retirer</span>
+          <span className="pf-kpi-sub">montant retirable</span>
         </div>
 
         <div className="pf-kpi pf-kpi--teal">
@@ -54,7 +56,9 @@ export default function PartenaireFinances() {
             {loadingDash ? "—" : `${fmt(dash?.revenu_mois)} DT`}
           </span>
           <span className={`pf-kpi-sub pf-kpi-evo ${(dash?.evolution_pct ?? 0) >= 0 ? "pos" : "neg"}`}>
-            {loadingDash ? "" : `${(dash?.evolution_pct ?? 0) >= 0 ? "+" : ""}${dash?.evolution_pct ?? 0}% vs mois passé`}
+            {loadingDash
+              ? ""
+              : `${(dash?.evolution_pct ?? 0) >= 0 ? "+" : ""}${dash?.evolution_pct ?? 0}% vs mois passé`}
           </span>
         </div>
 
@@ -94,9 +98,12 @@ export default function PartenaireFinances() {
         {tab === "globale"   && <TabVueGlobale dash={dash} loadingDash={loadingDash} />}
         {tab === "hotels"    && <TabMesHotels />}
         {tab === "paiements" && <TabPaiements />}
-        {tab === "retrait"   && <TabDemandeRetrait solde={dash?.solde_disponible ?? 0} onSuccess={() => {
-          fetchPartDashboard().then(setDash).catch(console.error);
-        }} />}
+        {tab === "retrait"   && (
+          <TabDemandeRetrait
+            solde={dash?.solde_disponible ?? 0}
+            onSuccess={reloadDash}
+          />
+        )}
       </div>
     </div>
   );

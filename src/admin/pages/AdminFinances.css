@@ -695,3 +695,36 @@
   .af2-table th, .af2-table td { padding: 8px 10px; }
   .af2-part-kpis { margin-left: 0; }
 }
+
+/* ── KPI cards (TabDemandes) ────────────────────────────── */
+.af2-kpi-card {
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--c-blue);
+  flex: 1;
+  min-width: 160px;
+}
+
+/* ── Tab badge (demandes EN_ATTENTE) ────────────────────── */
+.af2-tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: #E74C3C;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}

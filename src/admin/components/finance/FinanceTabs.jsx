@@ -1,20 +1,16 @@
 /**
  * FinanceTabs — barre d'onglets principale du module Finance.
- *
- * @prop {string}   activeTab — id de l'onglet actif
- * @prop {Function} onChange  — (tabId: string) => void
- * @prop {object}   dash      — données dashboard (pour badge soldes)
  */
-
 const TABS = [
-  { id: "revenus",     label: "📈 Revenus"            },
-  { id: "partenaires", label: "🤝 Partenaires"         },
-  { id: "soldes",      label: "⏳ Soldes à payer"      },
-  { id: "historique",  label: "📜 Historique"          },
-  { id: "clients",     label: "👥 Clients & Visiteurs" },
+  { id: "revenus",     label: "📈 Revenus"              },
+  { id: "partenaires", label: "🤝 Partenaires"           },
+  { id: "soldes",      label: "⏳ Soldes à payer"        },
+  { id: "demandes",    label: "📥 Demandes de retrait"   },
+  { id: "historique",  label: "📜 Historique"            },
+  { id: "clients",     label: "👥 Clients & Visiteurs"   },
 ];
 
-export default function FinanceTabs({ activeTab, onChange, dash }) {
+export default function FinanceTabs({ activeTab, onChange, dash, nbDemandes = 0 }) {
   return (
     <div className="af2-tabs">
       {TABS.map((t) => (
@@ -26,6 +22,11 @@ export default function FinanceTabs({ activeTab, onChange, dash }) {
           {t.label}
           {t.id === "soldes" && dash?.nb_partenaires_en_attente > 0 && (
             <span className="af2-tab-badge">{dash.nb_partenaires_en_attente}</span>
+          )}
+          {t.id === "demandes" && nbDemandes > 0 && (
+            <span className="af2-tab-badge" style={{ background: "#E74C3C" }}>
+              {nbDemandes}
+            </span>
           )}
         </button>
       ))}
