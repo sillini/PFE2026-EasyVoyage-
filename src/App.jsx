@@ -13,6 +13,7 @@ import AdminDemandesPartenaire from "./admin/pages/AdminDemandesPartenaire";
 import AdminClients            from "./admin/pages/AdminClients";
 import AdminFinances           from "./admin/pages/AdminFinances";
 import AdminMarketing          from "./admin/pages/AdminMarketing";
+import AdminCatalogue          from "./admin/pages/AdminCatalogue";   // ← NOUVEAU
 import AdminFactures           from "./admin/pages/AdminFactures";
 import AdminAgentIA            from "./admin/pages/AdminAgentIA";
 import AdminProfil             from "./admin/pages/AdminProfil";
@@ -109,14 +110,11 @@ export default function App() {
             />
           );
         case "demandes-partenaire":
-          return (
-            <AdminDemandesPartenaire
-              onConfirmer={handleConfirmerDemande}
-            />
-          );
+          return <AdminDemandesPartenaire onConfirmer={handleConfirmerDemande}/>;
         case "clients":         return <AdminClients />;
         case "finances":        return <AdminFinances />;
         case "marketing":       return <AdminMarketing />;
+        case "catalogues":      return <AdminCatalogue />;   // ← NOUVEAU
         case "factures":        return <AdminFactures />;
         case "agent":           return <AdminAgentIA />;
         case "hotels-vedettes": return <AdminHotelsVedettes />;
