@@ -1,60 +1,37 @@
-// ══════════════════════════════════════════════════════════
-//  src/admin/pages/marketing/ImageUploader.jsx
-//  Upload Cloudinary + gestion URLs manuelles
-// ══════════════════════════════════════════════════════════
+// src/admin/pages/marketing/ImageUploader.jsx
 import { useRef, useState } from "react";
 import { uploadToCloudinary } from "./marketingUtils";
+import "./ImageUploader.css";  // ← CSS isolé, rien dans AdminMarketing.css
 
 export default function ImageUploader({ urls, onChange }) {
   const [uploading, setUploading] = useState(false);
-  const [uploadingIdx, setUploadingIdx] = useState(null);
   const fileRef = useRef();
 
-  const validUrls = urls.filter((u) => u.startsWith("https://"));
+  const validUrls = urls.filter((u) => u && u.startsWith("https://"));
 
-  /* ── Ajouter une ligne URL vide ── */
-  const addRow = () => onChange([...urls, ""]);
-
-  /* ── Modifier une URL ── */
-  const setUrl = (i, val) => {
-    const copy = [...urls];
-    copy[i] = val;
-    onChange(copy);
-  };
-
-  /* ── Supprimer une ligne ── */
+  const addRow    = () => onChange([...urls, ""]);
+  const setUrl    = (i, val) => { const c = [...urls]; c[i] = val; onChange(c); };
   const removeRow = (i) => onChange(urls.filter((_, idx) => idx !== i));
 
-  /* ── Upload fichier → Cloudinary → URL auto-remplie ── */
   const handleFiles = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-
     setUploading(true);
-
-    for (let i = 0; i < files.length; i++) {
-      setUploadingIdx(i);
+    for (const file of files) {
       try {
-        const url = await uploadToCloudinary(files[i]);
-
-        // Remplir le premier champ vide OU ajouter une nouvelle ligne
+        const url = await uploadToCloudinary(file);
         onChange((prev) => {
           const emptyIdx = prev.findIndex((u) => !u);
           if (emptyIdx !== -1) {
-            const copy = [...prev];
-            copy[emptyIdx] = url;
-            return copy;
+            const c = [...prev]; c[emptyIdx] = url; return c;
           }
           return [...prev, url];
         });
       } catch (err) {
-        console.error("Upload échoué :", err.message);
         alert(`Erreur upload : ${err.message}`);
       }
     }
-
     setUploading(false);
-    setUploadingIdx(null);
     e.target.value = "";
   };
 
@@ -62,48 +39,34 @@ export default function ImageUploader({ urls, onChange }) {
     <div className="mkt-field">
       <label className="mkt-label">Images Cloudinary</label>
 
-      {/* Lignes URLs */}
+      {/* ── Lignes URL — pastille numéro seulement (pas de thumbnail) ── */}
       {urls.map((url, i) => (
-        <div key={i} className="mkt-url-row">
-          {/* Miniature si URL valide */}
-          {url.startsWith("https://") ? (
-            <div className="mkt-url-thumb">
-              <img src={url} alt={`img-${i + 1}`} />
-            </div>
-          ) : (
-            <div className="mkt-url-thumb mkt-url-thumb--empty">
-              <span>{i + 1}</span>
-            </div>
-          )}
-
+        <div key={i} className="imu-row">
+          <div className="imu-num">{i + 1}</div>
           <input
-            className="mkt-input"
+            className="imu-input"
             type="url"
-            placeholder="https://res.cloudinary.com/dzfznxn0q/..."
+            placeholder="https://res.cloudinary.com/..."
             value={url}
             onChange={(e) => setUrl(i, e.target.value)}
           />
-
           {urls.length > 1 && (
-            <button className="mkt-url-del" onClick={() => removeRow(i)} title="Supprimer">
+            <button type="button" className="imu-del" onClick={() => removeRow(i)} title="Supprimer">
               ✕
             </button>
           )}
         </div>
       ))}
 
-      {/* Actions */}
-      <div className="mkt-url-actions">
-        <button className="mkt-btn mkt-btn--ghost-sm" onClick={addRow} type="button">
+      {/* ── Actions ── */}
+      <div className="imu-actions">
+        <button type="button" className="imu-btn-add" onClick={addRow}>
           + Ajouter une URL
         </button>
-
-        <label className={`mkt-btn mkt-btn--upload ${uploading ? "uploading" : ""}`}>
-          {uploading ? (
-            <><span className="mkt-spin" /> Upload en cours...</>
-          ) : (
-            <><UploadIcon /> Uploader des images</>
-          )}
+        <label className={`imu-btn-upload ${uploading ? "uploading" : ""}`}>
+          {uploading
+            ? <><span className="mkt-spin" /> Upload en cours...</>
+            : <><UploadIcon /> Uploader des images</>}
           <input
             ref={fileRef}
             type="file"
@@ -116,18 +79,19 @@ export default function ImageUploader({ urls, onChange }) {
         </label>
       </div>
 
-      {/* Aperçus */}
+      {/* ── Previews : UNE seule fois, rangée horizontale ── */}
       {validUrls.length > 0 && (
-        <div className="mkt-previews">
-          {validUrls.map((u, i) => (
-            <div key={i} className="mkt-preview-item">
-              <img src={u} alt={`preview-${i + 1}`} />
-              <span className="mkt-preview-n">{i + 1}</span>
-            </div>
-          ))}
-          <div className="mkt-previews-info">
-            {validUrls.length} image{validUrls.length > 1 ? "s" : ""} sélectionnée{validUrls.length > 1 ? "s" : ""}
-            {validUrls.length > 1 && " — sera publiée en album"}
+        <div className="imu-previews-wrap">
+          <span className="imu-count">
+            ✅ {validUrls.length} image{validUrls.length > 1 ? "s" : ""} sélectionnée{validUrls.length > 1 ? "s" : ""}
+          </span>
+          <div className="imu-thumbs">
+            {validUrls.map((u, i) => (
+              <div key={i} className="imu-thumb">
+                <img src={u} alt={`img-${i + 1}`} />
+                <span className="imu-thumb-n">{i + 1}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}

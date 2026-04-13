@@ -1,0 +1,162 @@
+/* ══════════════════════════════════════════════════════════
+   PostInteractionsBar.css
+   À ajouter dans AdminMarketing.css (à la fin du fichier)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Conteneur racine ────────────────────────────────────── */
+.pib-root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--bord2);
+}
+
+/* ── Ligne principale ────────────────────────────────────── */
+.pib-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── Groupe de chips ─────────────────────────────────────── */
+.pib-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── Chip individuelle ───────────────────────────────────── */
+.pib-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--bg);
+  border: 1px solid var(--bord2);
+  font-family: 'Lato', sans-serif;
+  font-size: .75rem;
+  color: var(--t3);
+  white-space: nowrap;
+  transition: all .15s;
+}
+
+.pib-chip--active {
+  background: rgba(43, 95, 142, .06);
+  border-color: rgba(43, 95, 142, .25);
+  color: var(--azure);
+}
+
+.pib-chip-icon  { font-size: .85rem; line-height: 1; }
+.pib-chip-val   { font-weight: 700; color: var(--t1); font-size: .82rem; }
+.pib-chip--active .pib-chip-val { color: var(--sky); }
+.pib-chip-label { color: var(--t4); font-size: .72rem; }
+
+/* ── Score d'engagement total ────────────────────────────── */
+.pib-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: rgba(212, 175, 55, .1);
+  border: 1px solid rgba(212, 175, 55, .3);
+  color: var(--sky);
+  font-family: 'Lato', sans-serif;
+  font-size: .75rem;
+  font-weight: 600;
+}
+
+/* ── Zone droite (date sync + bouton) ───────────────────── */
+.pib-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pib-sync-date {
+  font-family: 'Lato', sans-serif;
+  font-size: .7rem;
+  color: var(--t4);
+  white-space: nowrap;
+}
+
+/* ── Bouton Actualiser ───────────────────────────────────── */
+.pib-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 7px;
+  border: 1.5px solid var(--bord2);
+  background: transparent;
+  color: var(--t3);
+  font-family: 'Lato', sans-serif;
+  font-size: .73rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.pib-sync-btn:hover:not(:disabled) {
+  border-color: var(--azure);
+  color: var(--sky);
+  background: rgba(43, 95, 142, .06);
+}
+.pib-sync-btn:disabled,
+.pib-sync-btn--loading {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* ── Message d'erreur Graph API ──────────────────────────── */
+.pib-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 7px 12px;
+  background: rgba(192, 57, 43, .06);
+  border: 1px solid rgba(192, 57, 43, .2);
+  border-radius: 7px;
+  font-family: 'Lato', sans-serif;
+  font-size: .75rem;
+}
+
+.pib-error-msg {
+  color: var(--red);
+  line-height: 1.4;
+}
+
+/* ── Onglet Dashboard dans les filtres ───────────────────── */
+.mkt-filter-btn--dashboard {
+  background: linear-gradient(135deg, rgba(212,175,55,.1), rgba(43,95,142,.07));
+  border-color: rgba(212,175,55,.35);
+  color: var(--sky);
+}
+.mkt-filter-btn--dashboard.active {
+  background: linear-gradient(135deg, rgba(212,175,55,.2), rgba(43,95,142,.14));
+  border-color: var(--gold);
+}
+
+/* ── Badge filtre count ──────────────────────────────────── */
+.mkt-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--gold-l);
+  border: 1px solid var(--gold-b);
+  color: var(--sky);
+  border-radius: 20px;
+  font-size: .68rem;
+  font-weight: 700;
+  margin-left: 4px;
+}

@@ -279,3 +279,120 @@
   width: 14px;
   height: 14px;
 }
+
+/* ══════════════════════════════════════════════════════════
+   GROUPE MARKETING — styles spécifiques (ajout)
+══════════════════════════════════════════════════════════ */
+
+/* Conteneur du groupe — pas de style particulier,
+   juste pour regrouper le parent + sous-menu */
+.adm-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bouton parent "Marketing" — override léger pour le chevron */
+.adm-nav-item--parent {
+  /* hérite tout de .adm-nav-item */
+}
+
+/* Chevron rotatif */
+.adm-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.25);
+  transition: transform 0.22s ease, color 0.2s;
+}
+.adm-chevron svg {
+  width: 12px;
+  height: 12px;
+}
+.adm-chevron--open {
+  transform: rotate(180deg);
+  color: rgba(196, 151, 58, 0.7);
+}
+.adm-nav-item--parent:hover .adm-chevron {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ── Sous-menu ── */
+.adm-submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 2px 0 4px 10px;
+  padding-left: 14px;
+  border-left: 1px solid rgba(196, 151, 58, 0.15);
+  animation: submenuIn 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+@keyframes submenuIn {
+  from { opacity: 0; transform: translateY(-6px); max-height: 0; }
+  to   { opacity: 1; transform: translateY(0);    max-height: 200px; }
+}
+
+.adm-submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: left;
+  width: 100%;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.adm-submenu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+.adm-submenu-item.active {
+  background: rgba(24, 119, 242, 0.15);
+  color: #ffffff;
+}
+
+.adm-submenu-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.65;
+}
+.adm-submenu-item.active .adm-submenu-icon {
+  opacity: 1;
+  color: #4A9EF5;
+}
+
+.adm-submenu-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  flex: 1;
+}
+.adm-submenu-item.active .adm-submenu-label {
+  font-weight: 600;
+}
+
+/* Barre active sous-menu — couleur bleu Facebook */
+.adm-submenu-bar {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 55%;
+  background: linear-gradient(180deg, #4A9EF5, #1877F2);
+  border-radius: 3px 0 0 3px;
+}

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import "./AdminSidebar.css";
 
-const MENU = [
+/* ══════════════════════════════════════════════════════════
+   MENU items avant le groupe Marketing
+══════════════════════════════════════════════════════════ */
+const MENU_TOP = [
   {
     id: "dashboard",
     label: "Tableau de bord",
@@ -89,29 +92,12 @@ const MENU = [
       </svg>
     ),
   },
-  {
-    id: "marketing",
-    label: "Marketing",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-      </svg>
-    ),
-  },
-  // ── NOUVEAU ───────────────────────────────────────────────
-  {
-    id: "catalogues",
-    label: "Catalogues Email",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-        <polyline points="22,6 12,13 2,6"/>
-      </svg>
-    ),
-  },
-  // ─────────────────────────────────────────────────────────
+];
+
+/* ══════════════════════════════════════════════════════════
+   MENU items après le groupe Marketing
+══════════════════════════════════════════════════════════ */
+const MENU_BOTTOM = [
   {
     id: "factures",
     label: "Factures",
@@ -168,8 +154,41 @@ const MENU = [
   },
 ];
 
+/* ══════════════════════════════════════════════════════════
+   Sous-items du groupe Marketing
+══════════════════════════════════════════════════════════ */
+const MARKETING_ITEMS = [
+  {
+    id: "marketing",
+    label: "Facebook Management",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15">
+        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+      </svg>
+    ),
+  },
+  {
+    id: "catalogue",
+    label: "Catalogues Email",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    ),
+  },
+];
+
+const MARKETING_IDS = MARKETING_ITEMS.map(i => i.id);
+
+/* ══════════════════════════════════════════════════════════
+   COMPOSANT
+══════════════════════════════════════════════════════════ */
 export default function AdminSidebar({ activePage, onNavigate, user, onLogout }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mktOpen,   setMktOpen]   = useState(MARKETING_IDS.includes(activePage));
+
+  const isMarketingActive = MARKETING_IDS.includes(activePage);
 
   return (
     <aside className={`adm-sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -188,7 +207,85 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
       {/* ── Navigation ── */}
       <nav className="adm-nav">
         {!collapsed && <p className="adm-section-label">NAVIGATION</p>}
-        {MENU.map((item) => (
+
+        {/* ── Items du haut ── */}
+        {MENU_TOP.map(item => (
+          <button
+            key={item.id}
+            className={`adm-nav-item ${activePage === item.id ? "active" : ""}`}
+            onClick={() => onNavigate(item.id)}
+            title={collapsed ? item.label : ""}
+          >
+            <span className="adm-nav-icon">{item.icon}</span>
+            {!collapsed && (
+              <>
+                <span className="adm-nav-label">{item.label}</span>
+                {item.badge && <span className="adm-badge">{item.badge}</span>}
+              </>
+            )}
+            {activePage === item.id && <span className="adm-active-bar" />}
+          </button>
+        ))}
+
+        {/* ══════════════════════════════════════
+            GROUPE MARKETING (dépliable)
+        ══════════════════════════════════════ */}
+        <div className="adm-group">
+
+          {/* Bouton parent "Marketing" */}
+          <button
+            className={`adm-nav-item adm-nav-item--parent ${isMarketingActive ? "active" : ""}`}
+            onClick={() => {
+              if (collapsed) {
+                setCollapsed(false);
+                setMktOpen(true);
+              } else {
+                setMktOpen(v => !v);
+              }
+            }}
+            title={collapsed ? "Marketing" : ""}
+          >
+            <span className="adm-nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              </svg>
+            </span>
+            {!collapsed && (
+              <>
+                <span className="adm-nav-label">Marketing</span>
+                <span className={`adm-chevron ${mktOpen ? "adm-chevron--open" : ""}`}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </span>
+              </>
+            )}
+            {isMarketingActive && <span className="adm-active-bar" />}
+          </button>
+
+          {/* Sous-menu animé */}
+          {!collapsed && mktOpen && (
+            <div className="adm-submenu">
+              {MARKETING_ITEMS.map(item => (
+                <button
+                  key={item.id}
+                  className={`adm-submenu-item ${activePage === item.id ? "active" : ""}`}
+                  onClick={() => onNavigate(item.id)}
+                >
+                  <span className="adm-submenu-icon">{item.icon}</span>
+                  <span className="adm-submenu-label">{item.label}</span>
+                  {activePage === item.id && <span className="adm-submenu-bar" />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* ══════════════════════════════════════ */}
+
+        {/* ── Items du bas ── */}
+        {MENU_BOTTOM.map(item => (
           <button
             key={item.id}
             className={`adm-nav-item ${activePage === item.id ? "active" : ""}`}
@@ -232,8 +329,10 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
       {/* ── Toggle collapse ── */}
       <button className="adm-toggle" onClick={() => setCollapsed(!collapsed)}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-          style={{ transform: collapsed ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
+        <svg
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          style={{ transform: collapsed ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}
+        >
           <polyline points="15 18 9 12 15 6"/>
         </svg>
       </button>
