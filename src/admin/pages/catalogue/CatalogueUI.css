@@ -1,0 +1,151 @@
+/* ═══════════════════════════════════════════════════════════
+   src/admin/pages/catalogue/CatalogueUI.css
+   Styles des sous-composants UI partagés du module Catalogue
+   StatutBadge · StatCard · Avatar · Spinner
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Animations globales (utilisées par tous les fichiers du module) ── */
+@keyframes cat-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+@keyframes cat-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cat-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cat-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+/* ── StatutBadge ─────────────────────────────────────────── */
+.cat-statut-badge {
+  display:      inline-flex;
+  align-items:  center;
+  gap:          5px;
+  border-radius: 999px;
+  font-weight:  700;
+  letter-spacing: 0.2px;
+}
+
+.cat-statut-badge--sm {
+  padding:   3px 10px;
+  font-size: 11px;
+}
+
+.cat-statut-badge--lg {
+  padding:   5px 14px;
+  font-size: 13px;
+}
+
+.cat-statut-dot {
+  width:         6px;
+  height:        6px;
+  border-radius: 50%;
+  flex-shrink:   0;
+}
+
+.cat-statut-dot--pulse {
+  animation: cat-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── StatCard ────────────────────────────────────────────── */
+.cat-stat-card {
+  background:    #ffffff;
+  border:        1px solid #E2E8F0;
+  border-radius: 10px;
+  padding:       14px 16px;
+  text-align:    center;
+}
+
+.cat-stat-card__value {
+  font-size:   22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.cat-stat-card__label {
+  font-size:   11px;
+  color:       #64748B;
+  margin-top:  4px;
+  font-weight: 600;
+}
+
+.cat-stat-card__sub {
+  font-size:   10px;
+  color:       #64748B;
+  margin-top:  2px;
+  opacity:     0.7;
+}
+
+/* ── Avatar ──────────────────────────────────────────────── */
+.cat-avatar {
+  border-radius:   50%;
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-weight:     700;
+  letter-spacing:  -0.5px;
+  user-select:     none;
+}
+
+/* ── Spinner ─────────────────────────────────────────────── */
+.cat-spinner {
+  border-style:  solid;
+  border-radius: 50%;
+  animation:     cat-spin 0.9s linear infinite;
+  flex-shrink:   0;
+}
+
+/* Spinner de taille standard */
+.cat-spinner--md {
+  width:        24px;
+  height:       24px;
+  border-width: 3px;
+  border-color: #E2E8F0;
+  border-top-color: #C4973A;
+}
+
+/* Spinner large (centré dans une vue) */
+.cat-spinner--lg {
+  width:        32px;
+  height:       32px;
+  border-width: 3px;
+  border-color: #E2E8F0;
+  border-top-color: #C4973A;
+}
+
+/* Spinner inline (dans un bouton) */
+.cat-spinner--inline {
+  display:      inline-block;
+  width:        14px;
+  height:       14px;
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+}
+
+/* ── Zone de chargement centrée ──────────────────────────── */
+.cat-loading-center {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-direction:  column;
+  gap:             14px;
+  height:          300px;
+  color:           #64748B;
+  font-size:       13px;
+}

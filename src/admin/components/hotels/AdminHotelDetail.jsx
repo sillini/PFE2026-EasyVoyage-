@@ -472,7 +472,18 @@ function AIReportCard({ report, onClose }) {
         </div>
       </div>
 
-      
+      {/* Recommandations */}
+      <div className="ai-section ai-reco-section">
+        <h4 className="ai-section-title">💡 Recommandations</h4>
+        <div className="ai-reco-list">
+          {report.recommandations.map((r, i) => (
+            <div key={i} className="ai-reco-item">
+              <span className="ai-reco-num">{i + 1}</span>
+              <span>{r}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <div className="ai-report-footer">
         <span>🤖 Généré par Claude AI · Analyse basée sur {report.nb_avis} avis clients</span>

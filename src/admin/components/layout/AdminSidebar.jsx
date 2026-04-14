@@ -1,8 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./AdminSidebar.css";
 
 /* ══════════════════════════════════════════════════════════
-   MENU items avant le groupe Marketing
+   MENU items principaux — ordre logique métier
+   1. Dashboard
+   2. Réservations
+   3. Hôtels
+   4. Voyages
+   5. Partenaires
+   6. Demandes partenaires
+   7. Clients
+   8. Finances
+   9. Promotions
+  10. Factures
+  11. Fiscal  ← NOUVEAU
+  12. Mise en avant
+  13. Hero Slides
+  14. Support
+  15. Agent IA
 ══════════════════════════════════════════════════════════ */
 const MENU_TOP = [
   {
@@ -82,6 +97,13 @@ const MENU_TOP = [
       </svg>
     ),
   },
+];
+
+/* ══════════════════════════════════════════════════════════
+   MENU FINANCIER — groupe logique : argent & facturation
+   Finances → Promotions → Factures → Fiscal
+══════════════════════════════════════════════════════════ */
+const MENU_FINANCE = [
   {
     id: "finances",
     label: "Finances",
@@ -92,12 +114,16 @@ const MENU_TOP = [
       </svg>
     ),
   },
-];
-
-/* ══════════════════════════════════════════════════════════
-   MENU items après le groupe Marketing
-══════════════════════════════════════════════════════════ */
-const MENU_BOTTOM = [
+  {
+    id: "promotions",
+    label: "Promotions",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+        <line x1="7" y1="7" x2="7.01" y2="7"/>
+      </svg>
+    ),
+  },
   {
     id: "factures",
     label: "Factures",
@@ -111,14 +137,22 @@ const MENU_BOTTOM = [
     ),
   },
   {
-    id: "support",
-    label: "Support",
+    id: "fiscal",
+    label: "Règles Fiscales",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
       </svg>
     ),
   },
+];
+
+/* ══════════════════════════════════════════════════════════
+   MENU items de configuration & outils
+══════════════════════════════════════════════════════════ */
+const MENU_BOTTOM = [
   {
     id: "hotels-vedettes",
     label: "Mise en avant",
@@ -136,6 +170,15 @@ const MENU_BOTTOM = [
         <rect x="2" y="3" width="20" height="14" rx="2"/>
         <path d="M8 21h8"/><path d="M12 17v4"/>
         <polyline points="2 10 7 6 11 9 16 5 22 10"/>
+      </svg>
+    ),
+  },
+  {
+    id: "support",
+    label: "Support",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
     ),
   },
@@ -185,10 +228,67 @@ const MARKETING_IDS = MARKETING_ITEMS.map(i => i.id);
    COMPOSANT
 ══════════════════════════════════════════════════════════ */
 export default function AdminSidebar({ activePage, onNavigate, user, onLogout }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mktOpen,   setMktOpen]   = useState(MARKETING_IDS.includes(activePage));
+  const [collapsed,    setCollapsed]    = useState(false);
+  const [mktOpen,      setMktOpen]      = useState(MARKETING_IDS.includes(activePage));
+  const [pendingCount, setPendingCount] = useState(0);
 
   const isMarketingActive = MARKETING_IDS.includes(activePage);
+
+  // ── Charger le compteur de promotions en attente ──────
+  useEffect(() => {
+    const fetchPending = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        const res = await fetch(
+          "http://localhost:8000/api/v1/promotions/admin/pending-count",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setPendingCount(data.pending ?? 0);
+        }
+      } catch {
+        // silencieux — badge reste à 0
+      }
+    };
+
+    fetchPending();
+    const interval = setInterval(fetchPending, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ── Helper : rendu d'un item de navigation ────────────
+  const renderItem = (item) => {
+    const showPendingBadge = item.id === "promotions" && pendingCount > 0;
+
+    return (
+      <button
+        key={item.id}
+        className={`adm-nav-item ${activePage === item.id ? "active" : ""}`}
+        onClick={() => onNavigate(item.id)}
+        title={collapsed ? item.label : ""}
+      >
+        <span className="adm-nav-icon" style={{ position: "relative" }}>
+          {item.icon}
+          {showPendingBadge && collapsed && (
+            <span className="adm-nav-dot-badge" />
+          )}
+        </span>
+        {!collapsed && (
+          <>
+            <span className="adm-nav-label">{item.label}</span>
+            {showPendingBadge && (
+              <span className="adm-pending-badge">{pendingCount}</span>
+            )}
+            {item.badge && !showPendingBadge && (
+              <span className="adm-badge">{item.badge}</span>
+            )}
+          </>
+        )}
+        {activePage === item.id && <span className="adm-active-bar" />}
+      </button>
+    );
+  };
 
   return (
     <aside className={`adm-sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -206,33 +306,18 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
       {/* ── Navigation ── */}
       <nav className="adm-nav">
-        {!collapsed && <p className="adm-section-label">NAVIGATION</p>}
 
-        {/* ── Items du haut ── */}
-        {MENU_TOP.map(item => (
-          <button
-            key={item.id}
-            className={`adm-nav-item ${activePage === item.id ? "active" : ""}`}
-            onClick={() => onNavigate(item.id)}
-            title={collapsed ? item.label : ""}
-          >
-            <span className="adm-nav-icon">{item.icon}</span>
-            {!collapsed && (
-              <>
-                <span className="adm-nav-label">{item.label}</span>
-                {item.badge && <span className="adm-badge">{item.badge}</span>}
-              </>
-            )}
-            {activePage === item.id && <span className="adm-active-bar" />}
-          </button>
-        ))}
+        {/* ── Section : Gestion ── */}
+        {!collapsed && <p className="adm-section-label">GESTION</p>}
+        {MENU_TOP.map(renderItem)}
 
-        {/* ══════════════════════════════════════
-            GROUPE MARKETING (dépliable)
-        ══════════════════════════════════════ */}
+        {/* ── Section : Finance & Facturation ── */}
+        {!collapsed && <p className="adm-section-label">FINANCE & FACTURATION</p>}
+        {MENU_FINANCE.map(renderItem)}
+
+        {/* ── Section : Marketing (groupe dépliable) ── */}
+        {!collapsed && <p className="adm-section-label">MARKETING</p>}
         <div className="adm-group">
-
-          {/* Bouton parent "Marketing" */}
           <button
             className={`adm-nav-item adm-nav-item--parent ${isMarketingActive ? "active" : ""}`}
             onClick={() => {
@@ -254,7 +339,7 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
             </span>
             {!collapsed && (
               <>
-                <span className="adm-nav-label">Marketing</span>
+                <span className="adm-nav-label">Campagnes</span>
                 <span className={`adm-chevron ${mktOpen ? "adm-chevron--open" : ""}`}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <polyline points="6 9 12 15 18 9"/>
@@ -265,7 +350,6 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
             {isMarketingActive && <span className="adm-active-bar" />}
           </button>
 
-          {/* Sous-menu animé */}
           {!collapsed && mktOpen && (
             <div className="adm-submenu">
               {MARKETING_ITEMS.map(item => (
@@ -282,26 +366,11 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
             </div>
           )}
         </div>
-        {/* ══════════════════════════════════════ */}
 
-        {/* ── Items du bas ── */}
-        {MENU_BOTTOM.map(item => (
-          <button
-            key={item.id}
-            className={`adm-nav-item ${activePage === item.id ? "active" : ""}`}
-            onClick={() => onNavigate(item.id)}
-            title={collapsed ? item.label : ""}
-          >
-            <span className="adm-nav-icon">{item.icon}</span>
-            {!collapsed && (
-              <>
-                <span className="adm-nav-label">{item.label}</span>
-                {item.badge && <span className="adm-badge">{item.badge}</span>}
-              </>
-            )}
-            {activePage === item.id && <span className="adm-active-bar" />}
-          </button>
-        ))}
+        {/* ── Section : Configuration & Outils ── */}
+        {!collapsed && <p className="adm-section-label">CONFIGURATION</p>}
+        {MENU_BOTTOM.map(renderItem)}
+
       </nav>
 
       {/* ── Utilisateur + Logout ── */}

@@ -1,0 +1,38 @@
+/* FiscalConfig.css v3 — minimal, tout est en inline style dans le JSX */
+.fc-page {
+  padding: 36px 40px 48px;
+  background: #F8FAFC;
+  min-height: calc(100vh - 72px);
+  font-family: -apple-system, 'Inter', 'Segoe UI', system-ui, sans-serif;
+  color: #0F172A;
+  box-sizing: border-box;
+}
+
+/* Toast */
+.fc-toast {
+  position: fixed; top: 22px; right: 28px; z-index: 9999;
+  display: flex; align-items: center; gap: 9px;
+  padding: 11px 16px 11px 13px;
+  border-radius: 10px;
+  font-size: .845rem; font-weight: 500;
+  box-shadow: 0 8px 24px rgba(15,23,42,.12);
+  animation: toastIn .28s cubic-bezier(.22,1,.36,1);
+  max-width: 320px;
+}
+.fc-toast--success { background: #F0FDF4; color: #166534; border: 1px solid #BBF7D0; }
+.fc-toast--error   { background: #FFF1F2; color: #9F1239; border: 1px solid #FECDD3; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-10px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Spinner */
+@keyframes fcSpin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .fc-page { padding: 28px 24px 40px; }
+}
+@media (max-width: 768px) {
+  .fc-page { padding: 20px 16px 32px; }
+}

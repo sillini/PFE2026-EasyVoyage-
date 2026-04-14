@@ -1,6 +1,7 @@
 import "./AdminTopbar.css";
 
 const PAGE_META = {
+  // ── Gestion ──────────────────────────────────────────
   dashboard:             { title: "Tableau de bord",        subtitle: "Vue globale de la plateforme" },
   reservations:          { title: "Réservations",            subtitle: "Toutes les réservations de la plateforme" },
   hotels:                { title: "Hôtels",                  subtitle: "Gestion de tous les établissements" },
@@ -8,14 +9,19 @@ const PAGE_META = {
   partenaires:           { title: "Partenaires",             subtitle: "Gestion des comptes partenaires" },
   "demandes-partenaire": { title: "Demandes partenaires",    subtitle: "Demandes d'inscription reçues depuis la landing page" },
   clients:               { title: "Clients",                 subtitle: "Gestion des comptes clients" },
+  // ── Finance & Facturation ────────────────────────────
   finances:              { title: "Finances",                subtitle: "Revenus, commissions partenaires & facturation" },
-  marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
-  catalogues:            { title: "Catalogues Email",        subtitle: "Créez et envoyez des catalogues personnalisés à vos contacts" },
+  promotions:            { title: "Promotions",              subtitle: "Validation des promotions soumises par les partenaires" },
   factures:              { title: "Factures",                subtitle: "Historique et gestion des factures" },
-  agent:                 { title: "Agent IA",                subtitle: "Assistant intelligent d'administration" },
+  fiscal:                { title: "Règles Fiscales",         subtitle: "Configuration des taxes, TVA et droits de timbre" },
+  // ── Marketing ────────────────────────────────────────
+  marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
+  catalogue:             { title: "Catalogues Email",        subtitle: "Créez et envoyez des catalogues personnalisés à vos contacts" },
+  // ── Configuration ────────────────────────────────────
   "hotels-vedettes":     { title: "Mise en avant",           subtitle: "Hôtels et villes affichés sur la page client" },
   "hero-slides":         { title: "Hero Slides",             subtitle: "Gestion du carousel de la page d'accueil" },
   support:               { title: "Support",                 subtitle: "Conversations avec les partenaires" },
+  agent:                 { title: "Agent IA",                subtitle: "Assistant intelligent d'administration" },
 };
 
 export default function AdminTopbar({ activePage, user, onNavigate }) {
@@ -53,10 +59,12 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
           </svg>
           <span className="adm-notif-dot" />
         </button>
-        <div className="adm-topbar-user"
+        <div
+          className="adm-topbar-user"
           onClick={() => onNavigate && onNavigate("profil")}
           style={{ cursor: "pointer" }}
-          title="Mon profil">
+          title="Mon profil"
+        >
           <div className={`adm-topbar-avatar ${activePage === "profil" ? "active" : ""}`}>
             {user?.prenom?.[0]}{user?.nom?.[0]}
           </div>

@@ -11,6 +11,7 @@ const authHeaders = () => ({
 });
 
 async function handleResponse(res) {
+  if (res.status === 204) return true;
   const text = await res.text();
   let data;
   try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
@@ -27,8 +28,8 @@ export const promotionsApi = {
   // ── Lister mes promotions ────────────────────────────
   list: (params = {}) => {
     const q = new URLSearchParams();
-    if (params.hotel_id)   q.set("hotel_id",   params.hotel_id);
-    if (params.actif_only) q.set("actif_only", "true");
+    if (params.hotel_id) q.set("hotel_id", params.hotel_id);
+    if (params.statut)   q.set("statut",   params.statut);
     return fetch(`${BASE}/promotions/mes-promotions?${q}`, {
       headers: authHeaders(),
     }).then(handleResponse);
@@ -47,7 +48,7 @@ export const promotionsApi = {
       body:    JSON.stringify(data),
     }).then(handleResponse),
 
-  // ── Modifier ─────────────────────────────────────────
+  // ── Modifier (uniquement si PENDING ou REJECTED) ─────
   update: (id, data) =>
     fetch(`${BASE}/promotions/${id}`, {
       method:  "PUT",
@@ -55,23 +56,10 @@ export const promotionsApi = {
       body:    JSON.stringify(data),
     }).then(handleResponse),
 
-  // ── Activer / Désactiver ─────────────────────────────
-  toggle: (id, actif) =>
-    fetch(`${BASE}/promotions/${id}/toggle?actif=${actif}`, {
-      method:  "PATCH",
-      headers: authHeaders(),
-    }).then(handleResponse),
-
-  // ── Supprimer ────────────────────────────────────────
+  // ── Supprimer (uniquement si non APPROVED) ───────────
   delete: (id) =>
     fetch(`${BASE}/promotions/${id}`, {
       method:  "DELETE",
       headers: authHeaders(),
-    }).then(async (res) => {
-      if (!res.ok && res.status !== 204) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.detail || `Erreur ${res.status}`);
-      }
-      return true;
-    }),
+    }).then(handleResponse),
 };

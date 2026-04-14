@@ -1,0 +1,472 @@
+/* ═══════════════════════════════════════════════════════════
+   src/admin/pages/catalogue/CatalogueEnvoi.css
+   Vue envoi : header steps, sélection rapide, liste contacts,
+   pagination, récapitulatif, planification
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Conteneur global ────────────────────────────────────── */
+.cat-envoi {
+  flex:           1;
+  animation:      cat-fadeIn 0.2s ease both;
+  display:        flex;
+  flex-direction: column;
+}
+
+/* ── Header avec indicateur d'étapes ────────────────────── */
+.cat-envoi__header {
+  background:      #ffffff;
+  border-bottom:   1px solid #E2E8F0;
+  padding:         16px 28px;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  flex-shrink:     0;
+}
+
+.cat-envoi__header-left { flex: 1; }
+
+.cat-envoi__header-title {
+  font-size:   16px;
+  font-weight: 800;
+  color:       #0F2235;
+  margin:      0 0 2px;
+}
+
+.cat-envoi__header-sub {
+  font-size:  12px;
+  color:      #64748B;
+  margin:     0;
+}
+
+.cat-envoi__header-right {
+  display:     flex;
+  align-items: center;
+  gap:         16px;
+}
+
+/* ── Indicateur steps (1 → 2) ────────────────────────────── */
+.cat-envoi__steps {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  font-size:   12px;
+}
+
+.cat-envoi__step-item {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+}
+
+.cat-envoi__step-circle {
+  width:           28px;
+  height:          28px;
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       12px;
+  font-weight:     800;
+  flex-shrink:     0;
+  transition:      background 0.2s, color 0.2s;
+}
+
+.cat-envoi__step-circle--active   { background: #0F2235; color: #ffffff; }
+.cat-envoi__step-circle--inactive { background: #F1F5F9; color: #64748B; }
+
+.cat-envoi__step-label            { font-weight: 400; color: #64748B; }
+.cat-envoi__step-label--active    { font-weight: 700; color: #0F2235; }
+
+.cat-envoi__step-arrow { color: #E2E8F0; }
+
+/* ── Corps de la vue ─────────────────────────────────────── */
+.cat-envoi__body {
+  flex:     1;
+  overflow: hidden;
+  display:  flex;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ÉTAPE 1 — Sélection contacts
+   ════════════════════════════════════════════════════════════ */
+.cat-envoi__step1 {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+}
+
+/* ── Sélection rapide ────────────────────────────────────── */
+.cat-envoi__quick-select {
+  padding:       16px 28px;
+  background:    #ffffff;
+  border-bottom: 1px solid #E2E8F0;
+  flex-shrink:   0;
+}
+
+.cat-envoi__quick-select-title {
+  font-size:      11px;
+  font-weight:    800;
+  color:          #64748B;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom:  10px;
+}
+
+.cat-envoi__quick-select-btns {
+  display:   flex;
+  gap:       8px;
+  flex-wrap: wrap;
+}
+
+/* Bouton mode */
+.cat-envoi__mode-btn {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     flex-start;
+  padding:         8px 14px;
+  border-radius:   8px;
+  font-size:       12px;
+  font-weight:     700;
+  cursor:          pointer;
+  border:          1.5px solid transparent;
+  transition:      all 0.15s;
+  font-family:     inherit;
+  background:      #ffffff;
+  color:           #64748B;
+  border-color:    #E2E8F0;
+}
+
+.cat-envoi__mode-btn:hover { border-color: #94A3B8; color: #0F2235; }
+
+.cat-envoi__mode-btn--active {
+  background:   #0F2235;
+  color:        #ffffff;
+  border-color: #0F2235;
+}
+
+.cat-envoi__mode-btn-desc {
+  font-size:   10px;
+  opacity:     0.7;
+  font-weight: 400;
+  margin-top:  1px;
+}
+
+.cat-envoi__mode-btn--active .cat-envoi__mode-btn-desc { opacity: 0.65; }
+
+/* ── Barre recherche + filtres type ──────────────────────── */
+.cat-envoi__searchbar {
+  padding:       12px 28px;
+  background:    #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  display:       flex;
+  gap:           10px;
+  align-items:   center;
+  flex-shrink:   0;
+}
+
+.cat-envoi__search-wrap {
+  position: relative;
+  flex:     1;
+}
+
+.cat-envoi__search-icon {
+  position:  absolute;
+  left:      10px;
+  top:       50%;
+  transform: translateY(-50%);
+  color:     #64748B;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.cat-envoi__search-input {
+  width:         100%;
+  padding:       9px 12px 9px 32px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size:     13px;
+  color:         #0F2235;
+  outline:       none;
+  transition:    border-color 0.15s, box-shadow 0.15s;
+  box-sizing:    border-box;
+  background:    #ffffff;
+  font-family:   inherit;
+}
+
+.cat-envoi__search-input:focus {
+  border-color: #C4973A;
+  box-shadow:   0 0 0 3px rgba(196, 151, 58, 0.15);
+}
+
+.cat-envoi__type-filters {
+  display: flex;
+  gap:     6px;
+}
+
+/* Bouton filtre type (Tous / Clients / Visiteurs) */
+.cat-envoi__type-btn {
+  padding:       8px 14px;
+  border-radius: 8px;
+  font-size:     11px;
+  font-weight:   700;
+  cursor:        pointer;
+  border:        1.5px solid #E2E8F0;
+  background:    #ffffff;
+  color:         #64748B;
+  transition:    all 0.15s;
+  font-family:   inherit;
+  white-space:   nowrap;
+}
+
+.cat-envoi__type-btn:hover       { border-color: #94A3B8; color: #0F2235; }
+.cat-envoi__type-btn--active     { background: #0F2235; color: #ffffff; border-color: #0F2235; }
+
+/* ── Liste contacts ──────────────────────────────────────── */
+.cat-envoi__contacts-list {
+  flex:       1;
+  overflow-y: auto;
+  padding:    0 28px;
+}
+
+/* Chargement */
+.cat-envoi__contacts-loading {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            10px;
+  padding:        32px;
+  color:          #64748B;
+  font-size:      13px;
+}
+
+/* Aucun résultat */
+.cat-envoi__contacts-empty {
+  text-align: center;
+  padding:    40px;
+  color:      #64748B;
+}
+
+.cat-envoi__contacts-empty-icon {
+  font-size:     32px;
+  margin-bottom: 8px;
+}
+
+.cat-envoi__contacts-empty-title {
+  font-weight: 700;
+  font-size:   14px;
+  margin:      0;
+}
+
+/* ── Ligne contact ───────────────────────────────────────── */
+.cat-envoi__contact-row {
+  display:       flex;
+  align-items:   center;
+  gap:           12px;
+  padding:       10px 14px;
+  cursor:        pointer;
+  border-bottom: 1px solid #E2E8F0;
+  border-radius: 4px;
+  transition:    background 0.12s;
+}
+
+.cat-envoi__contact-row:hover      { background: #F1F5F9; }
+.cat-envoi__contact-row--selected  { background: #DBEAFE; }
+
+/* Checkbox visuelle */
+.cat-envoi__checkbox {
+  width:           18px;
+  height:          18px;
+  border-radius:   4px;
+  flex-shrink:     0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      all 0.12s;
+  font-size:       11px;
+  font-weight:     800;
+  color:           #ffffff;
+}
+
+.cat-envoi__checkbox--empty    { border: 2px solid #CBD5E1; background: #ffffff; }
+.cat-envoi__checkbox--checked  { border: 2px solid #2563EB; background: #2563EB; }
+
+/* Infos contact */
+.cat-envoi__contact-info {
+  flex:      1;
+  min-width: 0;
+}
+
+.cat-envoi__contact-name {
+  font-size:     13px;
+  font-weight:   700;
+  color:         #0F2235;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-envoi__contact-email {
+  font-size:     11px;
+  color:         #64748B;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  margin-top:    1px;
+}
+
+/* Badge type (client / visiteur) */
+.cat-envoi__contact-badge {
+  font-size:     10px;
+  font-weight:   700;
+  padding:       2px 8px;
+  border-radius: 999px;
+  flex-shrink:   0;
+}
+
+.cat-envoi__contact-badge--client   { background: #DCFCE7; color: #16A34A; }
+.cat-envoi__contact-badge--visiteur { background: #FEF3C7; color: #D97706; }
+
+.cat-envoi__contact-date {
+  font-size:  10px;
+  color:      #64748B;
+  flex-shrink: 0;
+}
+
+/* ── Pagination ──────────────────────────────────────────── */
+.cat-envoi__pagination {
+  padding:         10px 28px;
+  background:      #ffffff;
+  border-top:      1px solid #E2E8F0;
+  display:         flex;
+  justify-content: center;
+  gap:             8px;
+  flex-shrink:     0;
+}
+
+.cat-envoi__page-btn {
+  width:         32px;
+  height:        32px;
+  border-radius: 6px;
+  font-size:     12px;
+  font-weight:   700;
+  cursor:        pointer;
+  transition:    all 0.12s;
+  font-family:   inherit;
+  border:        1.5px solid #E2E8F0;
+  background:    #ffffff;
+  color:         #64748B;
+}
+
+.cat-envoi__page-btn:hover        { border-color: #94A3B8; color: #0F2235; }
+.cat-envoi__page-btn--active      { background: #0F2235; color: #ffffff; border-color: #0F2235; }
+
+/* ── Barre bas étape 1 ───────────────────────────────────── */
+.cat-envoi__step1-footer {
+  padding:         14px 28px;
+  background:      #ffffff;
+  border-top:      1px solid #E2E8F0;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  flex-shrink:     0;
+}
+
+.cat-envoi__step1-counter {
+  font-size:   13px;
+  color:       #0F2235;
+  font-weight: 600;
+}
+
+.cat-envoi__step1-counter-nb {
+  color:       #2563EB;
+  font-weight: 800;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ÉTAPE 2 — Récapitulatif & confirmation
+   ════════════════════════════════════════════════════════════ */
+.cat-envoi__step2 {
+  flex:       1;
+  padding:    32px;
+  max-width:  600px;
+  margin:     0 auto;
+  width:      100%;
+  overflow-y: auto;
+}
+
+/* Carte récapitulatif */
+.cat-envoi__recap-card {
+  background:    #ffffff;
+  border:        1px solid #E2E8F0;
+  border-radius: 14px;
+  padding:       28px;
+  margin-bottom: 20px;
+}
+
+.cat-envoi__recap-title {
+  font-size:     15px;
+  font-weight:   800;
+  color:         #0F2235;
+  margin-bottom: 20px;
+}
+
+.cat-envoi__recap-row {
+  display:       flex;
+  gap:           16px;
+  padding:       12px 0;
+  border-bottom: 1px solid #E2E8F0;
+  font-size:     13px;
+}
+
+.cat-envoi__recap-row:last-of-type { border-bottom: none; }
+
+.cat-envoi__recap-label {
+  width:       120px;
+  flex-shrink: 0;
+  font-size:   12px;
+  color:       #64748B;
+  font-weight: 700;
+  padding-top: 1px;
+}
+
+.cat-envoi__recap-value {
+  font-weight: 700;
+  color:       #0F2235;
+  flex:        1;
+}
+
+.cat-envoi__recap-value--blue { color: #2563EB; }
+
+/* Planification */
+.cat-envoi__schedule {
+  margin-top: 20px;
+}
+
+.cat-envoi__schedule-label {
+  display:        block;
+  font-size:      11px;
+  font-weight:    800;
+  color:          #64748B;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom:  8px;
+}
+
+/* Avertissement */
+.cat-envoi__warning {
+  background:    #FEF3C7;
+  border:        1px solid #FDE68A;
+  border-radius: 10px;
+  padding:       12px 16px;
+  margin-bottom: 24px;
+  font-size:     12px;
+  color:         #92400E;
+  line-height:   1.5;
+}
+
+/* Boutons confirmation */
+.cat-envoi__confirm-actions {
+  display: flex;
+  gap:     12px;
+}

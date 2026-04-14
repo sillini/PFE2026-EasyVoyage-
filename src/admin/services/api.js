@@ -301,3 +301,43 @@ export const adminSupportApi = {
       headers: authHeaders(),
     }).then(handleResponse),
 };
+
+
+
+
+// ══════════════════════════════════════════════════════════
+//  AJOUTER CE BLOC dans src/admin/services/api.js
+//  (après les autres exports, ex: après marketingAdminApi)
+// ══════════════════════════════════════════════════════════
+
+// ── Promotions Admin ──────────────────────────────────────
+export const promotionsAdminApi = {
+  // Liste toutes les promos avec filtre optionnel par statut
+  list: (params = {}) => {
+    const q = new URLSearchParams({ page: 1, per_page: 50, ...params });
+    // Supprimer les paramètres vides
+    [...q.entries()].forEach(([k, v]) => { if (!v) q.delete(k); });
+    return fetch(`${BASE}/promotions/admin/all?${q}`, { headers: authHeaders() })
+      .then(handleResponse);
+  },
+
+  // Nombre de promotions PENDING
+  pendingCount: () =>
+    fetch(`${BASE}/promotions/admin/pending-count`, { headers: authHeaders() })
+      .then(handleResponse),
+
+  // Approuver ou refuser
+  decision: (id, data) =>
+    fetch(`${BASE}/promotions/admin/${id}/decision`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(data),
+    }).then(handleResponse),
+
+  // Activer / désactiver une promo approuvée
+  toggle: (id, actif) =>
+    fetch(`${BASE}/promotions/admin/${id}/toggle?actif=${actif}`, {
+      method:  "PATCH",
+      headers: authHeaders(),
+    }).then(handleResponse),
+};

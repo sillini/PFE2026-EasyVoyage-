@@ -396,3 +396,48 @@
   background: linear-gradient(180deg, #4A9EF5, #1877F2);
   border-radius: 3px 0 0 3px;
 }
+/* ══════════════════════════════════════════════════════════
+   À AJOUTER À LA FIN de AdminSidebar.css
+   Styles pour le badge de promotions en attente
+══════════════════════════════════════════════════════════ */
+
+/* Badge numérique orange — promotions en attente (sidebar ouvert) */
+.adm-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: linear-gradient(135deg, #D97706, #B45309);
+  color: #fff;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.45);
+  animation: adm-badge-pop 0.4s cubic-bezier(0.36, 1.4, 0.5, 1);
+}
+@keyframes adm-badge-pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* Point rouge — sidebar réduit (collapsed) */
+.adm-nav-dot-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  background: #D97706;
+  border-radius: 50%;
+  border: 2px solid #0F2235;
+  animation: adm-dot-pulse 1.6s ease infinite;
+}
+@keyframes adm-dot-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.7; }
+}

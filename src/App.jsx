@@ -13,19 +13,21 @@ import AdminDemandesPartenaire from "./admin/pages/AdminDemandesPartenaire";
 import AdminClients            from "./admin/pages/AdminClients";
 import AdminFinances           from "./admin/pages/AdminFinances";
 import AdminMarketing          from "./admin/pages/AdminMarketing";
-import AdminCatalogue          from "./admin/pages/AdminCatalogue";
+import AdminCatalogue          from "./admin/pages/catalogue/AdminCatalogue";
 import AdminFactures           from "./admin/pages/AdminFactures";
 import AdminAgentIA            from "./admin/pages/AdminAgentIA";
 import AdminProfil             from "./admin/pages/AdminProfil";
 import AdminHeroSlides         from "./admin/pages/AdminHeroSlides";
 import AdminSupport            from "./admin/pages/AdminSupport";
 import AdminHotelsVedettes     from "./admin/pages/AdminHotelsVedettes";
+import AdminPromotions         from "./admin/pages/AdminPromotions";
+import FiscalConfig            from "./admin/pages/FiscalConfig";           // ← NOUVEAU
 
 import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
 import MesHotels             from "./partenaire/pages/MesHotels";
 import ChambresPage          from "./partenaire/pages/ChambresPage";
-import MesPromotions         from "./partenaire/pages/MesPromotions";   // ← NOUVEAU
+import MesPromotions         from "./partenaire/pages/MesPromotions";
 import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
 import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
@@ -99,6 +101,7 @@ export default function App() {
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
+        // ── Gestion ──────────────────────────────────────
         case "reservations":    return <AdminReservations />;
         case "hotels":          return <AdminHotels />;
         case "voyages":         return <AdminVoyages />;
@@ -113,21 +116,32 @@ export default function App() {
         case "demandes-partenaire":
           return <AdminDemandesPartenaire onConfirmer={handleConfirmerDemande}/>;
         case "clients":         return <AdminClients />;
+        // ── Finance & Facturation ─────────────────────────
         case "finances":        return <AdminFinances />;
-        case "marketing":       return <AdminMarketing />;
-        case "catalogues":      return <AdminCatalogue />;
+        case "promotions":      return <AdminPromotions />;
         case "factures":        return <AdminFactures />;
-        case "agent":           return <AdminAgentIA />;
+        case "fiscal":          return <FiscalConfig />;               // ← NOUVEAU
+        // ── Marketing ─────────────────────────────────────
+        case "marketing":       return <AdminMarketing />;
+        case "catalogue":       return <AdminCatalogue />;
+        // ── Configuration ─────────────────────────────────
         case "hotels-vedettes": return <AdminHotelsVedettes />;
         case "hero-slides":     return <AdminHeroSlides />;
         case "support":         return <AdminSupport currentUserId={user?.id}/>;
+        case "agent":           return <AdminAgentIA />;
         case "profil":          return <AdminProfil />;
         default:                return <AdminDashboard />;
       }
     };
+
     return (
       <div className="app-shell">
-        <AdminSidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout}/>
+        <AdminSidebar
+          activePage={activePage}
+          onNavigate={setActivePage}
+          user={user}
+          onLogout={handleLogout}
+        />
         <div className="app-main">
           <AdminTopbar activePage={activePage} user={user} onNavigate={setActivePage}/>
           <main className="app-content">{renderAdmin()}</main>
@@ -141,7 +155,7 @@ export default function App() {
     switch (activePage) {
       case "hotels":        return <MesHotels />;
       case "chambres":      return <ChambresPage />;
-      case "promotions":    return <MesPromotions />;   // ← NOUVEAU
+      case "promotions":    return <MesPromotions />;
       case "reservations":  return <MesReservations />;
       case "finances":      return <PartenaireFinances />;
       case "profil":        return <PartenaireProfil />;
@@ -152,7 +166,12 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar activePage={activePage} onNavigate={setActivePage} user={user} onLogout={handleLogout}/>
+      <Sidebar
+        activePage={activePage}
+        onNavigate={setActivePage}
+        user={user}
+        onLogout={handleLogout}
+      />
       <div className="app-main">
         <Topbar activePage={activePage} user={user} onNavigate={setActivePage}/>
         <main className="app-content">{renderPartenaire()}</main>
