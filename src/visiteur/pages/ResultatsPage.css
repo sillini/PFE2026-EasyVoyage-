@@ -215,3 +215,133 @@
 /* Responsive */
 @media (max-width:1024px) { .rp-layout { grid-template-columns:1fr; } .rp-sidebar { position:static; } }
 @media (max-width:640px) { .rp-card { grid-template-columns:1fr; } .rp-card-img { height:200px; } .rp-layout { padding:16px; } .rp-sb-dates { grid-template-columns:1fr; } }
+
+
+/* ══════════════════════════════════════════════════════════
+   BADGES PROMOTION — CÔTÉ VISITEUR
+   ─────────────────────────────────────────────────────────
+   Ajouter ces styles À LA FIN DES DEUX fichiers CSS :
+     1. src/visiteur/components/sections/HotelsSection.css
+     2. src/visiteur/pages/ResultatsPage.css
+   ══════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════
+   À AJOUTER DANS : HotelsSection.css
+   ══════════════════════════════════════════════════════════ */
+
+/* Badge promo — pour cartes de la homepage */
+.hc-promo-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: #fff;
+  border-radius: 10px;
+  box-shadow:
+    0 6px 18px rgba(231, 76, 60, .45),
+    0 2px 6px rgba(0, 0, 0, .2);
+  animation: hc-promo-bounce .6s cubic-bezier(.22, 1, .36, 1);
+  transform-origin: top left;
+}
+.hc-promo-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .25) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hc-promo-top {
+  font-family: 'Lato', sans-serif;
+  font-size: .58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: .92;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.hc-promo-pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+@keyframes hc-promo-bounce {
+  0%   { opacity: 0; transform: scale(.6) rotate(-10deg); }
+  70%  { transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   À AJOUTER DANS : ResultatsPage.css
+   ══════════════════════════════════════════════════════════ */
+
+/* Badge promo — pour cartes de la page résultats */
+.rp-promo-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: #fff;
+  border-radius: 9px;
+  box-shadow:
+    0 6px 18px rgba(231, 76, 60, .45),
+    0 2px 6px rgba(0, 0, 0, .2);
+  animation: rp-promo-bounce .6s cubic-bezier(.22, 1, .36, 1);
+}
+.rp-promo-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .25) 0%, transparent 50%);
+  pointer-events: none;
+}
+.rp-promo-top {
+  font-family: 'Lato', sans-serif;
+  font-size: .55rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: .92;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.rp-promo-pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+@keyframes rp-promo-bounce {
+  0%   { opacity: 0; transform: scale(.6) rotate(-10deg); }
+  70%  { transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* Chip promo rouge (en bas de la carte) */
+.rp-chip.red {
+  background: rgba(231, 76, 60, .1);
+  border: 1px solid rgba(231, 76, 60, .28);
+  color: #C0392B;
+  font-weight: 700;
+}

@@ -13,7 +13,7 @@ import AdminDemandesPartenaire from "./admin/pages/AdminDemandesPartenaire";
 import AdminClients            from "./admin/pages/AdminClients";
 import AdminFinances           from "./admin/pages/AdminFinances";
 import AdminMarketing          from "./admin/pages/AdminMarketing";
-import AdminCatalogue          from "./admin/pages/AdminCatalogue";   // ← NOUVEAU
+import AdminCatalogue          from "./admin/pages/AdminCatalogue";
 import AdminFactures           from "./admin/pages/AdminFactures";
 import AdminAgentIA            from "./admin/pages/AdminAgentIA";
 import AdminProfil             from "./admin/pages/AdminProfil";
@@ -25,6 +25,7 @@ import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
 import MesHotels             from "./partenaire/pages/MesHotels";
 import ChambresPage          from "./partenaire/pages/ChambresPage";
+import MesPromotions         from "./partenaire/pages/MesPromotions";   // ← NOUVEAU
 import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
 import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
@@ -114,7 +115,7 @@ export default function App() {
         case "clients":         return <AdminClients />;
         case "finances":        return <AdminFinances />;
         case "marketing":       return <AdminMarketing />;
-        case "catalogues":      return <AdminCatalogue />;   // ← NOUVEAU
+        case "catalogues":      return <AdminCatalogue />;
         case "factures":        return <AdminFactures />;
         case "agent":           return <AdminAgentIA />;
         case "hotels-vedettes": return <AdminHotelsVedettes />;
@@ -140,6 +141,7 @@ export default function App() {
     switch (activePage) {
       case "hotels":        return <MesHotels />;
       case "chambres":      return <ChambresPage />;
+      case "promotions":    return <MesPromotions />;   // ← NOUVEAU
       case "reservations":  return <MesReservations />;
       case "finances":      return <PartenaireFinances />;
       case "profil":        return <PartenaireProfil />;

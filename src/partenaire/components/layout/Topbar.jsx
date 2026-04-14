@@ -4,6 +4,7 @@ const PAGE_TITLES = {
   dashboard:    { title: "Tableau de bord",    subtitle: "Vue d'ensemble de votre activité" },
   hotels:       { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
   chambres:     { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
+  promotions:   { title: "Mes Promotions",     subtitle: "Créez et gérez les offres spéciales de vos hôtels" },
   reservations: { title: "Réservations",       subtitle: "Consultez les réservations de vos établissements" },
   finances:     { title: "Finances",           subtitle: "Vos revenus, réservations et demandes de retrait" },
   marketing:    { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },

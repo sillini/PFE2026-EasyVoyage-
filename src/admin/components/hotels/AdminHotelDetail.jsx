@@ -169,12 +169,17 @@ function TypeDispoCard({ chambre }) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  ONGLET AVIS — avec suppression admin
+//  ONGLET AVIS — avec suppression admin + Analyse IA
 // ══════════════════════════════════════════════════════════
 function AvisTab({ avis, hotelId, onDeleted }) {
   const [confirmId,  setConfirmId]  = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [errMsg,     setErrMsg]     = useState("");
+
+  // ── Analyse IA ──
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError,   setAiError]   = useState("");
+  const [aiReport,  setAiReport]  = useState(null);
 
   const handleDelete = async (avisId) => {
     setDeletingId(avisId);
@@ -197,6 +202,31 @@ function AvisTab({ avis, hotelId, onDeleted }) {
     }
   };
 
+  const handleGenerateAI = async () => {
+    setAiLoading(true);
+    setAiError("");
+    setAiReport(null);
+    try {
+      const res = await fetch(`${BASE}/admin/hotels/${hotelId}/avis/analyse-ia`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:  `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.detail || `Erreur ${res.status}`);
+      }
+      const data = await res.json();
+      setAiReport(data);
+    } catch (e) {
+      setAiError(e.message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   if (avis.length === 0) {
     return (
       <div className="ahd-empty">
@@ -210,11 +240,42 @@ function AvisTab({ avis, hotelId, onDeleted }) {
 
   return (
     <div className="ahd-avis-list">
-      {/* Résumé */}
+      {/* Résumé + bouton IA */}
       <div className="ahd-avis-summary">
-        <span className="ahd-avis-total">{avis.length} avis</span>
-        <span className="ahd-avis-avg">★ {avgNote} / 5</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <span className="ahd-avis-total">{avis.length} avis</span>
+          <span className="ahd-avis-avg">★ {avgNote} / 5</span>
+        </div>
+        <button
+          className={`ahd-ai-btn ${aiLoading ? "ahd-ai-btn--busy" : ""}`}
+          onClick={handleGenerateAI}
+          disabled={aiLoading}
+        >
+          {aiLoading ? (
+            <>
+              <span className="ahd-ai-spin" />
+              Analyse en cours…
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>
+              </svg>
+              Générer rapport IA
+            </>
+          )}
+        </button>
       </div>
+
+      {/* Erreur IA */}
+      {aiError && (
+        <div className="ahd-ai-error">
+          <span>⚠️</span> {aiError}
+        </div>
+      )}
+
+      {/* Rapport IA */}
+      {aiReport && <AIReportCard report={aiReport} onClose={() => setAiReport(null)} />}
 
       {avis.map(a => (
         <div key={a.id} className={`ahd-avis-card ${confirmId === a.id ? "ahd-avis-confirming" : ""}`}>
@@ -295,6 +356,145 @@ function AvisTab({ avis, hotelId, onDeleted }) {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+//  AIReportCard — carte du rapport IA
+// ══════════════════════════════════════════════════════════
+function AIReportCard({ report, onClose }) {
+  const scoreColor =
+    report.score_satisfaction >= 75 ? "#27AE60" :
+    report.score_satisfaction >= 50 ? "#C4973A" :
+    "#C0392B";
+
+  const sentimentEmoji = {
+    "positif": "😊",
+    "neutre":  "😐",
+    "négatif": "😞",
+    "negatif": "😞",
+  }[report.sentiment_dominant?.toLowerCase()] || "📊";
+
+  const total = report.classification.positif + report.classification.neutre + report.classification.negatif;
+  const pct = (n) => total > 0 ? Math.round((n / total) * 100) : 0;
+
+  return (
+    <div className="ai-report">
+      {/* Header */}
+      <div className="ai-report-header">
+        <div className="ai-report-badge">
+          <span className="ai-report-icon">✨</span>
+          <div>
+            <span className="ai-report-label">ANALYSE IA — CLAUDE</span>
+            <span className="ai-report-sub">Rapport généré à partir de {report.nb_avis} avis</span>
+          </div>
+        </div>
+        <button className="ai-report-close" onClick={onClose} title="Fermer">✕</button>
+      </div>
+
+      {/* Hero : score circulaire + sentiment */}
+      <div className="ai-report-hero">
+        <div className="ai-score-circle">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#EEF2F8" strokeWidth="10"/>
+            <circle
+              cx="60" cy="60" r="52" fill="none"
+              stroke={scoreColor} strokeWidth="10" strokeLinecap="round"
+              strokeDasharray={`${(report.score_satisfaction / 100) * 326.7} 326.7`}
+              transform="rotate(-90 60 60)"
+            />
+          </svg>
+          <div className="ai-score-inner">
+            <span className="ai-score-val" style={{ color: scoreColor }}>
+              {report.score_satisfaction}
+            </span>
+            <span className="ai-score-lbl">/100</span>
+          </div>
+        </div>
+
+        <div className="ai-hero-details">
+          <div className="ai-sentiment">
+            <span className="ai-sentiment-emoji">{sentimentEmoji}</span>
+            <div>
+              <span className="ai-sentiment-lbl">Sentiment dominant</span>
+              <span className="ai-sentiment-val">{report.sentiment_dominant}</span>
+            </div>
+          </div>
+          <div className="ai-note-info">
+            ⭐ Note moyenne : <strong>{report.note_moyenne} / 5</strong>
+          </div>
+        </div>
+      </div>
+
+      {/* Résumé global */}
+      <div className="ai-section">
+        <h4 className="ai-section-title">📝 Résumé global</h4>
+        <p className="ai-resume">{report.resume_global}</p>
+      </div>
+
+      {/* Classification */}
+      <div className="ai-section">
+        <h4 className="ai-section-title">📊 Classification des avis</h4>
+        <div className="ai-classif-bars">
+          <ClassifBar label="Positifs" count={report.classification.positif} pct={pct(report.classification.positif)} color="#27AE60" icon="👍" />
+          <ClassifBar label="Neutres"  count={report.classification.neutre}  pct={pct(report.classification.neutre)}  color="#C4973A" icon="😐" />
+          <ClassifBar label="Négatifs" count={report.classification.negatif} pct={pct(report.classification.negatif)} color="#C0392B" icon="👎" />
+        </div>
+      </div>
+
+      {/* Grid positifs / négatifs */}
+      <div className="ai-pn-grid">
+        <div className="ai-pn-card ai-pn-positive">
+          <h4 className="ai-section-title">✅ Points forts</h4>
+          {report.points_positifs.length === 0 ? (
+            <p className="ai-empty-list">Aucun point fort identifié</p>
+          ) : (
+            <ul className="ai-pn-list">
+              {report.points_positifs.map((p, i) => (
+                <li key={i}><span className="ai-check">+</span>{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="ai-pn-card ai-pn-negative">
+          <h4 className="ai-section-title">⚠️ Points faibles</h4>
+          {report.points_negatifs.length === 0 ? (
+            <p className="ai-empty-list">Aucun point faible identifié 🎉</p>
+          ) : (
+            <ul className="ai-pn-list">
+              {report.points_negatifs.map((p, i) => (
+                <li key={i}><span className="ai-cross">−</span>{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      
+
+      <div className="ai-report-footer">
+        <span>🤖 Généré par Claude AI · Analyse basée sur {report.nb_avis} avis clients</span>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+//  ClassifBar — barre de classification
+// ══════════════════════════════════════════════════════════
+function ClassifBar({ label, count, pct, color, icon }) {
+  return (
+    <div className="ai-classif-row">
+      <div className="ai-classif-left">
+        <span>{icon}</span>
+        <span className="ai-classif-lbl">{label}</span>
+      </div>
+      <div className="ai-classif-track">
+        <div className="ai-classif-fill" style={{ width: `${pct}%`, background: color }} />
+      </div>
+      <span className="ai-classif-count">{count} ({pct}%)</span>
     </div>
   );
 }
@@ -758,7 +958,7 @@ export default function AdminHotelDetail({ hotelId, onBack }) {
           </div>
         )}
 
-        {/* ══ AVIS — avec suppression admin ══ */}
+        {/* ══ AVIS — avec suppression admin + Analyse IA ══ */}
         {activeTab === "avis" && (
           <AvisTab
             avis={avis}

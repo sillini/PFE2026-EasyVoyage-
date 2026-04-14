@@ -301,6 +301,12 @@ function HotelCard({ hotel, onDetail }) {
         {img ? <img src={img} alt={hotel.nom} onLoad={()=>setOk(true)} style={{opacity:ok?1:0}}/> :
           <div className="rp-card-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>}
         {hotel.mis_en_avant && <div className="rp-badge gold">★ Sélection</div>}
+        {hotel.promotion_active && hotel.promotion_pourcentage && (
+          <div className="rp-promo-badge" title={hotel.promotion_titre || "Promotion"}>
+            <span className="rp-promo-top">PROMO</span>
+            <span className="rp-promo-pct">-{Math.round(hotel.promotion_pourcentage)}%</span>
+          </div>
+        )}
       </div>
       <div className="rp-card-body">
         <div className="rp-card-top">
@@ -327,6 +333,9 @@ function HotelCard({ hotel, onDetail }) {
           <div className="rp-chips">
             {hotel.etoiles>=4&&<span className="rp-chip gold">Premium</span>}
             {hotel.mis_en_avant&&<span className="rp-chip blue">Recommandé</span>}
+            {hotel.promotion_active && (
+              <span className="rp-chip red">🎁 Promo -{Math.round(hotel.promotion_pourcentage)}%</span>
+            )}
           </div>
           <button className="rp-cta">Voir les chambres →</button>
         </div>

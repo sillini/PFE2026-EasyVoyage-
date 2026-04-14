@@ -1,12 +1,11 @@
 // ══════════════════════════════════════════════════════════
 //  src/admin/pages/marketing/InteractionsDashboard.jsx
-//  RENOMMÉ → "Statistiques Facebook"
-//  Design amélioré : métriques visuelles, barres de progression
-//  Correction : erreur "Failed to fetch" gérée proprement
+//  Statistiques Facebook — version améliorée
 // ══════════════════════════════════════════════════════════
 
 import { useState, useEffect, useCallback } from "react";
 import { facebookInteractionsApi } from "../../services/facebookInteractionsApi";
+import "./InteractionsDashboard.css";
 
 const fmtNum = (n) => {
   if (!n || n === 0) return "0";
@@ -21,6 +20,18 @@ const fmtDate = (d) =>
     hour: "2-digit", minute: "2-digit"
   }) : "—";
 
+const fmtDateLong = (d) =>
+  d ? new Date(d).toLocaleDateString("fr-FR", {
+    day: "2-digit", month: "long", year: "numeric"
+  }) : "—";
+
+const TYPE_LABELS = {
+  hotel:     { icon: "🏨", label: "Hôtel" },
+  voyage:    { icon: "✈️", label: "Voyage" },
+  promotion: { icon: "🎁", label: "Promotion" },
+  offre:     { icon: "⭐", label: "Offre" },
+};
+
 export default function InteractionsDashboard({ toast }) {
   const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +44,6 @@ export default function InteractionsDashboard({ toast }) {
       const res = await facebookInteractionsApi.getDashboard();
       setData(res);
     } catch (err) {
-      // Gestion propre de l'erreur réseau
       setError(err.message || "Impossible de charger les statistiques");
     }
     setLoading(false);
@@ -80,9 +90,14 @@ export default function InteractionsDashboard({ toast }) {
 
   const d   = data || {};
   const eng = (d.total_reactions || 0) + (d.total_comments || 0) + (d.total_shares || 0);
-
-  // Valeur max pour les barres de progression relatives
   const maxVal = Math.max(d.total_reactions || 0, d.total_comments || 0, d.total_shares || 0, 1);
+
+  // Lien Facebook direct depuis le fb_post_id (format : pageId_postId)
+  const fbLink = d.top_post_fb_id
+    ? `https://www.facebook.com/${d.top_post_fb_id}`
+    : null;
+
+  const typeInfo = TYPE_LABELS[(d.top_post_type || "").toLowerCase()] || { icon: "📰", label: d.top_post_type || "Publication" };
 
   return (
     <div className="ist-root">
@@ -142,53 +157,103 @@ export default function InteractionsDashboard({ toast }) {
         />
       </div>
 
-      {/* ── Ligne secondaire ── */}
-      <div className="ist-secondary-metrics">
-        <SecMetric icon="🎯" label="Engagement total" value={fmtNum(eng)} sub={`Taux : ${d.avg_engagement_rate ?? 0}%`} />
-        <SecMetric icon="👁️" label="Portée organique" value={fmtNum(d.total_reach || 0)} sub="personnes atteintes" />
-        <SecMetric icon="📣" label="Impressions" value={fmtNum(d.total_impressions || 0)} sub="affichages totaux" />
-        <SecMetric icon="🖱️" label="Clics" value={fmtNum(d.total_clicks || 0)} sub="clics sur liens" />
-      </div>
-
       {/* ── Répartition par type d'interaction ── */}
       {eng > 0 && (
         <div className="ist-breakdown-card">
           <p className="ist-block-title">Répartition des interactions</p>
           <div className="ist-breakdown-bars">
-            <BreakdownBar
-              icon="👍" label="Réactions"
-              val={d.total_reactions || 0} total={eng}
-              color="#1877F2"
-            />
-            <BreakdownBar
-              icon="💬" label="Commentaires"
-              val={d.total_comments || 0} total={eng}
-              color="#27AE60"
-            />
-            <BreakdownBar
-              icon="🔁" label="Partages"
-              val={d.total_shares || 0} total={eng}
-              color="#C4973A"
-            />
+            <BreakdownBar icon="👍" label="Réactions"    val={d.total_reactions || 0} total={eng} color="#1877F2" />
+            <BreakdownBar icon="💬" label="Commentaires" val={d.total_comments  || 0} total={eng} color="#27AE60" />
+            <BreakdownBar icon="🔁" label="Partages"     val={d.total_shares    || 0} total={eng} color="#C4973A" />
           </div>
         </div>
       )}
 
-      {/* ── Top publication ── */}
+      {/* ══════════════════════════════════════════════════ */}
+      {/*  PUBLICATION LA PLUS PERFORMANTE — CARTE DÉTAILLÉE  */}
+      {/* ══════════════════════════════════════════════════ */}
       {d.top_post_message && (
-        <div className="ist-top-card">
-          <div className="ist-top-header">
-            <span className="ist-top-crown">🏆</span>
-            <div>
-              <p className="ist-top-label">Publication la plus performante</p>
-              <span className="ist-top-score">{fmtNum(d.top_post_engagement)} interactions</span>
+        <div className="ist-top-v2">
+
+          {/* En-tête avec badge TOP */}
+          <div className="ist-top-v2-header">
+            <div className="ist-top-v2-badge">
+              <span className="ist-top-v2-crown">🏆</span>
+              <div>
+                <span className="ist-top-v2-badge-label">TOP PERFORMANCE</span>
+                <span className="ist-top-v2-badge-sub">Publication la plus engagée</span>
+              </div>
             </div>
+            {fbLink && (
+              <a href={fbLink} target="_blank" rel="noopener noreferrer" className="ist-top-v2-fb-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Voir sur Facebook
+              </a>
+            )}
           </div>
-          <blockquote className="ist-top-quote">"{d.top_post_message}"</blockquote>
-          <div className="ist-top-stats">
-            <span>👍 {fmtNum(d.top_post_likes)} réactions</span>
-            <span>·</span>
-            <span>🎯 {fmtNum(d.top_post_engagement)} total</span>
+
+          {/* Corps 2 colonnes : image + contenu */}
+          <div className="ist-top-v2-body">
+
+            {/* Image preview */}
+            {d.top_post_image_url ? (
+              <div className="ist-top-v2-image">
+                <img src={d.top_post_image_url} alt="Publication" onError={(e) => { e.target.style.display = 'none'; }} />
+                <span className="ist-top-v2-type-chip">{typeInfo.icon} {typeInfo.label}</span>
+              </div>
+            ) : (
+              <div className="ist-top-v2-image ist-top-v2-image--placeholder">
+                <span>{typeInfo.icon}</span>
+                <small>{typeInfo.label}</small>
+              </div>
+            )}
+
+            {/* Contenu */}
+            <div className="ist-top-v2-content">
+              <div className="ist-top-v2-meta">
+                {d.top_post_published_at && (
+                  <span className="ist-top-v2-date">
+                    📅 Publiée le {fmtDateLong(d.top_post_published_at)}
+                  </span>
+                )}
+              </div>
+
+              <p className="ist-top-v2-message">{d.top_post_message}</p>
+
+              {/* Stats en ligne */}
+              <div className="ist-top-v2-stats">
+                <div className="ist-top-v2-stat ist-top-v2-stat--blue">
+                  <span className="ist-top-v2-stat-icon">👍</span>
+                  <div>
+                    <span className="ist-top-v2-stat-val">{fmtNum(d.top_post_likes)}</span>
+                    <span className="ist-top-v2-stat-lbl">Réactions</span>
+                  </div>
+                </div>
+                <div className="ist-top-v2-stat ist-top-v2-stat--green">
+                  <span className="ist-top-v2-stat-icon">💬</span>
+                  <div>
+                    <span className="ist-top-v2-stat-val">{fmtNum(d.top_post_comments)}</span>
+                    <span className="ist-top-v2-stat-lbl">Commentaires</span>
+                  </div>
+                </div>
+                <div className="ist-top-v2-stat ist-top-v2-stat--gold">
+                  <span className="ist-top-v2-stat-icon">🔁</span>
+                  <div>
+                    <span className="ist-top-v2-stat-val">{fmtNum(d.top_post_shares)}</span>
+                    <span className="ist-top-v2-stat-lbl">Partages</span>
+                  </div>
+                </div>
+                <div className="ist-top-v2-stat ist-top-v2-stat--total">
+                  <span className="ist-top-v2-stat-icon">🎯</span>
+                  <div>
+                    <span className="ist-top-v2-stat-val">{fmtNum(d.top_post_engagement)}</span>
+                    <span className="ist-top-v2-stat-lbl">Total engagement</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -216,19 +281,6 @@ function MetricCard({ icon, label, value, sub, color, bgColor, borderColor, pct 
       <div className="ist-mc-sub">{sub}</div>
       <div className="ist-mc-bar-track">
         <div className="ist-mc-bar-fill" style={{ width: `${pct}%`, background: color }} />
-      </div>
-    </div>
-  );
-}
-
-function SecMetric({ icon, label, value, sub }) {
-  return (
-    <div className="ist-sec-metric">
-      <span className="ist-sec-icon">{icon}</span>
-      <div className="ist-sec-body">
-        <span className="ist-sec-val">{value}</span>
-        <span className="ist-sec-label">{label}</span>
-        <span className="ist-sec-sub">{sub}</span>
       </div>
     </div>
   );

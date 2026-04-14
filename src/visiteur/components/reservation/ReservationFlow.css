@@ -112,3 +112,114 @@
 .rf-notice.orange{background:rgba(196,151,58,.07);border:1px solid rgba(196,151,58,.22);color:#7A5C1E;}
 .rf-recap-row{font-family:'Lato',sans-serif;font-size:.85rem;color:rgba(255,255,255,.72);display:flex;align-items:center;gap:8px;}
 .rf-arrow{color:#C4973A;}
+
+
+/* ══════════════════════════════════════════════════════════
+   À AJOUTER À LA FIN DE : ReservationFlow.css
+   Styles pour l'affichage des promotions dans le modal
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Pill promo en haut du recap ────────────────────────── */
+.rf-promo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: #fff;
+  border-radius: 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(231, 76, 60, .35);
+  margin-bottom: 12px;
+  animation: rf-promo-in .5s cubic-bezier(.22, 1, .36, 1);
+}
+.rf-promo-pill strong {
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+.rf-promo-pill span {
+  opacity: .9;
+  font-weight: 600;
+}
+@keyframes rf-promo-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Bloc prix avec promotion dans le recap ─────────────── */
+.rf-recap-prix-promo {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background: rgba(231, 76, 60, .06);
+  border: 1px solid rgba(231, 76, 60, .22);
+  border-radius: 10px;
+}
+.rf-prix-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Lato', sans-serif;
+  font-size: .88rem;
+  color: #fff;
+}
+.rf-prix-barre {
+  text-decoration: line-through;
+  text-decoration-color: rgba(231, 76, 60, .9);
+  text-decoration-thickness: 2px;
+  color: rgba(255, 255, 255, .65);
+  font-weight: 600;
+}
+.rf-prix-reduc {
+  color: #FFE08A;
+  font-weight: 700;
+}
+.rf-prix-total {
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, .18);
+  margin-top: 2px;
+}
+.rf-prix-total strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem;
+  color: #FFE08A;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+}
+
+/* ── Montant à payer — étape paiement ───────────────────── */
+.rf-montant-promo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.rf-montant-barre {
+  font-family: 'Lato', sans-serif;
+  font-size: .95rem;
+  color: #8A9BB0;
+  text-decoration: line-through;
+  text-decoration-color: #C0392B;
+  text-decoration-thickness: 1.5px;
+  font-weight: 600;
+}
+.rf-montant-promo strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #C0392B;
+}
+.rf-montant-badge {
+  padding: 4px 11px;
+  background: linear-gradient(135deg, #E74C3C, #C0392B);
+  color: #fff;
+  border-radius: 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .3px;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, .35);
+}

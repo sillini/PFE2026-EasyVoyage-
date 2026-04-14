@@ -99,6 +99,14 @@ function HotelCard({ hotel, onReserver, isClient, isFavori, onFavoriChange, onLo
             <span>Sélection EasyVoyage</span>
           </div>
         )}
+
+        {/* ── Badge PROMO (À L'INTÉRIEUR de hc-img-wrap) ── */}
+        {hotel.promotion_active && hotel.promotion_pourcentage && (
+          <div className="hc-promo-badge" title={hotel.promotion_titre || "Promotion"}>
+            <span className="hc-promo-top">PROMO</span>
+            <span className="hc-promo-pct">-{Math.round(hotel.promotion_pourcentage)}%</span>
+          </div>
+        )}
       </div>
 
       {/* Corps */}
@@ -154,7 +162,6 @@ export default function HotelsSection({ onReserver, searchParams, isClient, onLo
   const [loading,   setLoading]   = useState(true);
   const [favoriIds, setFavoriIds] = useState([]);
 
-  // Charger IDs favoris si client connecté
   useEffect(() => {
     if (!isClient) { setFavoriIds([]); return; }
     getFavoriIds()

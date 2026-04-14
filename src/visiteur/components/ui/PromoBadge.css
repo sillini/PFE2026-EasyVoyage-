@@ -1,0 +1,137 @@
+/* ══════════════════════════════════════════════════════════
+   src/visiteur/components/ui/PromoBadge.css
+   Styles pour badge + prix promotionnel côté visiteur
+   ══════════════════════════════════════════════════════════ */
+
+/* ── BADGE (coin de carte) ──────────────────────────────── */
+.promo-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: #fff;
+  border-radius: 10px;
+  box-shadow:
+    0 6px 18px rgba(231,76,60,.45),
+    0 2px 6px rgba(0,0,0,.2);
+  animation: promo-bounce .6s cubic-bezier(.22,1,.36,1);
+  transform-origin: top left;
+}
+@keyframes promo-bounce {
+  0%   { opacity: 0; transform: scale(.6) rotate(-10deg); }
+  70%  { transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.promo-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255,255,255,.25) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.promo-badge-top {
+  font-family: 'Lato', sans-serif;
+  font-size: .58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: .92;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.promo-badge-pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+
+/* Variantes de taille */
+.promo-badge.pb-small {
+  padding: 6px 10px;
+}
+.promo-badge.pb-small .promo-badge-top { font-size: .52rem; }
+.promo-badge.pb-small .promo-badge-pct { font-size: 1.15rem; }
+
+.promo-badge.pb-large {
+  padding: 10px 16px;
+}
+.promo-badge.pb-large .promo-badge-top { font-size: .64rem; }
+.promo-badge.pb-large .promo-badge-pct { font-size: 1.7rem; }
+
+/* ── PRIX (barré + remisé) ──────────────────────────────── */
+.promo-price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Lato', sans-serif;
+}
+.pp-label {
+  font-size: .62rem;
+  color: rgba(255,255,255,.82);
+  font-weight: 600;
+  text-transform: lowercase;
+}
+.pp-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+.pp-currency {
+  font-size: .72rem;
+  color: rgba(255,255,255,.88);
+  font-weight: 700;
+}
+
+/* Quand il y a une promo : prix original barré */
+.pp-discounted .pp-original {
+  font-size: .72rem;
+  color: rgba(255,255,255,.65);
+  font-weight: 600;
+  text-decoration: line-through;
+  text-decoration-color: rgba(255,255,255,.7);
+  text-decoration-thickness: 1.5px;
+  margin-right: 4px;
+}
+.pp-discounted .pp-value {
+  color: #FFE08A;
+  text-shadow: 0 1px 3px rgba(0,0,0,.28);
+}
+
+/* Variantes de taille */
+.promo-price.pp-small .pp-value    { font-size: 1.1rem; }
+.promo-price.pp-small .pp-original { font-size: .66rem; }
+
+.promo-price.pp-large .pp-value    { font-size: 1.8rem; }
+.promo-price.pp-large .pp-original { font-size: .82rem; }
+.promo-price.pp-large .pp-label    { font-size: .7rem; }
+.promo-price.pp-large .pp-currency { font-size: .84rem; }
+
+/* ── CHIP (inline, sous la carte) ───────────────────────── */
+.promo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  background: rgba(231,76,60,.1);
+  border: 1px solid rgba(231,76,60,.28);
+  border-radius: 20px;
+  font-family: 'Lato', sans-serif;
+  font-size: .7rem;
+  font-weight: 700;
+  color: #C0392B;
+  white-space: nowrap;
+}

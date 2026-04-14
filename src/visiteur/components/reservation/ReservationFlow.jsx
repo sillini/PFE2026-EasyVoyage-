@@ -8,13 +8,32 @@ function authHeaders() {
   return { "Content-Type": "application/json", ...(t ? { Authorization: "Bearer " + t } : {}) };
 }
 
+// ── Helper : calcule le prix promo à partir d'un total et d'un % ──
+function applyPromo(total, promoPct) {
+  if (!total || !promoPct) return total;
+  return +(total * (1 - promoPct / 100)).toFixed(2);
+}
+
 // ══════════════════════════════════════════════════════════
 //  ÉTAPE 1 — RÉCAPITULATIF
 // ══════════════════════════════════════════════════════════
 function StepRecap({ data, isClient, user, onNext, onClose }) {
+  const promoPct  = (data.hotel?.promotion_active && data.hotel?.promotion_pourcentage) || 0;
+  const totalOrig = data.prix?.total || 0;
+  const totalFinal = applyPromo(totalOrig, promoPct);
+  const economie  = totalOrig - totalFinal;
+
   return (
     <div className="rf-step-content">
       <div className="rf-recap-hero">
+        {/* Badge promo */}
+        {promoPct > 0 && (
+          <div className="rf-promo-pill">
+            🎁 <strong>PROMO -{Math.round(promoPct)}%</strong>
+            {data.hotel?.promotion_titre && <span> · {data.hotel.promotion_titre}</span>}
+          </div>
+        )}
+
         <div className="rf-recap-hotel">🏨 {data.hotel?.nom}</div>
         <div className="rf-recap-row">
           <span>📅 {data.dateDebut}</span>
@@ -27,10 +46,29 @@ function StepRecap({ data, isClient, user, onNext, onClose }) {
           {data.adultes} adulte{data.adultes > 1 ? "s" : ""}
           {data.enfants > 0 ? `, ${data.enfants} enfant${data.enfants > 1 ? "s" : ""}` : ""}
         </div>
-        <div className="rf-recap-prix">
-          <span>Total séjour :</span>
-          <strong>{data.prix?.total?.toFixed(2)} DT</strong>
-        </div>
+
+        {/* Prix — avec ou sans promo */}
+        {promoPct > 0 ? (
+          <div className="rf-recap-prix rf-recap-prix-promo">
+            <div className="rf-prix-line">
+              <span>Prix initial :</span>
+              <span className="rf-prix-barre">{totalOrig.toFixed(2)} DT</span>
+            </div>
+            <div className="rf-prix-line rf-prix-reduc">
+              <span>Réduction (-{Math.round(promoPct)}%) :</span>
+              <span>− {economie.toFixed(2)} DT</span>
+            </div>
+            <div className="rf-prix-line rf-prix-total">
+              <span>Total séjour :</span>
+              <strong>{totalFinal.toFixed(2)} DT</strong>
+            </div>
+          </div>
+        ) : (
+          <div className="rf-recap-prix">
+            <span>Total séjour :</span>
+            <strong>{totalOrig.toFixed(2)} DT</strong>
+          </div>
+        )}
       </div>
 
       {isClient ? (
@@ -100,7 +138,7 @@ function StepInfos({ form, setForm, onNext, onBack }) {
 // ══════════════════════════════════════════════════════════
 //  ÉTAPE 3 — PAIEMENT
 // ══════════════════════════════════════════════════════════
-function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, onBack }) {
+function StepPaiement({ montant, montantOriginal, promoPct, paiement, setPaiement, loading, error, onPay, onBack }) {
   const [showNum, setShowNum] = useState(false);
   const fmtCard   = v => v.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim().slice(0, 19);
   const fmtExpiry = v => {
@@ -108,11 +146,21 @@ function StepPaiement({ montant, paiement, setPaiement, loading, error, onPay, o
     return d.length >= 3 ? d.slice(0, 2) + "/" + d.slice(2, 4) : d;
   };
 
+  const hasPromo = promoPct > 0 && montantOriginal && montantOriginal > montant;
+
   return (
     <div className="rf-step-content">
       <div className="rf-montant-banner">
         <span>Montant à payer</span>
-        <strong>{montant?.toFixed(2)} DT</strong>
+        {hasPromo ? (
+          <div className="rf-montant-promo">
+            <span className="rf-montant-barre">{montantOriginal.toFixed(2)} DT</span>
+            <strong>{montant.toFixed(2)} DT</strong>
+            <span className="rf-montant-badge">-{Math.round(promoPct)}%</span>
+          </div>
+        ) : (
+          <strong>{montant?.toFixed(2)} DT</strong>
+        )}
       </div>
 
       {/* Méthodes */}
@@ -214,12 +262,9 @@ function StepSucces({ result, isClient, onClose }) {
       let url, filename;
 
       if (isClient) {
-        // CLIENT → endpoint standard avec id réservation + JWT
         url      = `${API}/reservations/${result.reservation_id}/voucher-pdf`;
         filename = `voucher-${result.facture_numero}.pdf`;
       } else {
-        // VISITEUR → endpoint dédié avec numéro voucher (sans auth)
-        // CORRECTION : url correcte = /reservations/visiteur/{num}/pdf
         url      = `${API}/reservations/visiteur/${result.numero_voucher}/pdf`;
         filename = `voucher-${result.numero_voucher}.pdf`;
       }
@@ -229,7 +274,6 @@ function StepSucces({ result, isClient, onClose }) {
       });
 
       if (!res.ok) {
-        // Essayer de lire le message d'erreur du backend
         const txt = await res.text().catch(() => "");
         throw new Error(`Erreur ${res.status}${txt ? " : " + txt : ""}`);
       }
@@ -246,7 +290,6 @@ function StepSucces({ result, isClient, onClose }) {
     setDownloading(false);
   };
 
-  // Champs à afficher selon CLIENT ou VISITEUR
   const rows = isClient
     ? [
         ["N° Réservation",  `#${result.reservation_id}`],
@@ -302,8 +345,6 @@ function StepSucces({ result, isClient, onClose }) {
 //  FLOW PRINCIPAL
 // ══════════════════════════════════════════════════════════
 export default function ReservationFlow({ data, isClient, user, onClose, onNeedAuth }) {
-  // CLIENT : recap → paiement → succes (3 étapes)
-  // VISITEUR : recap → infos → paiement → succes (4 étapes)
   const steps = isClient
     ? ["recap", "paiement", "succes"]
     : ["recap", "infos", "paiement", "succes"];
@@ -330,7 +371,11 @@ export default function ReservationFlow({ data, isClient, user, onClose, onNeedA
     carte_cvv:    "",
   });
 
-  const montant = data?.prix?.total;
+  // ── Calcul avec promotion ─────────────────────────────
+  const promoPct        = (data?.hotel?.promotion_active && data?.hotel?.promotion_pourcentage) || 0;
+  const montantOriginal = data?.prix?.total || 0;
+  const montant         = applyPromo(montantOriginal, promoPct);
+
   const stepIdx = steps.indexOf(step);
   const titles  = {
     recap:    "Récapitulatif",
@@ -348,12 +393,14 @@ export default function ReservationFlow({ data, isClient, user, onClose, onNeedA
       if (isClient) {
         // ── CLIENT ──────────────────────────────────────
         // 1. Créer réservation chambre
+        // On envoie le pourcentage de promotion pour que le backend l'applique
         const r1 = await fetch(`${API}/reservations/chambres`, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             date_debut: data.dateDebut,
             date_fin:   data.dateFin,
+            promo_pct:  promoPct || null,  // ← NOUVEAU
             chambres: [{
               id_chambre: data.chambre.id,
               nb_adultes: data.adultes,
@@ -390,7 +437,6 @@ export default function ReservationFlow({ data, isClient, user, onClose, onNeedA
 
       } else {
         // ── VISITEUR ─────────────────────────────────────
-        // Réservation directe dans table reservation_visiteur (sans compte)
         const r = await fetch(`${API}/reservations/visiteur`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -405,11 +451,11 @@ export default function ReservationFlow({ data, isClient, user, onClose, onNeedA
             nb_adultes: data.adultes,
             nb_enfants: data.enfants,
             methode:    paiement.methode,
+            promo_pct:  promoPct || null,   // ← NOUVEAU
           }),
         });
         const d = await r.json();
         if (!r.ok) throw new Error(d.detail || "Erreur réservation visiteur");
-        // La réponse contient déjà : id, numero_voucher, hotel_nom, chambre_nom, etc.
         res = d;
       }
 
@@ -480,6 +526,8 @@ export default function ReservationFlow({ data, isClient, user, onClose, onNeedA
         {step === "paiement" && (
           <StepPaiement
             montant={montant}
+            montantOriginal={montantOriginal}
+            promoPct={promoPct}
             paiement={paiement} setPaiement={setPaiement}
             loading={loading} error={error}
             onPay={handlePay}

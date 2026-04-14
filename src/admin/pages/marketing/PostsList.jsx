@@ -17,7 +17,7 @@ const STATUS_TABS = [
   { id: "PUBLISHED", label: "Publiées"   },
   { id: "DRAFT",     label: "Brouillons" },
   { id: "HISTORY",   label: "Historique" },
-  { id: "DASHBOARD", label: "📊 Dashboard" },
+  { id: "DASHBOARD", label: "📊 Statistiques" },   // ← changé
 ];
 
 const TYPE_OPTIONS = [

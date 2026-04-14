@@ -16,7 +16,9 @@ function nightsBetween(d1, d2) {
   if (!d1 || !d2) return 0;
   return Math.max(0, Math.round((new Date(d2) - new Date(d1)) / (1000 * 60 * 60 * 24)));
 }
-function getPrixChambre(tarifs, dateDebut, dateFin) {
+
+// ── MODIFIÉ : accepte un pourcentage de promotion ─────────
+function getPrixChambre(tarifs, dateDebut, dateFin, promoPct = 0) {
   if (!tarifs?.length || !dateDebut || !dateFin) return null;
   const nuits = nightsBetween(dateDebut, dateFin);
   if (nuits <= 0) return null;
@@ -24,7 +26,21 @@ function getPrixChambre(tarifs, dateDebut, dateFin) {
          || tarifs.find(t => t.date_debut <= dateDebut)
          || tarifs[0];
   if (!t) return null;
-  return { prix_nuit: parseFloat(t.prix), total: parseFloat(t.prix) * nuits, type_resa: t.type_reservation?.nom || "Standard" };
+
+  const prixNuit = parseFloat(t.prix);
+  const total    = prixNuit * nuits;
+  const hasPromo = promoPct > 0;
+  const prixNuitPromo = hasPromo ? +(prixNuit * (1 - promoPct / 100)).toFixed(2) : null;
+  const totalPromo    = hasPromo ? +(total    * (1 - promoPct / 100)).toFixed(2) : null;
+
+  return {
+    prix_nuit:       prixNuit,
+    total:           total,
+    prix_nuit_promo: prixNuitPromo,
+    total_promo:     totalPromo,
+    has_promo:       hasPromo,
+    type_resa:       t.type_reservation?.nom || "Standard",
+  };
 }
 
 // ── Galerie images ────────────────────────────────────────
@@ -65,7 +81,7 @@ function Galerie({ images }) {
 }
 
 // ── Section Chambres & Tarifs ─────────────────────────────
-function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
+function ChambresSection({ hotelId, hotel, isClient, user, onSelectChambre }) {
   const [dateDebut, setDateDebut] = useState(addDays(todayStr(), 1));
   const [dateFin,   setDateFin]   = useState(addDays(todayStr(), 2));
   const [adultes,   setAdultes]   = useState(2);
@@ -76,27 +92,24 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
   const [loading,   setLoading]   = useState(false);
   const [searched,  setSearched]  = useState(false);
 
+  // ── Pourcentage de promotion de l'hôtel ──────────────────
+  const promoPct = (hotel?.promotion_active && hotel?.promotion_pourcentage) || 0;
+
   const search = async () => {
     if (dateFin <= dateDebut) { alert("La date de départ doit être après l'arrivée"); return; }
     setLoading(true); setSearched(true); setSelected(null);
 
-    // ── Capacité minimale requise = adultes + enfants ────────────────────
     const nbPersonnes = adultes + enfants;
 
     try {
-      // ── ÉTAPE 1 : disponibilités publiques par période + filtre capacité ─
-      // On envoie nbPersonnes → le backend ne retourne que les chambres
-      // dont capacite >= nbPersonnes (ex: 2 adultes + 2 enfants = 4 → chambre ≥ 4 pers.)
       const dispoData  = await hotelDetailApi.getChambresDisponibles(
         hotelId, dateDebut, dateFin, nbPersonnes
       );
       const dispoTypes = dispoData.chambres || [];
 
-      // ── ÉTAPE 2 : détails complets (type_chambre, description…) ─────────
       const allData     = await hotelDetailApi.getChambres(hotelId);
       const allChambres = allData.items || allData || [];
 
-      // Merger dispo + détails
       const merged = dispoTypes.map(dispo => {
         const full = allChambres.find(c => c.id === dispo.chambre_id) || {};
         return {
@@ -113,13 +126,10 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
         };
       });
 
-      // ── Double sécurité côté client : exclure les chambres insuffisantes ─
-      // (au cas où le backend ne supporterait pas encore capacite_min)
       const filtered = merged.filter(ch => (ch.capacite || 0) >= nbPersonnes);
 
       setChambres(filtered);
 
-      // ── ÉTAPE 3 : tarifs par chambre filtrée ─────────────────────────────
       const map = {};
       await Promise.all(filtered.map(async c => {
         try {
@@ -140,7 +150,7 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
   const handleReserver = () => {
     if (!selected) return;
     const tarifs = tarifMap[selected.id] || [];
-    const prix   = getPrixChambre(tarifs, dateDebut, dateFin);
+    const prix   = getPrixChambre(tarifs, dateDebut, dateFin, promoPct);
     onSelectChambre({ chambre: selected, prix, dateDebut, dateFin, adultes, enfants, nuits });
   };
 
@@ -155,6 +165,17 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
         </svg>
         Dates &amp; Disponibilités
       </h2>
+
+      {/* ── Info promo si active ─────────────────────────── */}
+      {promoPct > 0 && (
+        <div className="hd-promo-info">
+          <span className="hd-promo-info-icon">🎁</span>
+          <span>
+            <strong>{hotel.promotion_titre || "Promotion en cours"}</strong> —
+            Tous les prix ci-dessous bénéficient automatiquement de <strong>-{Math.round(promoPct)}%</strong> de réduction
+          </span>
+        </div>
+      )}
 
       {/* Barre de recherche */}
       <div className="hd-search-bar">
@@ -219,7 +240,7 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
 
               {chambres.map(ch => {
                 const tarifs = tarifMap[ch.id] || [];
-                const prix   = getPrixChambre(tarifs, dateDebut, dateFin);
+                const prix   = getPrixChambre(tarifs, dateDebut, dateFin, promoPct);
                 const isSel  = selected?.id === ch.id;
                 return (
                   <label key={ch.id}
@@ -253,10 +274,22 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
                     </div>
                     <div className="hd-ch-prix">
                       {prix ? (
-                        <>
-                          <div className="hd-prix-val">{prix.total.toFixed(2)} <span>DT</span></div>
-                          <div className="hd-prix-nuit">{prix.prix_nuit.toFixed(2)} DT / nuit</div>
-                        </>
+                        prix.has_promo ? (
+                          <>
+                            <div className="hd-prix-original">{prix.total.toFixed(2)} DT</div>
+                            <div className="hd-prix-val hd-prix-promo">
+                              {prix.total_promo.toFixed(2)} <span>DT</span>
+                            </div>
+                            <div className="hd-prix-nuit">
+                              {prix.prix_nuit_promo.toFixed(2)} DT / nuit
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="hd-prix-val">{prix.total.toFixed(2)} <span>DT</span></div>
+                            <div className="hd-prix-nuit">{prix.prix_nuit.toFixed(2)} DT / nuit</div>
+                          </>
+                        )
                       ) : (
                         <div className="hd-prix-na">Sur demande</div>
                       )}
@@ -265,23 +298,34 @@ function ChambresSection({ hotelId, isClient, user, onSelectChambre }) {
                 );
               })}
 
-              {selected && (
-                <div className="hd-ch-footer">
-                  <div className="hd-ch-total">
-                    <span>Montant total du séjour :</span>
-                    <strong>
-                      {getPrixChambre(tarifMap[selected.id] || [], dateDebut, dateFin)?.total.toFixed(2) || "—"} DT
-                    </strong>
+              {selected && (() => {
+                const prixSel = getPrixChambre(tarifMap[selected.id] || [], dateDebut, dateFin, promoPct);
+                return (
+                  <div className="hd-ch-footer">
+                    <div className="hd-ch-total">
+                      <span>Montant total du séjour :</span>
+                      {prixSel?.has_promo ? (
+                        <>
+                          <span className="hd-total-original">{prixSel.total.toFixed(2)} DT</span>
+                          <strong className="hd-total-promo">{prixSel.total_promo.toFixed(2)} DT</strong>
+                          <span className="hd-total-save">
+                            économie de {(prixSel.total - prixSel.total_promo).toFixed(2)} DT
+                          </span>
+                        </>
+                      ) : (
+                        <strong>{prixSel?.total.toFixed(2) || "—"} DT</strong>
+                      )}
+                    </div>
+                    <button className="hd-btn-reserver" onClick={handleReserver}>
+                      RÉSERVER
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                      </svg>
+                    </button>
                   </div>
-                  <button className="hd-btn-reserver" onClick={handleReserver}>
-                    RÉSERVER
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <line x1="5" y1="12" x2="19" y2="12"/>
-                      <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                  </button>
-                </div>
-              )}
+                );
+              })()}
             </>
           )}
         </div>
@@ -457,7 +501,22 @@ export default function HotelDetailPage({ hotelId, isClient, user, onBack, onRes
         {/* ── En-tête ── */}
         <div className="hd-hero">
           <div className="hd-hero-left">
+
+            {/* ── Bandeau promotion ── */}
+            {hotel.promotion_active && hotel.promotion_pourcentage && (
+              <div className="hd-promo-banner">
+                <span className="hd-promo-banner-icon">🎁</span>
+                <div className="hd-promo-banner-text">
+                  <strong>{hotel.promotion_titre || "Offre spéciale"}</strong>
+                  <span>Profitez de -{Math.round(hotel.promotion_pourcentage)}% de réduction !</span>
+                </div>
+                <div className="hd-promo-banner-pct">
+                  -{Math.round(hotel.promotion_pourcentage)}%
+                </div>
+              </div>
+            )}
             <div className="hd-stars">{"★".repeat(hotel.etoiles)}</div>
+
             <h1 className="hd-nom">{hotel.nom}</h1>
             <div className="hd-location">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -525,6 +584,19 @@ export default function HotelDetailPage({ hotelId, isClient, user, onBack, onRes
                   </div>
                 </div>
               )}
+
+              {/* ── Ligne promo dans la carte résumé ── */}
+              {hotel.promotion_active && hotel.promotion_pourcentage && (
+                <div className="hd-sum-item hd-sum-promo">
+                  <span style={{ fontSize: 20 }}>🎁</span>
+                  <div>
+                    <div className="hd-sum-label">Promotion active</div>
+                    <div className="hd-sum-val" style={{ color: "#C0392B", fontWeight: 800 }}>
+                      -{Math.round(hotel.promotion_pourcentage)}% sur toutes les chambres
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <button className="hd-cta-dispo"
               onClick={() => document.getElementById("disponibilite")?.scrollIntoView({ behavior: "smooth" })}>
@@ -551,7 +623,7 @@ export default function HotelDetailPage({ hotelId, isClient, user, onBack, onRes
           </div>
         )}
 
-        <ChambresSection hotelId={hotelId} isClient={isClient} user={user} onSelectChambre={handleSelectChambre} />
+        <ChambresSection hotelId={hotelId} hotel={hotel} isClient={isClient} user={user} onSelectChambre={handleSelectChambre} />
         <AvisSection hotelId={hotelId} isClient={isClient} />
       </div>
     </div>
