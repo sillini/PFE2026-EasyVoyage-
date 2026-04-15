@@ -21,7 +21,8 @@ import AdminHeroSlides         from "./admin/pages/AdminHeroSlides";
 import AdminSupport            from "./admin/pages/AdminSupport";
 import AdminHotelsVedettes     from "./admin/pages/AdminHotelsVedettes";
 import AdminPromotions         from "./admin/pages/AdminPromotions";
-import FiscalConfig            from "./admin/pages/FiscalConfig";           // ← NOUVEAU
+import FiscalConfig            from "./admin/pages/FiscalConfig";
+import AdminVideoCampaigns     from "./admin/pages/video-campaigns/AdminVideoCampaigns"; // ← NOUVEAU
 
 import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
@@ -120,10 +121,11 @@ export default function App() {
         case "finances":        return <AdminFinances />;
         case "promotions":      return <AdminPromotions />;
         case "factures":        return <AdminFactures />;
-        case "fiscal":          return <FiscalConfig />;               // ← NOUVEAU
+        case "fiscal":          return <FiscalConfig />;
         // ── Marketing ─────────────────────────────────────
         case "marketing":       return <AdminMarketing />;
         case "catalogue":       return <AdminCatalogue />;
+        case "video-campaigns": return <AdminVideoCampaigns />; // ← NOUVEAU
         // ── Configuration ─────────────────────────────────
         case "hotels-vedettes": return <AdminHotelsVedettes />;
         case "hero-slides":     return <AdminHeroSlides />;

@@ -1,151 +1,121 @@
-/* ═══════════════════════════════════════════════════════════
-   src/admin/pages/catalogue/CatalogueUI.css
-   Styles des sous-composants UI partagés du module Catalogue
-   StatutBadge · StatCard · Avatar · Spinner
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   CatalogueUI.css — Shared components
+   ═══════════════════════════════════════════════════════ */
 
-/* ── Animations globales (utilisées par tous les fichiers du module) ── */
-@keyframes cat-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
+/* ── Badge statut ── */
+.cui-badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  padding:       4px 10px;
+  border-radius: 20px;
+  font-family:   'DM Sans', sans-serif;
+  font-size:     11px;
+  font-weight:   600;
+  white-space:   nowrap;
 }
 
-@keyframes cat-spin {
-  to { transform: rotate(360deg); }
-}
+.cui-badge--lg { font-size: 13px; padding: 5px 14px; }
 
-@keyframes cat-fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes cat-shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position:  400px 0; }
-}
-
-/* ── StatutBadge ─────────────────────────────────────────── */
-.cat-statut-badge {
-  display:      inline-flex;
-  align-items:  center;
-  gap:          5px;
-  border-radius: 999px;
-  font-weight:  700;
-  letter-spacing: 0.2px;
-}
-
-.cat-statut-badge--sm {
-  padding:   3px 10px;
-  font-size: 11px;
-}
-
-.cat-statut-badge--lg {
-  padding:   5px 14px;
-  font-size: 13px;
-}
-
-.cat-statut-dot {
-  width:         6px;
-  height:        6px;
+.cui-badge__dot {
+  width:         5px;
+  height:        5px;
   border-radius: 50%;
   flex-shrink:   0;
 }
 
-.cat-statut-dot--pulse {
-  animation: cat-pulse 1.4s ease-in-out infinite;
+.cui-badge__dot--pulse {
+  animation: cuiPulse 1.2s ease-in-out infinite;
 }
 
-/* ── StatCard ────────────────────────────────────────────── */
-.cat-stat-card {
-  background:    #ffffff;
-  border:        1px solid #E2E8F0;
+@keyframes cuiPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .5; transform: scale(1.4); }
+}
+
+/* ── Stat card ── */
+.cui-stat-card {
+  background:    var(--cat-white);
+  border:        1px solid var(--cat-border);
   border-radius: 10px;
-  padding:       14px 16px;
+  padding:       14px 18px;
   text-align:    center;
+  box-shadow:    var(--cat-shadow);
 }
 
-.cat-stat-card__value {
+.cui-stat-card__value {
+  font-family: 'Syne', sans-serif;
   font-size:   22px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
+  margin-bottom: 4px;
 }
 
-.cat-stat-card__label {
-  font-size:   11px;
-  color:       #64748B;
-  margin-top:  4px;
-  font-weight: 600;
+.cui-stat-card__label {
+  font-size: 11px;
+  color:     var(--cat-gray);
+  font-weight: 500;
 }
 
-.cat-stat-card__sub {
-  font-size:   10px;
-  color:       #64748B;
-  margin-top:  2px;
-  opacity:     0.7;
+.cui-stat-card__sub {
+  font-size:  10px;
+  color:      var(--cat-gray);
+  margin-top: 3px;
+  opacity:    .7;
 }
 
-/* ── Avatar ──────────────────────────────────────────────── */
-.cat-avatar {
-  border-radius:   50%;
-  flex-shrink:     0;
+/* ── Avatar ── */
+.cui-avatar {
+  border-radius:   8px;
   display:         flex;
   align-items:     center;
   justify-content: center;
   font-weight:     700;
-  letter-spacing:  -0.5px;
-  user-select:     none;
+  font-family:     'DM Sans', sans-serif;
+  flex-shrink:     0;
 }
 
-/* ── Spinner ─────────────────────────────────────────────── */
-.cat-spinner {
-  border-style:  solid;
-  border-radius: 50%;
-  animation:     cat-spin 0.9s linear infinite;
-  flex-shrink:   0;
+/* ── Spinners ── */
+.cui-spinner {
+  border-radius:  50%;
+  border-style:   solid;
+  animation:      cuiSpin .7s linear infinite;
+  flex-shrink:    0;
 }
 
-/* Spinner de taille standard */
-.cat-spinner--md {
-  width:        24px;
-  height:       24px;
-  border-width: 3px;
-  border-color: #E2E8F0;
-  border-top-color: #C4973A;
-}
-
-/* Spinner large (centré dans une vue) */
-.cat-spinner--lg {
-  width:        32px;
-  height:       32px;
-  border-width: 3px;
-  border-color: #E2E8F0;
-  border-top-color: #C4973A;
-}
-
-/* Spinner inline (dans un bouton) */
-.cat-spinner--inline {
-  display:      inline-block;
-  width:        14px;
-  height:       14px;
+.cui-spinner--sm {
+  width:       16px;
+  height:      16px;
   border-width: 2px;
-  border-color: rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border-color: var(--cat-border);
+  border-top-color: var(--cat-navy);
 }
 
-/* ── Zone de chargement centrée ──────────────────────────── */
-.cat-loading-center {
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  flex-direction:  column;
-  gap:             14px;
-  height:          300px;
-  color:           #64748B;
-  font-size:       13px;
+.cui-spinner--md {
+  width:       28px;
+  height:      28px;
+  border-width: 2.5px;
+  border-color: var(--cat-border);
+  border-top-color: var(--cat-navy);
 }
+
+.cui-spinner--lg {
+  width:       40px;
+  height:      40px;
+  border-width: 3px;
+  border-color: var(--cat-border);
+  border-top-color: var(--cat-navy);
+}
+
+.cui-spinner-inline {
+  display:        inline-block;
+  width:          13px;
+  height:         13px;
+  border:         2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius:  50%;
+  animation:      cuiSpin .6s linear infinite;
+  flex-shrink:    0;
+}
+
+@keyframes cuiSpin { to { transform: rotate(360deg); } }

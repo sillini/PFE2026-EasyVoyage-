@@ -76,6 +76,28 @@
   min-height: 110px;
 }
 
+/* ══════════════════════════════════════════════════════════
+   ALERTE PROMOS DÉTECTÉES
+   ══════════════════════════════════════════════════════════ */
+.cat-create__promo-alert {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  margin-bottom: 18px;
+  padding:       10px 16px;
+  background:    #FFF7ED;
+  border:        1.5px solid #FED7AA;
+  border-radius: 8px;
+  font-size:     12px;
+  color:         #92400E;
+  line-height:   1.5;
+}
+
+.cat-create__promo-alert strong {
+  color:       #7C2D12;
+  font-weight: 800;
+}
+
 /* ── Grille 2 colonnes hôtels / voyages ──────────────────── */
 .cat-create__grid {
   display:               grid;
@@ -95,8 +117,8 @@
 }
 
 .cat-create__col-count {
-  font-size: 11px;
-  color:     #64748B;
+  font-size:   11px;
+  color:       #64748B;
   font-weight: 500;
 }
 
@@ -116,7 +138,7 @@
 /* ── Chip item (hôtel ou voyage) ─────────────────────────── */
 .cat-item-chip {
   display:       flex;
-  align-items:   center;
+  align-items:   flex-start;
   gap:           8px;
   padding:       8px 12px;
   border-radius: 8px;
@@ -137,12 +159,30 @@
   box-shadow:   0 0 0 2px rgba(196, 151, 58, 0.12);
 }
 
+/* Chip avec promo — bordure rouge subtile */
+.cat-item-chip--has-promo {
+  border-color: #FECACA;
+  background:   #FFF5F5;
+}
+
+.cat-item-chip--has-promo:hover {
+  border-color: #FCA5A5;
+  background:   #FEE2E2;
+}
+
+.cat-item-chip--has-promo.cat-item-chip--selected {
+  border-color: #EF4444;
+  background:   #FFF0F0;
+  box-shadow:   0 0 0 2px rgba(239, 68, 68, 0.12);
+}
+
 /* Case à cocher visuelle */
 .cat-item-chip__check {
   width:           20px;
   height:          20px;
   border-radius:   4px;
   flex-shrink:     0;
+  margin-top:      1px;
   display:         flex;
   align-items:     center;
   justify-content: center;
@@ -168,30 +208,86 @@
   white-space:   nowrap;
   overflow:      hidden;
   text-overflow: ellipsis;
+  display:       flex;
+  align-items:   center;
+  gap:           4px;
 }
 
 .cat-item-chip__sub {
-  font-size:  10px;
-  color:      #64748B;
-  margin-top: 1px;
-  display:    flex;
-  gap:        6px;
+  font-size:       10px;
+  color:           #64748B;
+  margin-top:      3px;
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  gap:             6px;
 }
 
-/* Badge promo sur le nom */
+/* ── Badge promo rouge ───────────────────────────────────── */
 .cat-item-chip__promo-badge {
-  margin-left:   6px;
+  flex-shrink:   0;
   font-size:     10px;
   background:    #FEE2E2;
   color:         #DC2626;
-  padding:       1px 6px;
+  padding:       2px 7px;
   border-radius: 10px;
   font-weight:   800;
+  white-space:   nowrap;
+  cursor:        help;
 }
 
-/* Prix dans le sub */
-.cat-item-chip__price       { color: #64748B; }
-.cat-item-chip__price--promo { color: #DC2626; font-weight: 700; }
+/* Badge dernières places voyage */
+.cat-item-chip__places-badge {
+  flex-shrink:   0;
+  font-size:     10px;
+  background:    #FEF3C7;
+  color:         #D97706;
+  padding:       2px 7px;
+  border-radius: 10px;
+  font-weight:   800;
+  white-space:   nowrap;
+}
+
+/* ── Prix wrap (barré + promo) ───────────────────────────── */
+.cat-item-chip__prix-wrap {
+  display:     flex;
+  align-items: center;
+  gap:         4px;
+}
+
+/* Prix original barré */
+.cat-item-chip__prix-original {
+  font-size:              10px;
+  color:                  #94A3B8;
+  text-decoration:        line-through;
+  text-decoration-color:  #EF4444;
+  text-decoration-thickness: 1.5px;
+  font-weight:            500;
+}
+
+/* Prix affiché (normal ou promo) */
+.cat-item-chip__price {
+  font-size:   10px;
+  color:       #64748B;
+  font-weight: 500;
+}
+
+.cat-item-chip__price--promo {
+  color:       #DC2626;
+  font-weight: 800;
+}
+
+/* ── Titre promo affiché quand sélectionné ───────────────── */
+.cat-item-chip__promo-label {
+  font-size:     10px;
+  color:         #B91C1C;
+  font-weight:   600;
+  margin-top:    3px;
+  padding:       2px 6px;
+  background:    #FEF2F2;
+  border-radius: 4px;
+  display:       inline-block;
+}
 
 /* État vide (aucun résultat) */
 .cat-create__no-result {
@@ -203,29 +299,29 @@
 
 /* ── Barre d'actions bas de page ─────────────────────────── */
 .cat-create__actions {
-  display:       flex;
-  gap:           12px;
-  margin-top:    28px;
-  padding-top:   20px;
-  border-top:    1px solid #E2E8F0;
+  display:    flex;
+  gap:        12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #E2E8F0;
 }
 
 /* ── Boutons partagés ────────────────────────────────────── */
 .cat-btn-primary {
-  display:       inline-flex;
-  align-items:   center;
+  display:         inline-flex;
+  align-items:     center;
   justify-content: center;
-  gap:           8px;
-  padding:       10px 20px;
-  background:    #0F2235;
-  color:         #ffffff;
-  border:        none;
-  border-radius: 8px;
-  font-size:     13px;
-  font-weight:   700;
-  cursor:        pointer;
-  transition:    background 0.15s, transform 0.1s;
-  font-family:   inherit;
+  gap:             8px;
+  padding:         10px 20px;
+  background:      #0F2235;
+  color:           #ffffff;
+  border:          none;
+  border-radius:   8px;
+  font-size:       13px;
+  font-weight:     700;
+  cursor:          pointer;
+  transition:      background 0.15s, transform 0.1s;
+  font-family:     inherit;
 }
 
 .cat-btn-primary:hover:not(:disabled)  { background: #1a3a5c; }
@@ -239,40 +335,40 @@
 }
 
 .cat-btn-gold {
-  display:       inline-flex;
-  align-items:   center;
+  display:         inline-flex;
+  align-items:     center;
   justify-content: center;
-  gap:           8px;
-  padding:       10px 20px;
-  background:    #C4973A;
-  color:         #ffffff;
-  border:        none;
-  border-radius: 8px;
-  font-size:     13px;
-  font-weight:   700;
-  cursor:        pointer;
-  transition:    opacity 0.15s;
-  font-family:   inherit;
+  gap:             8px;
+  padding:         10px 20px;
+  background:      #C4973A;
+  color:           #ffffff;
+  border:          none;
+  border-radius:   8px;
+  font-size:       13px;
+  font-weight:     700;
+  cursor:          pointer;
+  transition:      opacity 0.15s;
+  font-family:     inherit;
 }
 
-.cat-btn-gold:hover:not(:disabled)  { opacity: 0.88; }
-.cat-btn-gold:disabled              { opacity: 0.55; cursor: not-allowed; }
+.cat-btn-gold:hover:not(:disabled) { opacity: 0.88; }
+.cat-btn-gold:disabled             { opacity: 0.55; cursor: not-allowed; }
 
 .cat-btn-ghost {
-  display:       inline-flex;
-  align-items:   center;
+  display:         inline-flex;
+  align-items:     center;
   justify-content: center;
-  gap:           6px;
-  padding:       9px 16px;
-  background:    transparent;
-  color:         #64748B;
-  border:        1px solid #E2E8F0;
-  border-radius: 8px;
-  font-size:     13px;
-  font-weight:   600;
-  cursor:        pointer;
-  transition:    background 0.15s, color 0.15s;
-  font-family:   inherit;
+  gap:             6px;
+  padding:         9px 16px;
+  background:      transparent;
+  color:           #64748B;
+  border:          1px solid #E2E8F0;
+  border-radius:   8px;
+  font-size:       13px;
+  font-weight:     600;
+  cursor:          pointer;
+  transition:      background 0.15s, color 0.15s;
+  font-family:     inherit;
 }
 
 .cat-btn-ghost:hover { background: #F1F5F9; color: #0F2235; }

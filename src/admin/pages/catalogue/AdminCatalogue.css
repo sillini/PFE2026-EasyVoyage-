@@ -1,69 +1,151 @@
-/* ═══════════════════════════════════════════════════════════
-   src/admin/pages/catalogue/AdminCatalogue.css
-   Shell principal du module : layout, zone vide, scrollbar
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   AdminCatalogue.css — Shell & Empty State
+   ═══════════════════════════════════════════════════════ */
 
-/* ── Shell global ────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── Variables globales catalogue ── */
+:root {
+  --cat-navy:    #0B1E33;
+  --cat-navy2:   #152D47;
+  --cat-gold:    #C4973A;
+  --cat-gold-l:  #F9F1E2;
+  --cat-green:   #10B981;
+  --cat-green-l: #D1FAE5;
+  --cat-red:     #EF4444;
+  --cat-red-l:   #FEE2E2;
+  --cat-blue:    #3B82F6;
+  --cat-blue-l:  #DBEAFE;
+  --cat-amber:   #F59E0B;
+  --cat-amber-l: #FEF3C7;
+  --cat-gray:    #64748B;
+  --cat-border:  #E8EFF6;
+  --cat-bg:      #F5F7FA;
+  --cat-white:   #FFFFFF;
+  --cat-shadow:  0 1px 3px rgba(11,30,51,.07), 0 4px 16px rgba(11,30,51,.05);
+  --cat-shadow-lg: 0 8px 32px rgba(11,30,51,.12);
+  --cat-r:       12px;
+  --cat-r-sm:    8px;
+}
+
+/* ── Shell principal ── */
 .cat-shell {
-  display:     flex;
-  height:      100%;
-  min-height:  calc(100vh - 60px);
-  background:  #F8FAFC;
-  font-family: 'Lato', sans-serif;
+  display:    flex;
+  height:     100%;
+  background: var(--cat-bg);
+  font-family: 'DM Sans', sans-serif;
+  overflow:   hidden;
 }
 
-/* ── Zone principale (droite) ────────────────────────────── */
+/* ── Zone principale ── */
 .cat-main {
-  flex:         1;
-  overflow-y:   auto;
-  display:      flex;
-  flex-direction: column;
+  flex:       1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width:  0;
+  background: var(--cat-bg);
 }
 
-/* ── Vue "liste vide" ────────────────────────────────────── */
+/* ── Empty State ── */
 .cat-empty-state {
-  flex:            1;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  height:          100%;
+  min-height:      500px;
+  padding:         60px 40px;
+  text-align:      center;
+  animation:       cat-fadeIn .4s ease both;
+}
+
+.cat-empty-state__visual {
+  position:        relative;
+  width:           120px;
+  height:          120px;
   display:         flex;
   align-items:     center;
   justify-content: center;
-  flex-direction:  column;
-  gap:             16px;
-  color:           #64748B;
+  margin-bottom:   32px;
+}
+
+.cat-empty-state__ring {
+  position:      absolute;
+  border-radius: 50%;
+  border:        1.5px solid var(--cat-gold);
+  animation:     catRingPulse 3s ease-in-out infinite;
+}
+
+.cat-empty-state__ring--1 { width: 120px; height: 120px; opacity: .12; animation-delay: 0s; }
+.cat-empty-state__ring--2 { width:  88px; height:  88px; opacity: .22; animation-delay: .5s; }
+.cat-empty-state__ring--3 { width:  56px; height:  56px; opacity: .35; animation-delay: 1s; }
+
+@keyframes catRingPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
 }
 
 .cat-empty-state__icon {
-  font-size: 64px;
-  opacity:   0.25;
+  font-size:    32px;
+  z-index:      1;
+  position:     relative;
+  color:        var(--cat-gold);
+  font-style:   normal;
 }
 
 .cat-empty-state__title {
-  font-size:   16px;
-  font-weight: 700;
-  color:       #0F2235;
-  opacity:     0.5;
-  margin:      0;
+  font-family:   'Syne', sans-serif;
+  font-size:     22px;
+  font-weight:   700;
+  color:         var(--cat-navy);
+  margin:        0 0 10px;
 }
 
 .cat-empty-state__sub {
-  font-size: 13px;
-  opacity:   0.5;
-  margin:    0;
+  font-size:   14px;
+  color:       var(--cat-gray);
+  margin:      0 0 28px;
+  max-width:   360px;
+  line-height: 1.6;
 }
 
-/* ── Scrollbar globale (module entier) ───────────────────── */
-.cat-shell ::-webkit-scrollbar {
-  width: 5px;
+.cat-empty-state__cta {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       12px 24px;
+  background:    var(--cat-navy);
+  color:         #fff;
+  border:        none;
+  border-radius: var(--cat-r-sm);
+  font-family:   'DM Sans', sans-serif;
+  font-size:     14px;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    background .15s, transform .1s;
 }
 
-.cat-shell ::-webkit-scrollbar-track {
-  background: transparent;
+.cat-empty-state__cta:hover  { background: var(--cat-navy2); }
+.cat-empty-state__cta:active { transform: scale(.97); }
+
+/* ── Animation globale ── */
+@keyframes cat-fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.cat-shell ::-webkit-scrollbar-thumb {
-  background:    #CBD5E1;
-  border-radius: 4px;
+@keyframes cat-slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-.cat-shell ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+/* ── Loading center ── */
+.cat-loading-center {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             12px;
+  padding:         40px;
+  color:           var(--cat-gray);
+  font-size:       13px;
 }

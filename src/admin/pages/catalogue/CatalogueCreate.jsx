@@ -27,6 +27,11 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
   const toggleH = (id) => setSelHotels(p  => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
   const toggleV = (id) => setSelVoyages(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
 
+  // ── Comptage promos sélectionnées ─────────────────────
+  const promosSelectionnees = hotels.filter(
+    h => selHotels.includes(h.id) && h.promotion_active && h.promotion_pourcentage > 0
+  );
+
   // ── Génération ────────────────────────────────────────
   const handleGenerer = async () => {
     if (!selHotels.length && !selVoyages.length)
@@ -69,7 +74,7 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
 
       {/* ── Recherche ────────────────────────────────── */}
       <div className="cat-create__field">
-        <label className="cat-create__label">Rechercher hôtels & voyages</label>
+        <label className="cat-create__label">Rechercher hôtels &amp; voyages</label>
         <input
           className="cat-input"
           value={search}
@@ -77,6 +82,15 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
           placeholder="🔍 Nom, ville, destination..."
         />
       </div>
+
+      {/* ── Alerte promos détectées ───────────────────── */}
+      {promosSelectionnees.length > 0 && (
+        <div className="cat-create__promo-alert">
+          🔥 <strong>{promosSelectionnees.length} promotion{promosSelectionnees.length > 1 ? "s" : ""} active{promosSelectionnees.length > 1 ? "s" : ""}</strong> détectée{promosSelectionnees.length > 1 ? "s" : ""} —
+          Claude AI les intégrera dans la description marketing
+          &nbsp;({promosSelectionnees.map(h => `-${Math.round(h.promotion_pourcentage)}% ${h.nom}`).join(", ")})
+        </div>
+      )}
 
       {/* ── Grille hôtels / voyages ───────────────────── */}
       <div className="cat-create__grid">
@@ -93,34 +107,60 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
             {filteredHotels.map(h => {
               const sel      = selHotels.includes(h.id);
               const hasPromo = h.promotion_active && h.promotion_pourcentage > 0;
+              const prixAff  = hasPromo && h.prix_min_promo
+                ? Math.round(h.prix_min_promo)
+                : h.prix_min ? Math.round(h.prix_min) : null;
+
               return (
                 <div
                   key={h.id}
-                  className={`cat-item-chip${sel ? " cat-item-chip--selected" : ""}`}
+                  className={`cat-item-chip${sel ? " cat-item-chip--selected" : ""}${hasPromo ? " cat-item-chip--has-promo" : ""}`}
                   onClick={() => toggleH(h.id)}
                 >
                   <div className={`cat-item-chip__check${sel ? " cat-item-chip__check--filled" : " cat-item-chip__check--empty"}`}>
                     {sel && "✓"}
                   </div>
+
                   <div className="cat-item-chip__body">
+                    {/* Ligne nom + badge % */}
                     <div className="cat-item-chip__name">
                       {h.nom}
                       {hasPromo && (
-                        <span className="cat-item-chip__promo-badge">
-                          -{Math.round(h.promotion_pourcentage)}%
+                        <span
+                          className="cat-item-chip__promo-badge"
+                          title={h.promotion_titre || `Promotion active -${Math.round(h.promotion_pourcentage)}%`}
+                        >
+                          🔥 -{Math.round(h.promotion_pourcentage)}%
                         </span>
                       )}
                     </div>
+
+                    {/* Ligne ville + étoiles + prix */}
                     <div className="cat-item-chip__sub">
-                      <span>{h.ville} · {stars(h.etoiles)}</span>
+                      <span>{h.ville || "—"} · {stars(h.etoiles)}</span>
+
                       {h.prix_min && (
-                        <span className={`cat-item-chip__price${hasPromo ? " cat-item-chip__price--promo" : ""}`}>
-                          {hasPromo && h.prix_min_promo
-                            ? `${Math.round(h.prix_min_promo)} DT`
-                            : `${Math.round(h.prix_min)} DT`}/nuit
+                        <span className="cat-item-chip__prix-wrap">
+                          {/* Prix barré si promo */}
+                          {hasPromo && h.prix_min_promo && (
+                            <span className="cat-item-chip__prix-original">
+                              {Math.round(h.prix_min)} DT
+                            </span>
+                          )}
+                          {/* Prix actuel (promo ou normal) */}
+                          <span className={`cat-item-chip__price${hasPromo ? " cat-item-chip__price--promo" : ""}`}>
+                            {prixAff} DT/nuit
+                          </span>
                         </span>
                       )}
                     </div>
+
+                    {/* Titre de la promo si sélectionné */}
+                    {hasPromo && sel && h.promotion_titre && (
+                      <div className="cat-item-chip__promo-label">
+                        {h.promotion_titre}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -141,7 +181,10 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
           </div>
           <div className="cat-create__items-list">
             {filteredVoyages.map(v => {
-              const sel = selVoyages.includes(v.id);
+              const sel   = selVoyages.includes(v.id);
+              const places = v.capacite_max != null
+                ? Math.max(0, v.capacite_max - (v.nb_inscrits || 0))
+                : null;
               return (
                 <div
                   key={v.id}
@@ -152,9 +195,19 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
                     {sel && "✓"}
                   </div>
                   <div className="cat-item-chip__body">
-                    <div className="cat-item-chip__name">{v.titre}</div>
+                    <div className="cat-item-chip__name">
+                      {v.titre}
+                      {places != null && places <= 5 && (
+                        <span className="cat-item-chip__places-badge">
+                          ⚡ {places} place{places > 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
                     <div className="cat-item-chip__sub">
-                      {v.destination} · {v.duree}j · {parseInt(v.prix_base)} DT
+                      <span>{v.destination} · {v.duree}j</span>
+                      <span className="cat-item-chip__price">
+                        {parseInt(v.prix_base)} DT/pers
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -174,7 +227,9 @@ export default function CatalogueCreate({ hotels, voyages, onCreated, onCancel }
           onClick={handleGenerer}
           disabled={generating}
         >
-          {generating ? <><SpinnerInline /> Génération en cours...</> : "✨ Générer avec Claude AI"}
+          {generating
+            ? <><SpinnerInline /> Génération en cours...</>
+            : "✨ Générer avec Claude AI"}
         </button>
         <button className="cat-btn-ghost" onClick={onCancel}>Annuler</button>
       </div>

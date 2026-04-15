@@ -17,6 +17,7 @@ const PAGE_META = {
   // ── Marketing ────────────────────────────────────────
   marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
   catalogue:             { title: "Catalogues Email",        subtitle: "Créez et envoyez des catalogues personnalisés à vos contacts" },
+  "video-campaigns":     { title: "Vidéo Campaigns",         subtitle: "Générez et envoyez des campagnes vidéo marketing automatisées" }, // ← NOUVEAU
   // ── Configuration ────────────────────────────────────
   "hotels-vedettes":     { title: "Mise en avant",           subtitle: "Hôtels et villes affichés sur la page client" },
   "hero-slides":         { title: "Hero Slides",             subtitle: "Gestion du carousel de la page d'accueil" },

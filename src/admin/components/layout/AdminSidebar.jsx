@@ -1,24 +1,6 @@
 import { useState, useEffect } from "react";
 import "./AdminSidebar.css";
 
-/* ══════════════════════════════════════════════════════════
-   MENU items principaux — ordre logique métier
-   1. Dashboard
-   2. Réservations
-   3. Hôtels
-   4. Voyages
-   5. Partenaires
-   6. Demandes partenaires
-   7. Clients
-   8. Finances
-   9. Promotions
-  10. Factures
-  11. Fiscal  ← NOUVEAU
-  12. Mise en avant
-  13. Hero Slides
-  14. Support
-  15. Agent IA
-══════════════════════════════════════════════════════════ */
 const MENU_TOP = [
   {
     id: "dashboard",
@@ -99,10 +81,6 @@ const MENU_TOP = [
   },
 ];
 
-/* ══════════════════════════════════════════════════════════
-   MENU FINANCIER — groupe logique : argent & facturation
-   Finances → Promotions → Factures → Fiscal
-══════════════════════════════════════════════════════════ */
 const MENU_FINANCE = [
   {
     id: "finances",
@@ -149,9 +127,6 @@ const MENU_FINANCE = [
   },
 ];
 
-/* ══════════════════════════════════════════════════════════
-   MENU items de configuration & outils
-══════════════════════════════════════════════════════════ */
 const MENU_BOTTOM = [
   {
     id: "hotels-vedettes",
@@ -198,7 +173,8 @@ const MENU_BOTTOM = [
 ];
 
 /* ══════════════════════════════════════════════════════════
-   Sous-items du groupe Marketing
+   Sous-items du groupe Marketing / Campagnes
+   ← "video-campaigns" ajouté ici
 ══════════════════════════════════════════════════════════ */
 const MARKETING_ITEMS = [
   {
@@ -220,6 +196,17 @@ const MARKETING_ITEMS = [
       </svg>
     ),
   },
+  // ── NOUVEAU ──────────────────────────────────────────
+  {
+    id: "video-campaigns",
+    label: "Vidéo Campaigns",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15">
+        <polygon points="23 7 16 12 23 17 23 7"/>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+      </svg>
+    ),
+  },
 ];
 
 const MARKETING_IDS = MARKETING_ITEMS.map(i => i.id);
@@ -234,7 +221,6 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
   const isMarketingActive = MARKETING_IDS.includes(activePage);
 
-  // ── Charger le compteur de promotions en attente ──────
   useEffect(() => {
     const fetchPending = async () => {
       try {
@@ -248,19 +234,16 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
           setPendingCount(data.pending ?? 0);
         }
       } catch {
-        // silencieux — badge reste à 0
+        // silencieux
       }
     };
-
     fetchPending();
     const interval = setInterval(fetchPending, 60_000);
     return () => clearInterval(interval);
   }, []);
 
-  // ── Helper : rendu d'un item de navigation ────────────
   const renderItem = (item) => {
     const showPendingBadge = item.id === "promotions" && pendingCount > 0;
-
     return (
       <button
         key={item.id}
@@ -307,28 +290,21 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
       {/* ── Navigation ── */}
       <nav className="adm-nav">
 
-        {/* ── Section : Gestion ── */}
         {!collapsed && <p className="adm-section-label">GESTION</p>}
         {MENU_TOP.map(renderItem)}
 
-        {/* ── Section : Finance & Facturation ── */}
         {!collapsed && <p className="adm-section-label">FINANCE & FACTURATION</p>}
         {MENU_FINANCE.map(renderItem)}
 
-        {/* ── Section : Marketing (groupe dépliable) ── */}
         {!collapsed && <p className="adm-section-label">MARKETING</p>}
         <div className="adm-group">
           <button
             className={`adm-nav-item adm-nav-item--parent ${isMarketingActive ? "active" : ""}`}
             onClick={() => {
-              if (collapsed) {
-                setCollapsed(false);
-                setMktOpen(true);
-              } else {
-                setMktOpen(v => !v);
-              }
+              if (collapsed) { setCollapsed(false); setMktOpen(true); }
+              else { setMktOpen(v => !v); }
             }}
-            title={collapsed ? "Marketing" : ""}
+            title={collapsed ? "Campagnes" : ""}
           >
             <span className="adm-nav-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -367,7 +343,6 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
           )}
         </div>
 
-        {/* ── Section : Configuration & Outils ── */}
         {!collapsed && <p className="adm-section-label">CONFIGURATION</p>}
         {MENU_BOTTOM.map(renderItem)}
 

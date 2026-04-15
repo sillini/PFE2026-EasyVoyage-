@@ -1,8 +1,4 @@
 // src/admin/pages/catalogue/AdminCatalogue.jsx
-// ─────────────────────────────────────────────────────────
-// Point d'entrée — orchestre les 4 vues du module
-// Dans App.jsx : import AdminCatalogue from "./admin/pages/catalogue"
-// ─────────────────────────────────────────────────────────
 import { useState, useEffect, useCallback } from "react";
 import "./AdminCatalogue.css";
 import { BASE, auth } from "./constants";
@@ -14,23 +10,21 @@ import CatalogueDetail  from "./CatalogueDetail";
 import CatalogueEnvoi   from "./CatalogueEnvoi";
 
 export default function AdminCatalogue() {
-  const [catalogues, setCatalogues] = useState([]);
-  const [hotels,     setHotels]     = useState([]);
-  const [voyages,    setVoyages]    = useState([]);
-  const [loading,    setLoading]    = useState(true);
+  const [catalogues,    setCatalogues]    = useState([]);
+  const [hotels,        setHotels]        = useState([]);
+  const [voyages,       setVoyages]       = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [view,          setView]          = useState("list");
+  const [detailCat,     setDetailCat]     = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
-  const [view,          setView]         = useState("list");
-  const [detailCat,     setDetailCat]    = useState(null);
-  const [loadingDetail, setLoadingDetail]= useState(false);
-
-  // ── Chargement initial ────────────────────────────────
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
       const [cR, hR, vR] = await Promise.all([
-        fetch(`${BASE}/catalogues?per_page=50`, { headers: auth() }),
-        fetch(`${BASE}/hotels?per_page=100`,    { headers: auth() }),
-        fetch(`${BASE}/voyages?per_page=100`,   { headers: auth() }),
+        fetch(`${BASE}/catalogues?per_page=100`, { headers: auth() }),
+        fetch(`${BASE}/hotels?per_page=200`,     { headers: auth() }),
+        fetch(`${BASE}/voyages?per_page=200`,    { headers: auth() }),
       ]);
       setCatalogues((await cR.json()).items || []);
       setHotels((await hR.json()).items     || []);
@@ -41,7 +35,6 @@ export default function AdminCatalogue() {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // ── Ouvrir détail ─────────────────────────────────────
   const openDetail = useCallback(async (cat) => {
     setLoadingDetail(true);
     setDetailCat(null);
@@ -55,7 +48,6 @@ export default function AdminCatalogue() {
     setLoadingDetail(false);
   }, []);
 
-  // ── Supprimer ─────────────────────────────────────────
   const handleDelete = async (id) => {
     if (!confirm("Supprimer ce catalogue ?")) return;
     await fetch(`${BASE}/catalogues/${id}`, { method: "DELETE", headers: auth() });
@@ -63,7 +55,6 @@ export default function AdminCatalogue() {
     loadAll();
   };
 
-  // ── Callbacks enfants ─────────────────────────────────
   const handleCreated = async (cat) => {
     await loadAll();
     await openDetail(cat);
@@ -77,8 +68,6 @@ export default function AdminCatalogue() {
 
   return (
     <div className="cat-shell">
-
-      {/* Panneau gauche */}
       <CatalogueSidebar
         catalogues={catalogues}
         loading={loading}
@@ -88,14 +77,21 @@ export default function AdminCatalogue() {
         onDelete={handleDelete}
       />
 
-      {/* Zone principale */}
       <main className="cat-main">
-
         {view === "list" && (
           <div className="cat-empty-state">
-            <p className="cat-empty-state__icon">📧</p>
-            <h2 className="cat-empty-state__title">Sélectionnez un catalogue</h2>
-            <p className="cat-empty-state__sub">ou créez-en un nouveau</p>
+            <div className="cat-empty-state__visual">
+              <div className="cat-empty-state__ring cat-empty-state__ring--1" />
+              <div className="cat-empty-state__ring cat-empty-state__ring--2" />
+              <div className="cat-empty-state__ring cat-empty-state__ring--3" />
+              <span className="cat-empty-state__icon">✉</span>
+            </div>
+            <h2 className="cat-empty-state__title">Catalogues Email</h2>
+            <p className="cat-empty-state__sub">Sélectionnez un catalogue ou créez-en un nouveau pour démarrer votre campagne</p>
+            <button className="cat-empty-state__cta" onClick={() => setView("create")}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer un catalogue
+            </button>
           </div>
         )}
 

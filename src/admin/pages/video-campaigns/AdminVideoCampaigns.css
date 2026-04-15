@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════════════════════
+   AdminVideoCampaigns.css — shell + utilitaires partagés
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Shell ───────────────────────────────────────────────── */
+.vc-shell {
+  display:    flex;
+  height:     100%;
+  min-height: calc(100vh - 72px);
+  background: #F8FAFC;
+  font-family: 'Lato', sans-serif;
+}
+
+.vc-main {
+  flex:           1;
+  overflow-y:     auto;
+  display:        flex;
+  flex-direction: column;
+}
+
+/* ── État vide ───────────────────────────────────────────── */
+.vc-empty-state {
+  flex:            1;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-direction:  column;
+  gap:             16px;
+  color:           #64748B;
+  padding:         40px;
+}
+.vc-empty-state__icon  { font-size: 72px; opacity: 0.25; }
+.vc-empty-state__title { font-size: 18px; font-weight: 800; color: #0F2235; opacity: 0.5; margin: 0; }
+.vc-empty-state__sub   { font-size: 13px; opacity: 0.5; margin: 0; }
+
+/* ── Boutons communs ─────────────────────────────────────── */
+.vc-btn-primary {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       10px 20px;
+  background:    #0F2235;
+  color:         #fff;
+  border:        none;
+  border-radius: 8px;
+  font-size:     13px;
+  font-weight:   700;
+  cursor:        pointer;
+  transition:    background 0.15s, transform 0.1s;
+  font-family:   'Lato', sans-serif;
+}
+.vc-btn-primary:hover  { background: #1a3a5c; }
+.vc-btn-primary:active { transform: scale(0.97); }
+.vc-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.vc-btn-gold {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       10px 20px;
+  background:    linear-gradient(135deg, #C4973A, #D4A853);
+  color:         #0F2235;
+  border:        none;
+  border-radius: 8px;
+  font-size:     13px;
+  font-weight:   700;
+  cursor:        pointer;
+  transition:    opacity 0.15s, transform 0.1s;
+  font-family:   'Lato', sans-serif;
+}
+.vc-btn-gold:hover  { opacity: 0.88; }
+.vc-btn-gold:active { transform: scale(0.97); }
+.vc-btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.vc-btn-ghost {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       9px 16px;
+  background:    transparent;
+  color:         #64748B;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size:     13px;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    all 0.15s;
+  font-family:   'Lato', sans-serif;
+}
+.vc-btn-ghost:hover { border-color: #94A3B8; color: #0F2235; background: #F8FAFC; }
+
+.vc-btn-danger {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           6px;
+  padding:       9px 16px;
+  background:    #FEE2E2;
+  color:         #DC2626;
+  border:        1.5px solid #FECACA;
+  border-radius: 8px;
+  font-size:     13px;
+  font-weight:   700;
+  cursor:        pointer;
+  transition:    all 0.15s;
+  font-family:   'Lato', sans-serif;
+}
+.vc-btn-danger:hover { background: #DC2626; color: #fff; }
+
+/* ── Badge statut ────────────────────────────────────────── */
+.vc-badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  padding:       3px 10px;
+  border-radius: 999px;
+  font-size:     11px;
+  font-weight:   700;
+}
+.vc-badge__dot {
+  width:         6px;
+  height:        6px;
+  border-radius: 50%;
+  flex-shrink:   0;
+}
+.vc-badge__dot--pulse { animation: vc-pulse 1.4s ease-in-out infinite; }
+
+/* ── Inputs communs ──────────────────────────────────────── */
+.vc-input, .vc-select, .vc-textarea {
+  width:         100%;
+  padding:       9px 12px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size:     13px;
+  font-family:   'Lato', sans-serif;
+  color:         #0F2235;
+  background:    #fff;
+  transition:    border-color 0.15s;
+  box-sizing:    border-box;
+}
+.vc-input:focus, .vc-select:focus, .vc-textarea:focus {
+  outline:      none;
+  border-color: #C4973A;
+}
+.vc-textarea { resize: vertical; min-height: 80px; }
+.vc-label {
+  display:       block;
+  font-size:     11px;
+  font-weight:   700;
+  color:         #64748B;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Card générique ──────────────────────────────────────── */
+.vc-card {
+  background:    #fff;
+  border:        1px solid #E2E8F0;
+  border-radius: 12px;
+}
+.vc-card__header {
+  padding:         14px 20px;
+  border-bottom:   1px solid #E2E8F0;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+}
+.vc-card__title {
+  font-size:      11px;
+  font-weight:    800;
+  color:          #64748B;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin:         0;
+}
+.vc-card__body { padding: 20px; }
+
+/* ── Loader spinner ──────────────────────────────────────── */
+.vc-spinner {
+  width:  22px; height: 22px;
+  border: 3px solid #E2E8F0;
+  border-top-color: #C4973A;
+  border-radius: 50%;
+  animation: vc-spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes vc-fadeIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes vc-pulse   { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(.7); } }
+@keyframes vc-spin    { to { transform: rotate(360deg); } }
+@keyframes vc-shimmer { to { background-position: -400% 0; } }
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+.vc-shell ::-webkit-scrollbar { width: 5px; }
+.vc-shell ::-webkit-scrollbar-track { background: transparent; }
+.vc-shell ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+.vc-shell ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
