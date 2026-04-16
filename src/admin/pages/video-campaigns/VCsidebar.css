@@ -205,3 +205,191 @@
   font-weight: 600;
 }
 .vcs-card__sent-err { color: #DC2626; }
+
+/* ══ FILTRES — styles ajoutés v2 ══════════════════════════ */
+.vcs-search-row {
+  display:   flex;
+  gap:       6px;
+  margin-top: 10px;
+}
+.vcs-search-wrap {
+  flex:     1;
+  position: relative;
+}
+.vcs-search-icon {
+  position:  absolute;
+  left:      9px; top: 50%;
+  transform: translateY(-50%);
+  width:     14px; height: 14px;
+  color:     #94A3B8;
+  pointer-events: none;
+}
+.vcs-search {
+  width:         100%;
+  padding:       8px 28px 8px 30px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size:     12px;
+  font-family:   'Lato', sans-serif;
+  color:         #0F2235;
+  background:    #fff;
+  box-sizing:    border-box;
+  transition:    border-color 0.15s;
+}
+.vcs-search:focus { outline: none; border-color: #C4973A; }
+.vcs-search-clear {
+  position:  absolute;
+  right:     8px; top: 50%;
+  transform: translateY(-50%);
+  border:    none; background: transparent;
+  color:     #94A3B8; font-size: 16px;
+  cursor:    pointer; padding: 0;
+  line-height: 1;
+}
+.vcs-search-clear:hover { color: #0F2235; }
+
+.vcs-filter-btn {
+  position:      relative;
+  padding:       7px 10px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 8px;
+  background:    #fff;
+  cursor:        pointer;
+  transition:    all 0.15s;
+  display:       flex;
+  align-items:   center;
+  flex-shrink:   0;
+}
+.vcs-filter-btn:hover           { border-color: #94A3B8; }
+.vcs-filter-btn--active         { border-color: #C4973A; background: #FFFBF2; }
+.vcs-filter-dot {
+  position:      absolute;
+  top:           4px; right: 4px;
+  width:         6px; height: 6px;
+  background:    #C4973A;
+  border-radius: 50%;
+  border:        1.5px solid #fff;
+}
+
+.vcs-filters {
+  border-top:   1px solid #E2E8F0;
+  margin-top:   10px;
+  padding-top:  12px;
+  display:      flex;
+  flex-direction: column;
+  gap:          12px;
+  animation:    vc-fadeIn 0.15s ease both;
+}
+.vcs-filter-group { display: flex; flex-direction: column; gap: 6px; }
+.vcs-filter-label {
+  font-size:      10px;
+  font-weight:    700;
+  color:          #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.vcs-filter-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.vcs-pill {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           4px;
+  padding:       4px 9px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 999px;
+  background:    #F8FAFC;
+  font-size:     11px;
+  font-weight:   600;
+  color:         #64748B;
+  cursor:        pointer;
+  transition:    all 0.12s;
+  font-family:   'Lato', sans-serif;
+}
+.vcs-pill:hover        { border-color: #94A3B8; color: #0F2235; }
+.vcs-pill--active      { border-color: #0F2235; background: #0F2235; color: #fff; }
+.vcs-pill-dot          { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+.vcs-filter-reset {
+  font-size:   11px;
+  font-weight: 600;
+  color:       #DC2626;
+  background:  transparent;
+  border:      none;
+  cursor:      pointer;
+  padding:     4px 0;
+  text-align:  left;
+  font-family: 'Lato', sans-serif;
+}
+.vcs-filter-reset:hover { text-decoration: underline; }
+.vcs-filter-result {
+  font-size:  11px;
+  color:      #64748B;
+  margin:     6px 0 0;
+  padding:    4px 8px;
+  background: #F1F5F9;
+  border-radius: 6px;
+}
+
+/* Thumbnail vidéo (pas d'image) */
+.vcs-card__thumb-video {
+  width:           100%;
+  height:          100%;
+  background:      linear-gradient(135deg, #0F2235, #1a3a5c);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+.vcs-card__thumb-play {
+  color:     rgba(255,255,255,0.7);
+  font-size: 18px;
+}
+
+/* ── Date range picker ───────────────────────────────────── */
+.vcs-date-range {
+  display:     flex;
+  align-items: flex-end;
+  gap:         8px;
+  flex-wrap:   wrap;
+}
+.vcs-date-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  flex:           1;
+  min-width:      120px;
+}
+.vcs-date-label {
+  font-size:   10px;
+  font-weight: 700;
+  color:       #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.vcs-date-input {
+  padding:       6px 8px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 7px;
+  font-size:     12px;
+  font-family:   'Lato', sans-serif;
+  color:         #0F2235;
+  background:    #fff;
+  cursor:        pointer;
+  transition:    border-color 0.15s;
+  width:         100%;
+  box-sizing:    border-box;
+}
+.vcs-date-input:focus  { outline: none; border-color: #C4973A; }
+.vcs-date-sep          { color: #CBD5E1; font-size: 14px; padding-bottom: 6px; flex-shrink: 0; }
+.vcs-date-clear {
+  padding:       6px 10px;
+  border:        1.5px solid #E2E8F0;
+  border-radius: 7px;
+  background:    #fff;
+  color:         #64748B;
+  font-size:     14px;
+  cursor:        pointer;
+  flex-shrink:   0;
+  line-height:   1;
+  font-family:   'Lato', sans-serif;
+  padding-bottom: 8px;
+}
+.vcs-date-clear:hover { background: #FEE2E2; color: #DC2626; border-color: #FECACA; }
