@@ -1,160 +1,760 @@
-.aia-root {
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN AGENT IA — Premium Design System v2
+   Palette : Navy #0F2235 · Sky #1A3F63 · Gold #C4973A · BG #EEF2F7
+   Layout  : Sidebar gauche (260px) + Chat window (flex)
+   Cohérent avec AdminClients.css / AdminSupport.css
+═══════════════════════════════════════════════════════════════ */
+
+.aia-root-v2 {
+  --ink:        #0F2235;
+  --sky:        #1A3F63;
+  --azure:      #2B5F8E;
+  --gold:       #C4973A;
+  --gold-l:     #D4A853;
+  --green:      #27AE60;
+  --red:        #C0392B;
+  --bg:         #EEF2F7;
+  --bg-chat:    #F7F9FC;
+  --surface:    #FFFFFF;
+  --border:     #E4EAF3;
+  --border-2:   #D0DAE8;
+  --text-1:     #0F2235;
+  --text-2:     #3A5570;
+  --text-3:     #7A93AE;
+  --text-4:     #B0C4D8;
+  --sh-sm:      0 1px 4px rgba(15,34,53,.06);
+  --sh-md:      0 4px 16px rgba(15,34,53,.1);
+  --sh-lg:      0 12px 40px rgba(15,34,53,.14);
+
   display: flex;
-  flex-direction: column;
-  height: calc(100vh - 80px);
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 24px 0;
-  gap: 0;
+  height: calc(100vh - 72px);
+  width: 100%;
+  background: var(--bg);
+  font-family: 'Lato', sans-serif;
+  color: var(--text-1);
+  overflow: hidden;
 }
 
-/* Header */
-.aia-header {
+/* ════════════════════════════════════════════════════════
+   SIDEBAR
+════════════════════════════════════════════════════════ */
+.aia-side {
+  width: 280px;
+  min-width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.aia-side-collapsed {
+  width: 56px;
+  min-width: 56px;
+  align-items: center;
+  padding: 12px 0;
+  gap: 12px;
+}
+
+.aia-side-collapsed .aia-side-toggle,
+.aia-side-collapsed .aia-side-new-mini {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.aia-side-collapsed .aia-side-toggle:hover,
+.aia-side-collapsed .aia-side-new-mini:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: white;
+}
+.aia-side-collapsed svg { width: 16px; height: 16px; }
+
+/* Header sidebar */
+.aia-side-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.aia-side-new {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.aia-side-new:hover {
+  background: var(--gold);
+}
+.aia-side-new svg { width: 16px; height: 16px; }
+
+.aia-side-toggle {
+  width: 34px; height: 34px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.aia-side-toggle:hover {
+  background: var(--bg-chat);
+  border-color: var(--border-2);
+}
+.aia-side-toggle svg { width: 14px; height: 14px; }
+
+/* Recherche */
+.aia-side-search {
+  position: relative;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.aia-side-search svg {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  color: var(--text-3);
+  pointer-events: none;
+}
+.aia-side-search input {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  background: var(--bg-chat);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-1);
+  outline: none;
+  transition: border-color 0.18s;
+  box-sizing: border-box;
+}
+.aia-side-search input:focus {
+  border-color: var(--gold);
+  background: white;
+}
+.aia-side-search input::placeholder { color: var(--text-3); }
+
+/* Liste */
+.aia-side-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 8px 16px;
+}
+.aia-side-list::-webkit-scrollbar { width: 6px; }
+.aia-side-list::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 3px;
+}
+
+.aia-side-empty {
+  padding: 30px 16px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 0.85rem;
+}
+
+.aia-side-group { margin-top: 8px; }
+
+.aia-side-group-label {
+  padding: 10px 10px 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.aia-side-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  transition: background 0.15s;
+}
+.aia-side-item:hover { background: var(--bg-chat); }
+.aia-side-item.active { background: var(--bg-chat); }
+.aia-side-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px; bottom: 6px;
+  width: 3px;
+  background: var(--gold);
+  border-radius: 0 2px 2px 0;
+}
+
+.aia-side-item-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 8px 10px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-2);
+  min-width: 0;
+  font-family: 'Lato', sans-serif;
+}
+.aia-side-item.active .aia-side-item-btn {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.aia-side-item-icon {
+  width: 14px; height: 14px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+.aia-side-item.active .aia-side-item-icon { color: var(--gold); }
+
+.aia-side-item-title {
+  flex: 1;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aia-side-item-more {
+  width: 26px; height: 26px;
+  margin-right: 4px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-3);
+  opacity: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.aia-side-item:hover .aia-side-item-more,
+.aia-side-item.active .aia-side-item-more { opacity: 1; }
+.aia-side-item-more:hover { background: var(--border); color: var(--ink); }
+.aia-side-item-more svg { width: 14px; height: 14px; }
+
+/* Menu contextuel */
+.aia-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.aia-side-menu {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 8px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--sh-md);
+  padding: 5px;
+  z-index: 100;
+  min-width: 160px;
+}
+.aia-side-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-2);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.aia-side-menu button:hover { background: var(--bg-chat); color: var(--ink); }
+.aia-side-menu button svg { width: 14px; height: 14px; }
+.aia-side-menu-danger { color: var(--red) !important; }
+.aia-side-menu-danger:hover { background: #FEF2F2 !important; color: var(--red) !important; }
+
+/* Rename input */
+.aia-side-rename {
+  flex: 1;
+  margin: 4px 8px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--gold);
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  color: var(--ink);
+  outline: none;
+  background: white;
+}
+
+/* Footer sidebar */
+.aia-side-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+.aia-side-clear-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 10px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-3);
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.78rem;
+  transition: all 0.15s;
+}
+.aia-side-clear-all:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: #FEF2F2;
+}
+.aia-side-clear-all svg { width: 13px; height: 13px; }
+
+/* ════════════════════════════════════════════════════════
+   CHAT WINDOW
+════════════════════════════════════════════════════════ */
+.aia-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-chat);
+  overflow: hidden;
+}
+
+/* Header chat */
+.aia-chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  background: #fff;
-  border-radius: 14px 14px 0 0;
-  border: 1px solid #E8EDF5;
-  border-bottom: none;
+  padding: 14px 24px;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.aia-header-left { display: flex; align-items: center; gap: 14px; }
-.aia-avatar-icon { font-size: 32px; }
-.aia-header h2 { margin: 0; font-size: 18px; color: #1A3F63; }
-.aia-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #2E7D32;
-  background: #E8F5E9; padding: 3px 10px; border-radius: 20px;
+.aia-chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
-.aia-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #4CAF50; display: inline-block;
+.aia-chat-avatar {
+  font-size: 28px;
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, var(--ink), var(--sky));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.aia-chat-header h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.aia-chat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 0.72rem;
+  color: var(--green);
+  font-weight: 600;
+}
+.aia-chat-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
   animation: aia-pulse 1.5s infinite;
 }
 @keyframes aia-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-.aia-clear-btn {
-  background: #FFF3E0; color: #E65100; border: none;
-  padding: 7px 14px; border-radius: 8px; cursor: pointer;
-  font-size: 13px; font-weight: 500;
-  transition: background 0.2s;
-}
-.aia-clear-btn:hover { background: #FFE0B2; }
-
-/* Messages */
-.aia-messages {
+/* Zone messages */
+.aia-chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
-  background: #F7F9FC;
-  border: 1px solid #E8EDF5;
-  border-top: none;
-  border-bottom: none;
+  padding: 24px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
+.aia-chat-messages::-webkit-scrollbar { width: 8px; }
+.aia-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--border-2);
+  border-radius: 4px;
+}
+
+/* Loader chargement conv */
+.aia-chat-loader {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-3);
+  font-size: 0.9rem;
+}
+.aia-spin-lg {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: aia-spin 0.8s linear infinite;
+}
+@keyframes aia-spin { to { transform: rotate(360deg); } }
+
+/* Welcome screen */
+.aia-chat-welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.aia-chat-welcome-icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+}
+.aia-chat-welcome h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.aia-chat-welcome p {
+  color: var(--text-3);
+  font-size: 0.95rem;
+  margin: 0 0 32px;
+  max-width: 560px;
+}
+.aia-chat-prompts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 640px;
+}
+.aia-chat-prompt-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  font-family: 'Lato', sans-serif;
+}
+.aia-chat-prompt-card:hover {
+  border-color: var(--gold);
+  box-shadow: var(--sh-sm);
+  transform: translateY(-1px);
+}
+.aia-chat-prompt-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.aia-chat-prompt-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.aia-chat-prompt-text {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  line-height: 1.4;
+}
+
+/* Messages */
 .aia-msg {
   display: flex;
   align-items: flex-end;
   gap: 10px;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 .aia-msg-user { flex-direction: row-reverse; }
 
 .aia-msg-avatar {
-  font-size: 22px;
+  font-size: 20px;
   width: 36px; height: 36px;
-  background: #fff;
-  border: 1px solid #E8EDF5;
+  background: white;
+  border: 1px solid var(--border);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.aia-msg-avatar-user { background: #1A3F63; }
+.aia-msg-avatar-user {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
 
 .aia-msg-bubble {
-  max-width: 70%;
+  max-width: 72%;
   padding: 12px 16px;
   border-radius: 16px;
-  font-size: 14px;
+  font-size: 0.92rem;
   line-height: 1.6;
-  color: #1A2B42;
-  background: #fff;
-  border: 1px solid #E8EDF5;
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  color: var(--ink);
+  background: white;
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-sm);
 }
 .aia-msg-user .aia-msg-bubble {
-  background: #1A3F63;
-  color: #fff;
-  border-color: #1A3F63;
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
 }
 .aia-msg-error .aia-msg-bubble {
-  background: #FFF3F3;
-  border-color: #FFCDD2;
-  color: #C62828;
+  background: #FEF2F2;
+  border-color: #FCA5A5;
+  color: var(--red);
 }
 
-/* Typing animation */
+.aia-msg-content strong { font-weight: 700; }
+
+.aia-msg-meta {
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+/* Curseur streaming */
+.aia-cursor {
+  display: inline-block;
+  color: var(--gold);
+  animation: aia-blink 1s infinite;
+  margin-left: 2px;
+}
+@keyframes aia-blink { 50% { opacity: 0; } }
+
+/* Typing dots */
 .aia-typing {
   display: flex; align-items: center; gap: 5px;
   padding: 14px 18px !important;
 }
 .aia-typing span {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #90A4AE;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-3);
   animation: aia-bounce 1.2s infinite;
 }
 .aia-typing span:nth-child(2) { animation-delay: .2s; }
 .aia-typing span:nth-child(3) { animation-delay: .4s; }
-@keyframes aia-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+@keyframes aia-bounce {
+  0%,80%,100% { transform: translateY(0); }
+  40%         { transform: translateY(-6px); }
+}
 
-/* Input */
-.aia-input-zone {
+/* ════════════════════════════════════════════════════════
+   COMPOSER
+════════════════════════════════════════════════════════ */
+.aia-chat-composer {
+  padding: 16px 24px 14px;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-chat) 50%);
+  flex-shrink: 0;
+}
+
+.aia-chat-composer-inner {
   display: flex;
   align-items: flex-end;
-  gap: 12px;
-  padding: 16px;
-  background: #fff;
-  border: 1px solid #E8EDF5;
-  border-top: none;
-  border-radius: 0 0 14px 14px;
-  margin-bottom: 24px;
+  gap: 10px;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 10px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--sh-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.aia-textarea {
+.aia-chat-composer-inner:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(196,151,58,0.12);
+}
+
+.aia-chat-textarea {
   flex: 1;
   resize: none;
-  border: 1.5px solid #E8EDF5;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 14px;
-  font-family: inherit;
-  color: #1A2B42;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.92rem;
+  color: var(--ink);
   outline: none;
-  transition: border-color 0.2s;
-  max-height: 140px;
-  overflow-y: auto;
+  max-height: 200px;
+  line-height: 1.5;
 }
-.aia-textarea:focus { border-color: #1A3F63; }
-.aia-textarea:disabled { background: #F7F9FC; }
+.aia-chat-textarea::placeholder { color: var(--text-3); }
+.aia-chat-textarea:disabled { color: var(--text-3); cursor: not-allowed; }
 
-.aia-send-btn {
-  width: 44px; height: 44px;
-  background: #1A3F63;
-  border: none; border-radius: 10px;
+.aia-chat-send {
+  width: 38px; height: 38px;
+  background: var(--ink);
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  transition: background 0.2s, opacity 0.2s;
+  transition: all 0.18s;
 }
-.aia-send-btn:hover:not(:disabled) { background: #C4973A; }
-.aia-send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.aia-send-btn svg { width: 18px; height: 18px; color: #fff; }
+.aia-chat-send:hover:not(:disabled) { background: var(--gold); }
+.aia-chat-send:disabled { opacity: 0.35; cursor: not-allowed; }
+.aia-chat-send svg { width: 17px; height: 17px; color: white; }
 
-.aia-spin {
-  width: 18px; height: 18px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.3);
-  border-top-color: #fff;
-  animation: aia-spin .7s linear infinite;
+.aia-chat-abort {
+  background: var(--red) !important;
 }
-@keyframes aia-spin { to { transform: rotate(360deg); } }
+.aia-chat-abort:hover { background: #991b1b !important; }
+
+.aia-chat-footer-hint {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-3);
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .aia-side {
+    width: 240px;
+    min-width: 240px;
+  }
+  .aia-chat-prompts {
+    grid-template-columns: 1fr;
+  }
+  .aia-msg-bubble { max-width: 85%; }
+}
+
+@media (max-width: 640px) {
+  .aia-side:not(.aia-side-collapsed) {
+    position: absolute;
+    z-index: 50;
+    height: 100%;
+    box-shadow: var(--sh-lg);
+  }
+}
+/* ════════════════════════════════════════════════════════
+   AJOUTS CSS — à coller à la fin de AdminAgentIA.css
+   (timestamps, sous-titre header, liens markdown)
+════════════════════════════════════════════════════════ */
+
+/* ── Sous-titre du header (remplace le badge "Connecté") ── */
+.aia-chat-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+/* ── Wrapper message (bulle + timestamp) ── */
+.aia-msg-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+}
+.aia-msg-wrap-user    { align-items: stretch; }
+.aia-msg-wrap-assistant { align-items: stretch; }
+
+/* Le message lui-même n'est plus dans une margin horizontale,
+   c'est le wrapper qui gère la largeur */
+.aia-msg {
+  padding: 0 24px;
+}
+
+/* ── Timestamp sous chaque message ── */
+.aia-msg-time {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  padding: 0 66px;   /* aligné sous la bulle (avatar + gap) */
+}
+.aia-msg-time-user {
+  text-align: right;
+}
+.aia-msg-time-assistant {
+  text-align: left;
+}
+.aia-msg-duree {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* ── Liens Markdown cliquables dans les messages ── */
+.aia-link {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  word-break: break-all;
+  transition: color 0.15s;
+}
+.aia-link:hover {
+  color: var(--ink);
+  text-decoration-thickness: 2px;
+}
+
+/* Liens dans bulle utilisateur (fond sombre) → doivent rester lisibles */
+.aia-msg-user .aia-link {
+  color: #F5D68C;
+}
+.aia-msg-user .aia-link:hover {
+  color: #FFFFFF;
+}
+
+/* ── Responsive timestamp ── */
+@media (max-width: 640px) {
+  .aia-msg-time {
+    padding: 0 46px;
+  }
+}
