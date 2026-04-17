@@ -1,11 +1,14 @@
 /* ════════════════════════════════════════════════════════════
    SEARCH BAR — Dropdowns custom professionnels
+   ✅ CORRECTION : positionnement des dropdowns renforcé
 ════════════════════════════════════════════════════════════ */
 
 .sb-root {
   background: #F2F6FA;
   padding: 0 0 24px;
   display: flex; flex-direction: column; align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 /* Onglets */
@@ -34,11 +37,29 @@
   box-shadow: 0 8px 32px rgba(15,34,53,0.1);
   max-width: 1140px; width: calc(100% - 48px);
   min-height: 68px;
+  /* ✅ FIX : garantir que les dropdowns ne soient pas masqués */
+  overflow: visible;
+  position: relative;
 }
 .sb-sep { width: 1px; background: #EEF2F7; flex-shrink: 0; margin: 12px 0; }
 
 /* ── Dropdown générique ─────────────────────────────── */
-.sb-dd { position: relative; flex: 1; min-width: 0; }
+/* ✅ FIX : position: relative garantit que le panel se positionne
+           par rapport au wrapper du dropdown, et non par rapport
+           au body de la page */
+.sb-dd {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Compat : si du code plus ancien utilise encore .sb-dd-wrap,
+   on lui applique les mêmes règles */
+.sb-dd-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
 
 .sb-dd-trigger {
   width: 100%; height: 100%; min-height: 68px;
@@ -139,6 +160,26 @@
 }
 .sb-text-input::placeholder { color:#B0BEC8; font-weight:400; }
 
+/* ── Champ destination voyage (input texte libre, plus large) ── */
+.sb-field-dest-voyage {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1.4;
+  min-width: 180px;
+  padding: 10px 16px;
+  justify-content: center;
+}
+.sb-dest-input {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #1C2E42 !important;
+}
+.sb-dest-input::placeholder {
+  font-weight: 400;
+  color: #B0BEC8;
+}
+
 /* ── Nuitées ─────────────────────────────────────────── */
 .sb-field-nuits {
   flex: 0.75; display: flex; flex-direction: column; justify-content: center;
@@ -184,11 +225,15 @@
 /* Responsive */
 @media (max-width: 960px) {
   .sb-bar { flex-wrap: wrap; padding: 8px; border-radius: 14px; }
-  .sb-dd, .sb-field-text, .sb-field-nuits { flex: 1 1 45%; min-width: 140px; }
+  .sb-dd, .sb-dd-wrap, .sb-field-text, .sb-field-nuits, .sb-field-dest-voyage {
+    flex: 1 1 45%; min-width: 140px;
+  }
   .sb-sep { display: none; }
   .sb-btn { width: 100%; margin: 4px 0 0; padding: 14px; border-radius: 10px; }
 }
 @media (max-width: 600px) {
   .sb-bar { width: calc(100% - 32px); }
-  .sb-dd, .sb-field-text, .sb-field-nuits { flex: 1 1 100%; }
+  .sb-dd, .sb-dd-wrap, .sb-field-text, .sb-field-nuits, .sb-field-dest-voyage {
+    flex: 1 1 100%;
+  }
 }

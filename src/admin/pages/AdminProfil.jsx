@@ -209,10 +209,7 @@ export default function AdminProfil() {
 
           {/* Stats */}
           <div className="pp-hero-stats">
-            <div className="pp-hero-stat">
-              <span className="pp-hero-stat-val">#{profil?.id}</span>
-              <span className="pp-hero-stat-lbl">ID Compte</span>
-            </div>
+            
             <div className="pp-hero-stat-sep"/>
             <div className="pp-hero-stat">
               <span className="pp-hero-stat-val">
@@ -316,7 +313,7 @@ export default function AdminProfil() {
             <div className="pp-card-body">
               <div className="pp-info-table">
                 {[
-                  { icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>, key:"ID Compte",     val:`#${profil?.id}`,  cls:"blue" },
+                 
                   { icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,                                                                                                       key:"Rôle",          val:profil?.role,      cls:"gold" },
                   { icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,                                  key:"Email",         val:profil?.email },
                   { icon:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,                                                                                          key:"Statut",        val:profil?.actif?"Actif":"Inactif", cls:profil?.actif?"green":"red" },

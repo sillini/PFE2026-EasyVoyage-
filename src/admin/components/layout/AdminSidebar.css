@@ -441,3 +441,117 @@
   0%, 100% { transform: scale(1);   opacity: 1; }
   50%       { transform: scale(1.3); opacity: 0.7; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AJOUTS À COLLER À LA FIN DE : src/admin/components/layout/AdminSidebar.css
+
+   Ces règles :
+   1. Transforment la carte utilisateur en bouton cliquable
+   2. Ajoutent un effet hover élégant + état "actif" quand on est sur la page profil
+   3. Gèrent le mode collapsed (avatar seul cliquable)
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Carte utilisateur cliquable (mode normal) ─────────────── */
+.adm-user-clickable {
+  /* reset bouton */
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+
+  /* apparence */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.adm-user-clickable:hover {
+  background: rgba(196, 151, 58, 0.12);
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.adm-user-clickable:hover .adm-user-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.adm-user-clickable:hover .adm-avatar {
+  transform: scale(1.05);
+}
+
+.adm-user-clickable:active {
+  transform: translateX(1px);
+  background: rgba(196, 151, 58, 0.18);
+}
+
+/* État actif : la page profil est ouverte */
+.adm-user-clickable.active {
+  background: linear-gradient(
+    135deg,
+    rgba(196, 151, 58, 0.18),
+    rgba(196, 151, 58, 0.08)
+  );
+  box-shadow: inset 0 0 0 1px rgba(196, 151, 58, 0.35);
+}
+
+.adm-user-clickable.active .adm-user-name {
+  color: #C4973A;
+}
+
+/* Flèche indicative (visible au hover) */
+.adm-user-arrow {
+  margin-left: auto;
+  color: rgba(196, 151, 58, 0.75);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.22s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.adm-user-clickable.active .adm-user-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Avatar — transition au hover (au cas où le CSS existant ne l'a pas) */
+.adm-user-clickable .adm-avatar {
+  transition: transform 0.22s ease;
+}
+
+/* ── Mode collapsed : avatar seul cliquable ────────────────── */
+.adm-user-collapsed {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s;
+  position: relative;
+  margin-bottom: 8px;
+}
+.adm-user-collapsed:hover {
+  background: rgba(196, 151, 58, 0.12);
+}
+.adm-user-collapsed.active {
+  background: rgba(196, 151, 58, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(196, 151, 58, 0.35);
+}
+.adm-user-collapsed .adm-avatar {
+  transition: transform 0.2s;
+}
+.adm-user-collapsed:hover .adm-avatar {
+  transform: scale(1.08);
+}

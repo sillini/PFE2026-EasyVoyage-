@@ -210,6 +210,8 @@
   padding: 10px 16px;
   box-shadow: var(--shadow-sm);
   flex-wrap: wrap;
+  position: relative;    /* ✅ FIX: contexte de stacking explicite */
+  z-index: 1;
 }
 
 /* tabs */
@@ -253,19 +255,22 @@
 
 .apm-toolbar-spacer { flex: 1; min-width: 12px; }
 
-/* Search */
+/* ── Search (maintenant un <div>, pas un <label>) ── */
 .apm-search {
   display: flex; align-items: center; gap: 8px;
   background: var(--bg); border: 1.5px solid transparent;
   border-radius: var(--radius-sm); padding: 0 12px;
-  transition: all 0.2s; cursor: text; min-width: 220px;
+  transition: all 0.2s;
+  min-width: 220px;
+  position: relative;
+  z-index: 1;
 }
 .apm-search:focus-within {
   background: var(--surface);
   border-color: var(--sky);
   box-shadow: 0 0 0 3px rgba(26,63,99,0.1);
 }
-.apm-search svg { color: var(--text-4); flex-shrink: 0; }
+.apm-search > svg { color: var(--text-4); flex-shrink: 0; cursor: text; }
 .apm-search input {
   flex: 1; border: none; outline: none; padding: 9px 0;
   font-family: 'Lato', sans-serif; font-size: 0.88rem; color: var(--text-1);
@@ -280,13 +285,17 @@
 }
 .apm-search-clear:hover { background: #DDE3EC; color: var(--ink); }
 
-/* Filter btn */
+/* ── Filter btn - cliquable garanti ── */
 .apm-btn-filter {
   display: flex; align-items: center; gap: 7px;
   padding: 9px 14px; border-radius: var(--radius-sm);
   border: 1.5px solid var(--border2); background: var(--surface);
   font-family: 'Lato', sans-serif; font-size: 0.83rem; font-weight: 600; color: var(--text-3);
-  cursor: pointer; transition: all 0.2s; position: relative; white-space: nowrap;
+  cursor: pointer; transition: all 0.2s;
+  position: relative;
+  white-space: nowrap;
+  z-index: 2;                /* ✅ FIX: au-dessus de la toolbar */
+  pointer-events: auto;      /* ✅ FIX: garantit la capture de clic */
 }
 .apm-btn-filter:hover  { border-color: var(--sky); color: var(--sky); }
 .apm-btn-filter.active { border-color: var(--sky); color: var(--sky); background: rgba(26,63,99,0.05); }
@@ -314,14 +323,18 @@
   font-size: 0.75rem; color: var(--text-3);
 }
 
-/* ── FILTER DRAWER ─────────────────────────────────────────── */
+/* ── FILTER DRAWER - visibilité garantie ───────────────────── */
 .apm-filter-drawer {
   background: var(--surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow: visible;                /* ✅ FIX: pas d'overflow hidden */
   box-shadow: var(--shadow-sm);
   animation: apmSlide 0.22s cubic-bezier(0.22,1,0.36,1);
+  display: block;                   /* ✅ FIX: force l'affichage */
+  width: 100%;
+  position: relative;
+  z-index: 3;
 }
 @keyframes apmSlide { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
 .apm-filter-drawer-inner { padding: 20px 24px; }

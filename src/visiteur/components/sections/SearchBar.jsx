@@ -35,8 +35,9 @@ function DatePicker({ label, icon, value, onChange, min }) {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
+  // ✅ FIX: utiliser "sb-dd" (qui a position:relative dans le CSS)
   return (
-    <div className="sb-dd-wrap" ref={ref}>
+    <div className="sb-dd" ref={ref}>
       <button className={`sb-dd-trigger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)} type="button">
         <div className="sb-dd-trigger-inner">
@@ -91,8 +92,11 @@ function Dropdown({ label, icon, value, children, align = "left" }) {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
+  // ✅ FIX: utiliser "sb-dd" (qui a position:relative dans le CSS)
+  //         au lieu de "sb-dd-wrap" qui n'a aucune règle CSS,
+  //         ce qui faisait apparaître les panels à gauche de la page
   return (
-    <div className="sb-dd-wrap" ref={ref}>
+    <div className="sb-dd" ref={ref}>
       <button className={`sb-dd-trigger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)} type="button">
         <div className="sb-dd-trigger-inner">

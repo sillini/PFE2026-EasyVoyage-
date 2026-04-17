@@ -220,6 +220,7 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
   const [pendingCount, setPendingCount] = useState(0);
 
   const isMarketingActive = MARKETING_IDS.includes(activePage);
+  const isProfilActive    = activePage === "profil";
 
   useEffect(() => {
     const fetchPending = async () => {
@@ -271,6 +272,11 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
         {activePage === item.id && <span className="adm-active-bar" />}
       </button>
     );
+  };
+
+  // ✅ NOUVEAU : handler navigation vers le profil admin
+  const handleProfilClick = () => {
+    onNavigate("profil");
   };
 
   return (
@@ -350,8 +356,15 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
       {/* ── Utilisateur + Logout ── */}
       <div className="adm-bottom">
+        {/* ✅ MODIFIÉ : la zone utilisateur est maintenant un bouton cliquable
+             qui redirige vers la page "profil" */}
         {!collapsed && (
-          <div className="adm-user">
+          <button
+            type="button"
+            className={`adm-user adm-user-clickable ${isProfilActive ? "active" : ""}`}
+            onClick={handleProfilClick}
+            title="Voir mon profil"
+          >
             <div className="adm-avatar">
               {user?.prenom?.[0]}{user?.nom?.[0]}
             </div>
@@ -359,8 +372,32 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
               <span className="adm-user-name">{user?.prenom} {user?.nom}</span>
               <span className="adm-user-role">Administrateur</span>
             </div>
-          </div>
+            {/* Petite flèche pour indiquer que c'est cliquable */}
+            <span className="adm-user-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+                   width="14" height="14">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </span>
+            {isProfilActive && <span className="adm-active-bar" />}
+          </button>
         )}
+
+        {/* En mode collapsed, l'avatar seul reste cliquable vers profil */}
+        {collapsed && (
+          <button
+            type="button"
+            className={`adm-user-collapsed ${isProfilActive ? "active" : ""}`}
+            onClick={handleProfilClick}
+            title={`Profil — ${user?.prenom || ""} ${user?.nom || ""}`.trim()}
+          >
+            <div className="adm-avatar">
+              {user?.prenom?.[0]}{user?.nom?.[0]}
+            </div>
+            {isProfilActive && <span className="adm-active-bar" />}
+          </button>
+        )}
+
         <button className="adm-logout" onClick={onLogout} title="Déconnexion">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>

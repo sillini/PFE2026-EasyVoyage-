@@ -1,6 +1,8 @@
 import "./AProposSection.css";
 
-// ── Données statiques ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  DONNÉES STATIQUES
+// ══════════════════════════════════════════════════════════
 const STATS = [
   { valeur: "500+",  label: "Partenaires",      icon: "🤝" },
   { valeur: "12k+",  label: "Réservations",     icon: "📋" },
@@ -50,15 +52,9 @@ const VALEURS = [
   },
 ];
 
-const EQUIPE = [
-  { prenom: "Rania",   nom: "Hamdi",    role: "CEO & Co-fondatrice",         init: "RH", couleur: "#1A3F63" },
-  { prenom: "Karim",   nom: "Belhaj",   role: "Directeur des Opérations",    init: "KB", couleur: "#C4973A" },
-  { prenom: "Salma",   nom: "Trabelsi", role: "Responsable Partenariats",    init: "ST", couleur: "#27AE60" },
-  { prenom: "Youssef", nom: "Meddeb",   role: "Lead Développeur",            init: "YM", couleur: "#8E44AD" },
-];
-
-// ── Composants ────────────────────────────────────────────
-
+// ══════════════════════════════════════════════════════════
+//  SOUS-COMPOSANTS
+// ══════════════════════════════════════════════════════════
 function StatCard({ valeur, label, icon }) {
   return (
     <div className="ap-stat-card">
@@ -79,43 +75,30 @@ function ValeurCard({ titre, desc, icone }) {
   );
 }
 
-function MembreCard({ prenom, nom, role, init, couleur }) {
-  return (
-    <div className="ap-membre-card">
-      <div className="ap-membre-avatar" style={{ background: couleur }}>
-        {init}
-      </div>
-      <div className="ap-membre-info">
-        <span className="ap-membre-nom">{prenom} {nom}</span>
-        <span className="ap-membre-role">{role}</span>
-      </div>
-    </div>
-  );
-}
-
-// ── Section principale ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  SECTION PRINCIPALE
+// ══════════════════════════════════════════════════════════
 export default function AProposSection() {
   return (
     <section className="ap-root" id="pourquoi">
-      {/* Déco de fond */}
+      {/* Déco de fond subtile */}
       <div className="ap-bg-deco-1"/>
       <div className="ap-bg-deco-2"/>
 
       <div className="ap-container">
 
-        {/* ── BLOC HERO ── */}
+        {/* ═══ BLOC HERO (sans carte) ═══ */}
         <div className="ap-hero">
-          <div className="ap-hero-left">
+          <div className="ap-hero-content">
             <div className="ap-eyebrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 8v4l3 3"/>
               </svg>
               Notre histoire
             </div>
             <h2 className="ap-hero-title">
-              La plateforme tunisienne<br/>
-              <em>de confiance</em>
+              La plateforme tunisienne <em>de confiance</em>
             </h2>
             <p className="ap-hero-text">
               Fondée en 2016 à Tunis, EasyVoyage est née d'un constat simple : réserver un hôtel
@@ -139,100 +122,176 @@ export default function AProposSection() {
                 Voir les voyages
               </a>
             </div>
-          </div>
 
-          <div className="ap-hero-right">
-            {/* Image carte + badge */}
-            <div className="ap-carte-wrap">
-              <div className="ap-carte-bg">
-                <svg viewBox="0 0 200 260" fill="none" className="ap-carte-svg">
-                  {/* Silhouette Tunisie simplifiée */}
-                  <path
-                    d="M110 15 L130 20 L148 35 L152 55 L145 70 L155 85 L158 110
-                       L150 130 L155 155 L148 175 L140 200 L125 220 L110 235
-                       L95 240 L80 230 L70 210 L65 185 L72 165 L68 145
-                       L75 120 L65 100 L55 80 L60 60 L70 45 L85 30 Z"
-                    fill="rgba(196,151,58,0.15)"
-                    stroke="rgba(196,151,58,0.5)"
-                    strokeWidth="1.5"
-                  />
-                  {/* Points destinations */}
-                  {[
-                    { x: 105, y: 90,  label: "Tunis" },
-                    { x: 95,  y: 115, label: "Hammamet" },
-                    { x: 88,  y: 130, label: "Sousse" },
-                    { x: 80,  y: 200, label: "Djerba" },
-                    { x: 90,  y: 175, label: "Tozeur" },
-                  ].map(p => (
-                    <g key={p.label}>
-                      <circle cx={p.x} cy={p.y} r="4" fill="#C4973A" opacity="0.8"/>
-                      <circle cx={p.x} cy={p.y} r="8" fill="#C4973A" opacity="0.2"/>
-                      <text x={p.x + 11} y={p.y + 4}
-                        fontFamily="'Lato',sans-serif" fontSize="9"
-                        fill="rgba(255,255,255,0.7)">
-                        {p.label}
-                      </text>
-                    </g>
-                  ))}
-                </svg>
+            {/* Badges de confiance */}
+            <div className="ap-trust-badges">
+              <div className="ap-trust-badge">
+                <span className="ap-trust-ico">🏆</span>
+                <div>
+                  <strong>Top plateforme 2025</strong>
+                  <span>Prix de l'innovation touristique</span>
+                </div>
               </div>
-              {/* Badges flottants */}
-              <div className="ap-badge-1">🏆 Top plateforme 2025</div>
-              <div className="ap-badge-2">🇹🇳 100% Tunisien</div>
+              <div className="ap-trust-badge">
+                <span className="ap-trust-ico">🇹🇳</span>
+                <div>
+                  <strong>100% Tunisien</strong>
+                  <span>Équipe et partenaires locaux</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ── STATS ── */}
+        {/* ═══ STATS ═══ */}
         <div className="ap-stats">
           {STATS.map(s => <StatCard key={s.label} {...s}/>)}
         </div>
 
-        {/* ── VALEURS ── */}
+        {/* ═══ VALEURS ═══ */}
         <div className="ap-section-head">
           <div className="ap-eyebrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
             Nos engagements
           </div>
           <h3 className="ap-section-title">Ce qui nous distingue</h3>
         </div>
+
         <div className="ap-valeurs-grid">
           {VALEURS.map(v => <ValeurCard key={v.titre} {...v}/>)}
         </div>
 
-        {/* ── ÉQUIPE ── */}
+        {/* ═══ SECTION AGENT IA ═══ */}
         <div className="ap-section-head">
-          <div className="ap-eyebrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          <div className="ap-eyebrow ap-eyebrow-ai">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7H3a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
+              <path d="M5 14v7M19 14v7M5 17H3M21 17h-2"/>
+              <circle cx="12" cy="11" r="1"/>
             </svg>
-            L'équipe
+            Innovation
           </div>
-          <h3 className="ap-section-title">Les personnes derrière EasyVoyage</h3>
-        </div>
-        <div className="ap-equipe-grid">
-          {EQUIPE.map(m => <MembreCard key={m.init} {...m}/>)}
+          <h3 className="ap-section-title">
+            Propulsé par l'<em>Intelligence Artificielle</em>
+          </h3>
+          <p className="ap-section-sub">
+            EasyVoyage intègre une IA avancée pour simplifier votre expérience
+          </p>
         </div>
 
-        {/* ── CTA FINAL ── */}
+        <div className="ap-ai-card">
+          {/* Colonne gauche : texte et features */}
+          <div className="ap-ai-left">
+            <div className="ap-ai-badge">
+              <span className="ap-ai-dot"/>
+              Exclusif EasyVoyage
+            </div>
+            <h3 className="ap-ai-title">
+              Un assistant intelligent pour tous vos besoins
+            </h3>
+            <p className="ap-ai-desc">
+              Notre <strong>intelligence artificielle</strong> simplifie chaque étape de votre
+              expérience — de la recherche du voyage idéal à la gestion quotidienne de nos
+              partenaires et administrateurs.
+            </p>
+
+            <ul className="ap-ai-features">
+              <li>
+                <span className="ap-ai-feat-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Recommandations personnalisées</strong>
+                  <span>Selon vos préférences, budget et style de voyage</span>
+                </div>
+              </li>
+              <li>
+                <span className="ap-ai-feat-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Analyse financière en temps réel</strong>
+                  <span>Commissions, revenus et statistiques pour nos partenaires</span>
+                </div>
+              </li>
+              <li>
+                <span className="ap-ai-feat-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Assistant administratif intelligent</strong>
+                  <span>Génère rapports et analyses en langage naturel</span>
+                </div>
+              </li>
+              <li>
+                <span className="ap-ai-feat-ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Disponible 24h/24 et 7j/7</strong>
+                  <span>Une réponse instantanée à chaque question</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          {/* Colonne droite : aperçu du chat */}
+          <div className="ap-ai-right">
+            <div className="ap-ai-chat">
+              <div className="ap-ai-chat-head">
+                <div className="ap-ai-chat-avatar">🤖</div>
+                <div className="ap-ai-chat-info">
+                  <div className="ap-ai-chat-name">Agent IA EasyVoyage</div>
+                  <div className="ap-ai-chat-status">
+                    <span className="ap-ai-chat-online"/>
+                    En ligne
+                  </div>
+                </div>
+              </div>
+              <div className="ap-ai-chat-body">
+                <div className="ap-ai-bubble ap-ai-bubble-user">
+                  Quels sont les 5 hôtels les mieux notés à Hammamet ?
+                </div>
+                <div className="ap-ai-bubble ap-ai-bubble-bot">
+                  Voici les 5 meilleurs hôtels de Hammamet :
+                  <br/>⭐ <strong>Hôtel Royal</strong> — 4.9/5
+                  <br/>⭐ <strong>Bel Azur</strong> — 4.8/5
+                  <br/>⭐ <strong>Sindbad Palace</strong> — 4.7/5
+                </div>
+                <div className="ap-ai-bubble ap-ai-bubble-typing">
+                  <span/><span/><span/>
+                </div>
+              </div>
+            </div>
+            {/* Décos flottantes */}
+            <div className="ap-ai-float ap-ai-float-1">✨</div>
+            <div className="ap-ai-float ap-ai-float-2">💬</div>
+            <div className="ap-ai-float ap-ai-float-3">⚡</div>
+          </div>
+        </div>
+
+        {/* ═══ CTA BANNER ═══ */}
         <div className="ap-cta-banner">
           <div className="ap-cta-left">
-            <h3>Prêt à voyager ?</h3>
-            <p>Des milliers d'offres vous attendent — hôtels, séjours tout compris, circuits exclusifs.</p>
+            <h3>Prêt à explorer la Tunisie ?</h3>
+            <p>Rejoignez des milliers de voyageurs qui nous font confiance.</p>
           </div>
-          <div className="ap-cta-right">
-            <a href="#hotels" className="ap-btn-primary ap-btn-lg">
-              Réserver maintenant
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </a>
-          </div>
+          <a href="#hotels" className="ap-btn-primary ap-btn-lg">
+            Commencer ma recherche
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
         </div>
 
       </div>

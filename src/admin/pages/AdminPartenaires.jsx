@@ -126,14 +126,14 @@ function PartenaireCard({ partenaire, onToggle, onView, index }) {
       )}
 
       <div className="apm-card-actions" onClick={e => e.stopPropagation()}>
-        <button className="apm-action-profile" onClick={() => onView(partenaire)}>
+        <button type="button" className="apm-action-profile" onClick={() => onView(partenaire)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
             <circle cx="12" cy="12" r="3"/>
           </svg>
           Voir le profil
         </button>
-        <button className={`apm-action-toggle ${partenaire.actif ? "suspend" : "activate"}`}
+        <button type="button" className={`apm-action-toggle ${partenaire.actif ? "suspend" : "activate"}`}
           onClick={handleToggle} disabled={toggling}>
           {toggling
             ? <span className="apm-spinner-xs" />
@@ -176,7 +176,7 @@ function PartenaireDetail({ partenaire, onBack, onToggle, onViewHotel }) {
 
       {/* breadcrumb */}
       <div className="apm-breadcrumb">
-        <button className="apm-back" onClick={onBack}>
+        <button type="button" className="apm-back" onClick={onBack}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="13" height="13">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
@@ -226,7 +226,7 @@ function PartenaireDetail({ partenaire, onBack, onToggle, onViewHotel }) {
             </div>
           </div>
           <div className="apm-banner-right">
-            <button className={`apm-toggle-hero ${partenaire.actif ? "suspend" : "activate"}`}
+            <button type="button" className={`apm-toggle-hero ${partenaire.actif ? "suspend" : "activate"}`}
               onClick={handleToggle} disabled={toggling}>
               {toggling
                 ? <span className="apm-spinner-xs white" />
@@ -380,6 +380,13 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
   const handleToggle = async (id, actif) => { await partenairesApi.toggle(id, actif); await load(); };
   const handleViewHotel = (hotelId) => setHotelDetailId(hotelId);
 
+  // ✅ FIX: Handler explicite pour le bouton filtre
+  const handleToggleFilters = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowFilters(prev => !prev);
+  };
+
   if (hotelDetailId) return <AdminHotelDetail hotelId={hotelDetailId} onBack={() => { setHotelDetailId(null); load(); }} />;
 
   if (selectedId) {
@@ -426,7 +433,7 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
             {partenaires.length} partenaire{partenaires.length !== 1 ? "s" : ""} enregistrés sur la plateforme
           </p>
         </div>
-        <button className="apm-cta" onClick={() => setWizard(true)}>
+        <button type="button" className="apm-cta" onClick={() => setWizard(true)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="15" height="15">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
@@ -464,7 +471,7 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
             { key: "actif",   label: "Actifs",    count: actifs.length,   dot: "green" },
             { key: "inactif", label: "Suspendus", count: inactifs.length, dot: "rose" },
           ].map(t => (
-            <button key={t.key} className={`apm-tab ${filterTab === t.key ? "apm-tab-active" : ""}`}
+            <button key={t.key} type="button" className={`apm-tab ${filterTab === t.key ? "apm-tab-active" : ""}`}
               onClick={() => setFilterTab(t.key)}>
               <span className={`apm-tab-dot apm-td-${t.dot}`} />
               {t.label}
@@ -473,21 +480,27 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
           ))}
         </div>
         <div className="apm-toolbar-spacer" />
-        <label className="apm-search">
+
+        {/* ✅ FIX: <label> remplacé par <div> pour éviter que le label intercepte les clics adjacents */}
+        <div className="apm-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un partenaire…" />
           {search && (
-            <button className="apm-search-clear" onClick={() => setSearch("")} title="Effacer">
+            <button type="button" className="apm-search-clear" onClick={() => setSearch("")} title="Effacer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="10" height="10">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           )}
-        </label>
-        <button className={`apm-btn-filter ${showFilters ? "active" : ""} ${(filterType || filterEnt) ? "has-filter" : ""}`}
-          onClick={() => setShowFilters(v => !v)}>
+        </div>
+
+        {/* ✅ FIX: type="button" + handler avec preventDefault/stopPropagation */}
+        <button
+          type="button"
+          className={`apm-btn-filter ${showFilters ? "active" : ""} ${(filterType || filterEnt) ? "has-filter" : ""}`}
+          onClick={handleToggleFilters}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
           </svg>
@@ -500,7 +513,7 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
         </div>
       </div>
 
-      {/* Filtres avancés */}
+      {/* ✅ FIX: Filtres avancés - drawer visible et fonctionnel */}
       {showFilters && (
         <div className="apm-filter-drawer">
           <div className="apm-filter-drawer-inner">
@@ -512,8 +525,11 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
             </p>
             <div className="apm-filter-fields">
               <div className="apm-filter-field">
-                <label>Type de partenaire</label>
-                <select value={filterType} onChange={e => setFilterType(e.target.value)}>
+                <label htmlFor="apm-filter-type">Type de partenaire</label>
+                <select
+                  id="apm-filter-type"
+                  value={filterType}
+                  onChange={e => setFilterType(e.target.value)}>
                   <option value="">Tous les types</option>
                   {["HOTEL","AGENCE","TRANSPORT","RESTAURATION","AUTRE"].map(t => (
                     <option key={t} value={t}>{t}</option>
@@ -521,12 +537,20 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
                 </select>
               </div>
               <div className="apm-filter-field">
-                <label>Nom d'entreprise</label>
-                <input value={filterEnt} onChange={e => setFilterEnt(e.target.value)} placeholder="Ex: Hôtel Carthage…" />
+                <label htmlFor="apm-filter-ent">Nom d'entreprise</label>
+                <input
+                  id="apm-filter-ent"
+                  value={filterEnt}
+                  onChange={e => setFilterEnt(e.target.value)}
+                  placeholder="Ex: Hôtel Carthage…"
+                />
               </div>
             </div>
             {(filterType || filterEnt) && (
-              <button className="apm-filter-reset" onClick={() => { setFilterType(""); setFilterEnt(""); }}>
+              <button
+                type="button"
+                className="apm-filter-reset"
+                onClick={() => { setFilterType(""); setFilterEnt(""); }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
                   <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
                 </svg>
@@ -557,7 +581,7 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
             <strong>Erreur de chargement</strong>
             <p>{error}</p>
           </div>
-          <button onClick={load}>Réessayer</button>
+          <button type="button" onClick={load}>Réessayer</button>
         </div>
       )}
 
@@ -567,7 +591,7 @@ export default function AdminPartenaires({ initialWizardEmail, initialWizardForm
           <h3>{hasFilters ? "Aucun résultat trouvé" : `Aucun partenaire ${filterTab === "actif" ? "actif" : "suspendu"}`}</h3>
           <p>{hasFilters ? "Essayez de modifier vos critères de recherche" : "Commencez par inviter votre premier partenaire"}</p>
           {!hasFilters && (
-            <button className="apm-cta" onClick={() => setWizard(true)}>
+            <button type="button" className="apm-cta" onClick={() => setWizard(true)}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
                 <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
