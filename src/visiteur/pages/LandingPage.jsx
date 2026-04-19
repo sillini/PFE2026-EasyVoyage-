@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar                from "../components/layout/Navbar";
 import Footer                from "../components/layout/Footer";
 import HeroSlider            from "../components/sections/HeroSlider";
 import SearchBar             from "../components/sections/SearchBar";
 import HotelsSection         from "../components/sections/HotelsSection";
 import VoyagesSection        from "../components/sections/VoyagesSection";
-import AProposSection        from "../components/sections/AProposSection";   // ← NOUVEAU
+import AProposSection        from "../components/sections/AProposSection";
 import ResultatsPage         from "./ResultatsPage";
 import HotelDetailPage       from "./HotelDetailPage";
 import VoyageDetailPage      from "./VoyageDetailPage";
@@ -43,6 +43,19 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
   const openAuth     = (tab = "login") => { setAuthTab(tab); setShowAuth(true); };
   const handleLogin  = (data) => { setShowAuth(false); onLogin(data); };
   const clearDetails = () => { setHotelDetail(null); setVoyageDetail(null); };
+
+  // ✨ NOUVEAU — Écoute l'événement "open-login-modal" dispatché
+  // depuis App.jsx quand le client clique sur "Se connecter"
+  // dans l'assistant IA (bulle dorée).
+  useEffect(() => {
+    const handleOpenLogin = () => {
+      openAuth("login");
+    };
+    window.addEventListener("open-login-modal", handleOpenLogin);
+    return () => {
+      window.removeEventListener("open-login-modal", handleOpenLogin);
+    };
+  }, []);
 
   const goToHotel = (hotel) => {
     clearDetails();
@@ -155,7 +168,7 @@ export default function LandingPage({ onLogin, onLogout, user, role }) {
           searchParams={searchParams}
           onLoginRequired={() => openAuth("login")}
         />
-        <AProposSection />     {/* ← NOUVEAU */}
+        <AProposSection />
         <Footer />
       </>
     );

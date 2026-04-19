@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 
 import LandingPage from "./visiteur/pages/LandingPage";
 
+// ✨ Widget Agent IA (visible uniquement pour visiteur/client)
+import AgentIaClient from "./visiteur/components/agent-ia/AgentIaClient";
+
 import AdminSidebar            from "./admin/components/layout/AdminSidebar";
 import AdminTopbar             from "./admin/components/layout/AdminTopbar";
 import AdminDashboard          from "./admin/pages/AdminDashboard";
@@ -22,7 +25,7 @@ import AdminSupport            from "./admin/pages/AdminSupport";
 import AdminHotelsVedettes     from "./admin/pages/AdminHotelsVedettes";
 import AdminPromotions         from "./admin/pages/AdminPromotions";
 import FiscalConfig            from "./admin/pages/FiscalConfig";
-import AdminVideoCampaigns     from "./admin/pages/video-campaigns/AdminVideoCampaigns"; // ← NOUVEAU
+import AdminVideoCampaigns     from "./admin/pages/video-campaigns/AdminVideoCampaigns";
 
 import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
@@ -82,6 +85,36 @@ export default function App() {
     setActivePage("partenaires");
   };
 
+  // ✨ Déclencheur du modal de connexion depuis l'Agent IA
+  // Essaye plusieurs stratégies dans l'ordre pour maximiser la compat avec
+  // l'implementation existante de LandingPage :
+  //   1. Événement custom "open-login-modal" (si LandingPage l'écoute)
+  //   2. Clic sur un élément marqué [data-login-trigger]
+  //   3. Clic sur un bouton dont le texte contient "se connecter" (fallback)
+  const handleOpenLoginModal = () => {
+    // 1. Dispatch l'événement custom
+    window.dispatchEvent(new CustomEvent("open-login-modal"));
+
+    // 2. Essaye de trouver un trigger explicite
+    const trigger = document.querySelector("[data-login-trigger]");
+    if (trigger) {
+      trigger.click();
+      trigger.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    // 3. Fallback : cherche un bouton "Se connecter" dans la landing
+    const buttons = Array.from(document.querySelectorAll("button, a"));
+    const loginBtn = buttons.find((el) => {
+      const txt = (el.textContent || "").trim().toLowerCase();
+      return txt === "se connecter" || txt === "connexion" || txt === "login";
+    });
+    if (loginBtn) {
+      loginBtn.click();
+      loginBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   // ── VISITEUR / CLIENT ──────────────────────────────────
   if (!user || role === "CLIENT") {
     document.body.style.overflow = "";
@@ -89,12 +122,16 @@ export default function App() {
     document.body.style.top      = "";
     document.documentElement.style.overflow = "";
     return (
-      <LandingPage
-        onLogin={handleLogin}
-        onLogout={handleLogout}
-        user={role === "CLIENT" ? user : null}
-        role={role}
-      />
+      <>
+        <LandingPage
+          onLogin={handleLogin}
+          onLogout={handleLogout}
+          user={role === "CLIENT" ? user : null}
+          role={role}
+        />
+        {/* ✨ Bulle assistant IA — visible partout sur la landing */}
+        <AgentIaClient onLoginRedirect={handleOpenLoginModal} />
+      </>
     );
   }
 
@@ -102,7 +139,6 @@ export default function App() {
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
-        // ── Gestion ──────────────────────────────────────
         case "reservations":    return <AdminReservations />;
         case "hotels":          return <AdminHotels />;
         case "voyages":         return <AdminVoyages />;
@@ -117,16 +153,13 @@ export default function App() {
         case "demandes-partenaire":
           return <AdminDemandesPartenaire onConfirmer={handleConfirmerDemande}/>;
         case "clients":         return <AdminClients />;
-        // ── Finance & Facturation ─────────────────────────
         case "finances":        return <AdminFinances />;
         case "promotions":      return <AdminPromotions />;
         case "factures":        return <AdminFactures />;
         case "fiscal":          return <FiscalConfig />;
-        // ── Marketing ─────────────────────────────────────
         case "marketing":       return <AdminMarketing />;
         case "catalogue":       return <AdminCatalogue />;
-        case "video-campaigns": return <AdminVideoCampaigns />; // ← NOUVEAU
-        // ── Configuration ─────────────────────────────────
+        case "video-campaigns": return <AdminVideoCampaigns />;
         case "hotels-vedettes": return <AdminHotelsVedettes />;
         case "hero-slides":     return <AdminHeroSlides />;
         case "support":         return <AdminSupport currentUserId={user?.id}/>;
