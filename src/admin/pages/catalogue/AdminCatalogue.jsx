@@ -21,15 +21,52 @@ export default function AdminCatalogue() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
+      // ⚠️  IMPORTANT : per_page MAX = 100 (limite imposée par le backend FastAPI)
+      //                 actif_only=0 pour récupérer aussi les inactifs
       const [cR, hR, vR] = await Promise.all([
-        fetch(`${BASE}/catalogues?per_page=100`, { headers: auth() }),
-        fetch(`${BASE}/hotels?per_page=200`,     { headers: auth() }),
-        fetch(`${BASE}/voyages?per_page=200`,    { headers: auth() }),
+        fetch(`${BASE}/catalogues?per_page=100`,                  { headers: auth() }),
+        fetch(`${BASE}/hotels?per_page=100&actif_only=0`,         { headers: auth() }),
+        fetch(`${BASE}/voyages?per_page=100&actif_only=0`,        { headers: auth() }),
       ]);
-      setCatalogues((await cR.json()).items || []);
-      setHotels((await hR.json()).items     || []);
-      setVoyages((await vR.json()).items    || []);
-    } catch (e) { console.error(e); }
+
+      // ── Catalogues ──
+      if (cR.ok) {
+        const cData = await cR.json();
+        setCatalogues(cData.items || []);
+      } else {
+        console.error("[CATALOGUE] catalogues HTTP", cR.status);
+        setCatalogues([]);
+      }
+
+      // ── Hôtels ──
+      if (hR.ok) {
+        const hData = await hR.json();
+        const hItems = hData.items || [];
+        console.log(`[CATALOGUE] ${hItems.length}/${hData.total} hôtels chargés`);
+        setHotels(hItems);
+      } else {
+        const errTxt = await hR.text();
+        console.error("[CATALOGUE] hotels HTTP", hR.status, errTxt);
+        setHotels([]);
+      }
+
+      // ── Voyages ──
+      if (vR.ok) {
+        const vData = await vR.json();
+        const vItems = vData.items || [];
+        console.log(`[CATALOGUE] ${vItems.length}/${vData.total} voyages chargés`);
+        setVoyages(vItems);
+      } else {
+        const errTxt = await vR.text();
+        console.error("[CATALOGUE] voyages HTTP", vR.status, errTxt);
+        setVoyages([]);
+      }
+    } catch (e) {
+      console.error("[CATALOGUE] loadAll error:", e);
+      setCatalogues([]);
+      setHotels([]);
+      setVoyages([]);
+    }
     setLoading(false);
   }, []);
 
@@ -99,6 +136,7 @@ export default function AdminCatalogue() {
           <CatalogueCreate
             hotels={hotels}
             voyages={voyages}
+            loading={loading}
             onCreated={handleCreated}
             onCancel={() => setView("list")}
           />

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { chambresApi } from "../../services/api";
 import "./ChambreModal.css";
 
-export default function ChambreModal({ chambre, typesChambres, onClose, onSave }) {
+export default function ChambreModal({ chambre, typesChambres, onClose, onSave, hotel }) {
   const isEdit = !!chambre;
   const [form, setForm] = useState({
     capacite:        2,
@@ -11,6 +12,11 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
   });
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
+
+  // ── États IA ───────────────────────────────────────────
+  const [aiLoading,  setAiLoading]  = useState(false);
+  const [aiError,    setAiError]    = useState("");
+  const [aiOriginal, setAiOriginal] = useState(null);   // description avant IA (pour "Annuler")
 
   useEffect(() => {
     if (chambre) {
@@ -29,10 +35,53 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
       ...p,
       [name]: name === "id_type_chambre" ? Number(value) : value,
     }));
+    if (name === "description") setAiError("");
   };
 
   const setCapacite   = val => setForm(p => ({ ...p, capacite:    Math.max(1,   Math.min(20,  val)) }));
   const setNbChambres = val => setForm(p => ({ ...p, nb_chambres: Math.max(1,   Math.min(200, val)) }));
+
+  const selectedType = typesChambres.find(t => t.id === Number(form.id_type_chambre));
+
+  // ── Génération IA ──────────────────────────────────────
+  const handleGenerateAI = async () => {
+    setAiError("");
+
+    if (!selectedType) {
+      setAiError("Sélectionnez d'abord le type de chambre");
+      return;
+    }
+    if (!form.description.trim() || form.description.trim().length < 3) {
+      setAiError("Écrivez d'abord quelques mots (équipements, ambiance…), l'IA se chargera de l'améliorer");
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const res = await chambresApi.generateDescriptionAI({
+        type_chambre:      selectedType.nom,
+        capacite:          Number(form.capacite),
+        nb_chambres:       Number(form.nb_chambres),
+        description_brute: form.description.trim(),
+        hotel_nom:         hotel?.nom     || null,
+        hotel_etoiles:     hotel?.etoiles || null,
+      });
+
+      setAiOriginal(form.description);
+      setForm(prev => ({ ...prev, description: res.description_amelioree }));
+    } catch (err) {
+      setAiError(err.message || "Impossible de générer la description");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleRevertAI = () => {
+    if (aiOriginal !== null) {
+      setForm(prev => ({ ...prev, description: aiOriginal }));
+      setAiOriginal(null);
+    }
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -50,8 +99,6 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
       setLoading(false);
     }
   };
-
-  const selectedType = typesChambres.find(t => t.id === Number(form.id_type_chambre));
 
   return (
     <div className="cm-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -142,32 +189,23 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
                   <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
               </button>
-              {/* Aperçu visuel du stock */}
-              <div className="cm-nb-preview">
-                {Array.from({ length: Math.min(form.nb_chambres, 10) }).map((_, i) => (
-                  <svg key={i} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-                    style={{ width: 16, height: 16, color: "#1A3F63" }}>
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-                  </svg>
-                ))}
-                {form.nb_chambres > 10 && (
-                  <span style={{ fontSize: "0.75rem", color: "#8A9BB0", fontWeight: 700 }}>
-                    +{form.nb_chambres - 10}
-                  </span>
-                )}
+              <div className="cm-cap-icons">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <rect x="3" y="3" width="7" height="7" rx="1"/>
+                  <rect x="14" y="3" width="7" height="7" rx="1"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1"/>
+                  <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
               </div>
             </div>
           </div>
 
-          {/* Capacité */}
+          {/* Capacité (personnes / chambre) */}
           <div className="cm-field">
             <label className="cm-label">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
               </svg>
               Capacité (personnes / chambre) <span className="cm-required">*</span>
             </label>
@@ -203,23 +241,99 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
             </div>
           </div>
 
-          {/* Description */}
+          {/* ─────────────────────────────────────────────
+              Description + bouton IA
+             ───────────────────────────────────────────── */}
           <div className="cm-field">
-            <label className="cm-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <line x1="8" y1="6" x2="21" y2="6"/>
-                <line x1="8" y1="12" x2="21" y2="12"/>
-                <line x1="8" y1="18" x2="21" y2="18"/>
-              </svg>
-              Description
-              <span className="cm-optional">optionnel</span>
-            </label>
-            <textarea name="description" value={form.description}
-              onChange={handleChange} className="cm-textarea" rows={3}
-              placeholder="Vue sur mer, balcon, climatisation, coffre-fort..." />
+            <div className="cm-desc-label-row">
+              <label className="cm-label" style={{margin:0}}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <line x1="8" y1="6" x2="21" y2="6"/>
+                  <line x1="8" y1="12" x2="21" y2="12"/>
+                  <line x1="8" y1="18" x2="21" y2="18"/>
+                </svg>
+                Description
+                <span className="cm-optional">optionnel</span>
+              </label>
+
+              <div className="cm-ai-btn-group">
+                {aiOriginal !== null && !aiLoading && (
+                  <button
+                    type="button"
+                    className="cm-ai-revert-btn"
+                    onClick={handleRevertAI}
+                    title="Revenir à votre texte original"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+                      <polyline points="1 4 1 10 7 10"/>
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                    </svg>
+                    Annuler IA
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className={`cm-ai-generate-btn ${aiLoading ? "is-loading" : ""}`}
+                  onClick={handleGenerateAI}
+                  disabled={aiLoading}
+                  title="Laissez Claude IA améliorer votre description"
+                >
+                  {aiLoading ? (
+                    <>
+                      <span className="cm-ai-spinner" />
+                      Génération…
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                           strokeWidth="2" width="13" height="13">
+                        <path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 20 12 16.77 7.82 20 9 13.87 4 9l5.91-.74L12 2z"/>
+                      </svg>
+                      {aiOriginal !== null ? "Régénérer" : "Améliorer avec IA"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className={`cm-textarea ${aiOriginal !== null ? "cm-ai-improved" : ""}`}
+              rows={aiOriginal !== null ? 5 : 3}
+              placeholder="Vue sur mer, balcon, climatisation, coffre-fort..."
+            />
+
             <p className="cm-field-hint" style={{ textAlign: "right" }}>
               {form.description.length} caractères
             </p>
+
+            {/* Badge confirmation IA */}
+            {aiOriginal !== null && !aiLoading && (
+              <div className="cm-ai-hint-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                  <path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 20 12 16.77 7.82 20 9 13.87 4 9l5.91-.74L12 2z"/>
+                </svg>
+                <span>
+                  <strong>Description améliorée par l'IA.</strong>{" "}
+                  Vous pouvez la modifier librement avant d'enregistrer.
+                </span>
+              </div>
+            )}
+
+            {/* Erreur IA */}
+            {aiError && (
+              <div className="cm-ai-error-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {aiError}
+              </div>
+            )}
           </div>
 
           {/* Récap */}
@@ -238,22 +352,32 @@ export default function ChambreModal({ chambre, typesChambres, onClose, onSave }
             </div>
           </div>
 
-          {error && <p className="cm-error">{error}</p>}
+          {error && (
+            <p className="cm-error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              {error}
+            </p>
+          )}
 
           <div className="cm-actions">
             <button type="button" className="cm-btn-cancel" onClick={onClose} disabled={loading}>
               Annuler
             </button>
-            <button type="submit" className="cm-btn-save" disabled={loading}>
-              {loading ? <span className="cm-spin" /> : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+            <button type="submit" className="cm-btn-save" disabled={loading || aiLoading}>
+              {loading ? (
+                <span className="cm-spinner" />
+              ) : (
+                <>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  {isEdit ? "Enregistrer" : `Créer — ${form.nb_chambres} chambre${form.nb_chambres > 1 ? "s" : ""} ${selectedType?.nom || ""}`}
+                </>
               )}
-              {isEdit
-                ? "Enregistrer"
-                : `Créer — ${form.nb_chambres} chambre${form.nb_chambres > 1 ? "s" : ""} ${selectedType?.nom || ""}`
-              }
             </button>
           </div>
         </form>

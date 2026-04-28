@@ -1,4 +1,5 @@
 import "./AdminTopbar.css";
+import NotificationsBell from "./NotificationsBell";
 
 const PAGE_META = {
   // ── Gestion ──────────────────────────────────────────
@@ -17,7 +18,7 @@ const PAGE_META = {
   // ── Marketing ────────────────────────────────────────
   marketing:             { title: "Marketing",               subtitle: "Validation et suivi des campagnes" },
   catalogue:             { title: "Catalogues Email",        subtitle: "Créez et envoyez des catalogues personnalisés à vos contacts" },
-  "video-campaigns":     { title: "Vidéo Campaigns",         subtitle: "Générez et envoyez des campagnes vidéo marketing automatisées" }, // ← NOUVEAU
+  "video-campaigns":     { title: "Vidéo Campaigns",         subtitle: "Générez et envoyez des campagnes vidéo marketing automatisées" },
   // ── Configuration ────────────────────────────────────
   "hotels-vedettes":     { title: "Mise en avant",           subtitle: "Hôtels et villes affichés sur la page client" },
   "hero-slides":         { title: "Hero Slides",             subtitle: "Gestion du carousel de la page d'accueil" },
@@ -53,13 +54,10 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
       <div className="adm-topbar-right">
         <span className="adm-topbar-date">{dateStr}</span>
         <div className="adm-topbar-divider" />
-        <button className="adm-topbar-notif">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span className="adm-notif-dot" />
-        </button>
+
+        {/* ✅ Cloche de notifications fonctionnelle */}
+        <NotificationsBell onNavigate={onNavigate} />
+
         <div
           className="adm-topbar-user"
           onClick={() => onNavigate && onNavigate("profil")}

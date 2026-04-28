@@ -37,6 +37,7 @@ import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
 import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
 import MesReservations       from "./partenaire/pages/MesReservations";
 import PartenaireFinances    from "./partenaire/pages/PartenaireFinances";
+import PartenaireAgentIA     from "./partenaire/pages/PartenaireAgentIA";  // ← AJOUT
 
 import "./App.css";
 
@@ -139,6 +140,7 @@ export default function App() {
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
+        case "dashboard":       return <AdminDashboard onNavigate={setActivePage} user={user} />;  // ← MODIFIÉ
         case "reservations":    return <AdminReservations />;
         case "hotels":          return <AdminHotels />;
         case "voyages":         return <AdminVoyages />;
@@ -165,7 +167,7 @@ export default function App() {
         case "support":         return <AdminSupport currentUserId={user?.id}/>;
         case "agent":           return <AdminAgentIA />;
         case "profil":          return <AdminProfil />;
-        default:                return <AdminDashboard />;
+        default:                return <AdminDashboard onNavigate={setActivePage} user={user} />;  // ← MODIFIÉ
       }
     };
 
@@ -195,6 +197,7 @@ export default function App() {
       case "finances":      return <PartenaireFinances />;
       case "profil":        return <PartenaireProfil />;
       case "support":       return <PartenaireSupportPage currentUserId={user?.id}/>;
+      case "agent":         return <PartenaireAgentIA />;                         // ← AJOUT
       default:              return <PlaceholderPage page={activePage} />;
     }
   };

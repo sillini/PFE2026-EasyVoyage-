@@ -248,3 +248,238 @@
   background: rgba(26,63,99,0.04);
   border-radius: 8px; border: 1px dashed rgba(26,63,99,0.15);
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   👉 AJOUT À FAIRE : À coller À LA FIN de
+   src/partenaire/components/chambres/ChambreModal.css
+
+   Ces styles gèrent :
+   - Le bouton "Améliorer avec IA" (dégradé violet → doré, cohérent avec HotelModal)
+   - Le bouton "Annuler IA" (retour à l'original)
+   - L'animation du spinner IA
+   - La mise en valeur du textarea après amélioration
+   - Le badge de confirmation IA
+   - La boîte d'erreur IA
+
+   Les préfixes sont `cm-ai-*` pour ne pas entrer en conflit avec les
+   styles existants du ChambreModal.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── Ligne label + boutons IA ──────────────────────────── */
+.cm-desc-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.cm-ai-btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ── Bouton "Améliorer avec IA" ────────────────────────── */
+.cm-ai-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 9px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #fff;
+  background: linear-gradient(135deg, #7B3FF2 0%, #9B59B6 50%, #C4973A 100%);
+  background-size: 200% 200%;
+  box-shadow: 0 4px 14px rgba(123, 63, 242, 0.28);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  animation: cm-ai-gradient-shift 4s ease infinite;
+}
+
+.cm-ai-generate-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(123, 63, 242, 0.42);
+}
+
+.cm-ai-generate-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cm-ai-generate-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.cm-ai-generate-btn.is-loading {
+  background: linear-gradient(135deg, #8A6FC2 0%, #A880B8 100%);
+  animation: none;
+}
+
+@keyframes cm-ai-gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.cm-ai-generate-btn svg {
+  flex-shrink: 0;
+}
+
+/* Spinner interne du bouton */
+.cm-ai-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cm-ai-spin 0.7s linear infinite;
+}
+
+@keyframes cm-ai-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Bouton "Annuler IA" ───────────────────────────────── */
+.cm-ai-revert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 9px;
+  border: 1.5px solid #DDE3EC;
+  background: #F8FAFC;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #6B7F95;
+  transition: all 0.2s;
+}
+
+.cm-ai-revert-btn:hover {
+  background: #fff;
+  border-color: #C4973A;
+  color: #C4973A;
+}
+
+.cm-ai-revert-btn svg {
+  flex-shrink: 0;
+}
+
+/* ── Textarea amélioré par IA ──────────────────────────── */
+.cm-textarea.cm-ai-improved {
+  border-color: rgba(123, 63, 242, 0.35);
+  background: linear-gradient(to bottom,
+              rgba(123, 63, 242, 0.025) 0%,
+              rgba(196, 151, 58, 0.02) 100%);
+  box-shadow: 0 0 0 3px rgba(123, 63, 242, 0.06);
+  animation: cm-ai-textarea-glow 0.5s ease-out;
+}
+
+.cm-textarea.cm-ai-improved:focus {
+  border-color: #7B3FF2;
+  box-shadow: 0 0 0 3px rgba(123, 63, 242, 0.12);
+}
+
+@keyframes cm-ai-textarea-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(123, 63, 242, 0.4);
+    transform: scale(0.995);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(123, 63, 242, 0.08);
+  }
+  100% {
+    box-shadow: 0 0 0 3px rgba(123, 63, 242, 0.06);
+    transform: scale(1);
+  }
+}
+
+/* ── Badge confirmation IA ─────────────────────────────── */
+.cm-ai-hint-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: linear-gradient(135deg,
+              rgba(123, 63, 242, 0.06) 0%,
+              rgba(196, 151, 58, 0.05) 100%);
+  border: 1px solid rgba(123, 63, 242, 0.18);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #4A3470;
+  animation: cm-ai-slide-in 0.35s ease-out;
+}
+
+.cm-ai-hint-box svg {
+  flex-shrink: 0;
+  color: #7B3FF2;
+  margin-top: 1px;
+}
+
+.cm-ai-hint-box strong {
+  color: #5A2BC2;
+  font-weight: 700;
+}
+
+@keyframes cm-ai-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Erreur IA ─────────────────────────────────────────── */
+.cm-ai-error-box {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: rgba(192, 57, 43, 0.07);
+  border: 1px solid rgba(192, 57, 43, 0.22);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #C0392B;
+  animation: cm-ai-slide-in 0.25s ease-out;
+}
+
+.cm-ai-error-box svg {
+  flex-shrink: 0;
+}
+
+/* ── Responsive : sur mobile, empile les boutons ────────── */
+@media (max-width: 540px) {
+  .cm-desc-label-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cm-ai-btn-group {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .cm-ai-generate-btn,
+  .cm-ai-revert-btn {
+    font-size: 0.72rem;
+    padding: 6px 10px;
+  }
+}

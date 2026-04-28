@@ -62,4 +62,27 @@ export const promotionsApi = {
       method:  "DELETE",
       headers: authHeaders(),
     }).then(handleResponse),
+
+  // ✨ IA — Améliorer la description d'une promotion via Claude
+  // Utilisé dans : PromoModal (MesPromotions.jsx)
+  //
+  // payload attendu :
+  //   {
+  //     titre: string,                // obligatoire
+  //     pourcentage: number,          // obligatoire (1-99)
+  //     date_debut?: string (YYYY-MM-DD),
+  //     date_fin?: string (YYYY-MM-DD),
+  //     description_brute: string,    // obligatoire
+  //     hotel_nom?: string,
+  //     hotel_ville?: string,
+  //     hotel_etoiles?: number (1-5)
+  //   }
+  //
+  // Retourne : { description_amelioree: string }
+  generateDescriptionAI: (payload) =>
+    fetch(`${BASE}/promotions/description/generate-ai`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(payload),
+    }).then(handleResponse),
 };

@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════════════════
 //  src/partenaire/pages/MesPromotions.jsx
-//  Espace Partenaire — Gestion promotions avec workflow
+//  Espace Partenaire — Gestion promotions avec workflow + IA description
 // ══════════════════════════════════════════════════════════
 
 import { useState, useEffect, useCallback } from "react";
@@ -64,7 +64,7 @@ export default function MesPromotions() {
     try {
       const [pData, hData] = await Promise.all([
         promotionsApi.list(),
-        hotelsApi.mesHotels(),   // ← uniquement les hôtels du partenaire connecté
+        hotelsApi.mesHotels(),
       ]);
       setPromos(pData?.items || []);
       setHotels(hData?.items || hData || []);
@@ -399,7 +399,7 @@ function PromoCard({ promo, onEdit, onDelete }) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  Modal Création / Édition (formulaire simplifié)
+//  Modal Création / Édition (avec IA pour la description)
 // ══════════════════════════════════════════════════════════
 function PromoModal({ promo, hotels, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -413,7 +413,61 @@ function PromoModal({ promo, hotels, onClose, onSave }) {
   const [saving, setSaving] = useState(false);
   const [err,    setErr]    = useState(null);
 
+  // ── États IA ───────────────────────────────────────────
+  const [aiLoading,  setAiLoading]  = useState(false);
+  const [aiError,    setAiError]    = useState("");
+  const [aiOriginal, setAiOriginal] = useState(null);
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // Hôtel actuellement sélectionné (pour contexte IA)
+  const selectedHotel = hotels.find(h => h.id === Number(form.hotel_id));
+
+  // ── Génération IA ──────────────────────────────────────
+  const handleGenerateAI = async () => {
+    setAiError("");
+
+    if (!form.titre.trim()) {
+      setAiError("Renseignez d'abord le titre de la promotion");
+      return;
+    }
+    if (!form.pourcentage || form.pourcentage <= 0 || form.pourcentage >= 100) {
+      setAiError("Renseignez d'abord un pourcentage valide (1-99)");
+      return;
+    }
+    if (!form.description.trim() || form.description.trim().length < 3) {
+      setAiError("Écrivez d'abord quelques mots, l'IA se chargera de les enrichir");
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const res = await promotionsApi.generateDescriptionAI({
+        titre:             form.titre.trim(),
+        pourcentage:       parseFloat(form.pourcentage),
+        date_debut:        form.date_debut || null,
+        date_fin:          form.date_fin   || null,
+        description_brute: form.description.trim(),
+        hotel_nom:         selectedHotel?.nom     || null,
+        hotel_ville:       selectedHotel?.ville   || null,
+        hotel_etoiles:     selectedHotel?.etoiles || null,
+      });
+
+      setAiOriginal(form.description);
+      setForm(f => ({ ...f, description: res.description_amelioree }));
+    } catch (e) {
+      setAiError(e.message || "Impossible de générer la description");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleRevertAI = () => {
+    if (aiOriginal !== null) {
+      setForm(f => ({ ...f, description: aiOriginal }));
+      setAiOriginal(null);
+    }
+  };
 
   const handleSubmit = async () => {
     setErr(null);
@@ -502,15 +556,92 @@ function PromoModal({ promo, hotels, onClose, onSave }) {
                 maxLength={200}
               />
             </div>
+
+            {/* ──────────────────────────────────────────
+                Description + bouton IA
+               ────────────────────────────────────────── */}
             <div className="mp-field">
-              <label>Description (optionnelle)</label>
+              <div className="mp-desc-label-row">
+                <label style={{ marginBottom: 0 }}>Description (optionnelle)</label>
+
+                <div className="mp-ai-btn-group">
+                  {aiOriginal !== null && !aiLoading && (
+                    <button
+                      type="button"
+                      className="mp-ai-revert-btn"
+                      onClick={handleRevertAI}
+                      title="Revenir à votre texte original"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+                        <polyline points="1 4 1 10 7 10"/>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                      </svg>
+                      Annuler IA
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className={`mp-ai-generate-btn ${aiLoading ? "is-loading" : ""}`}
+                    onClick={handleGenerateAI}
+                    disabled={aiLoading}
+                    title="Laissez Claude IA améliorer votre description"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <span className="mp-ai-spinner" />
+                        Génération…
+                      </>
+                    ) : (
+                      <>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             strokeWidth="2" width="13" height="13">
+                          <path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 20 12 16.77 7.82 20 9 13.87 4 9l5.91-.74L12 2z"/>
+                        </svg>
+                        {aiOriginal !== null ? "Régénérer" : "Améliorer avec IA"}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
               <textarea
+                className={aiOriginal !== null ? "mp-ai-improved" : ""}
                 placeholder="Décrivez brièvement votre promotion…"
                 value={form.description}
-                onChange={e => set("description", e.target.value)}
-                rows={3}
+                onChange={e => {
+                  set("description", e.target.value);
+                  setAiError("");
+                }}
+                rows={aiOriginal !== null ? 5 : 3}
               />
+
+              {/* Badge confirmation IA */}
+              {aiOriginal !== null && !aiLoading && (
+                <div className="mp-ai-hint-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                    <path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 20 12 16.77 7.82 20 9 13.87 4 9l5.91-.74L12 2z"/>
+                  </svg>
+                  <span>
+                    <strong>Description améliorée par l'IA.</strong>{" "}
+                    Vous pouvez la modifier librement avant de soumettre.
+                  </span>
+                </div>
+              )}
+
+              {/* Erreur IA */}
+              {aiError && (
+                <div className="mp-ai-error-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  {aiError}
+                </div>
+              )}
             </div>
+
             <div className="mp-field">
               <label>Réduction (%) *</label>
               <div className="mp-field-pct">
@@ -563,12 +694,12 @@ function PromoModal({ promo, hotels, onClose, onSave }) {
 
           {/* Actions */}
           <div className="mp-modal-actions">
-            <button className="mp-btn-ghost-lg" onClick={onClose} disabled={saving}>
+            <button className="mp-btn-ghost-lg" onClick={onClose} disabled={saving || aiLoading}>
               Annuler
             </button>
-            <button className="mp-btn-primary" onClick={handleSubmit} disabled={saving}>
+            <button className="mp-btn-primary" onClick={handleSubmit} disabled={saving || aiLoading}>
               {saving ? <span className="mp-btn-spin" /> : null}
-              {isResubmit ? "Resoumettre pour validation" : isEdit ? "Enregistrer les modifications" : "Soumettre la promotion"}
+              {isResubmit ? "Resoumettre" : isEdit ? "Enregistrer" : "Soumettre la promotion"}
             </button>
           </div>
         </div>

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { hotelsApi, imagesApi } from "../services/api";
 import "./HotelDetail.css";
 
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
+
 // ── Carousel d'images ─────────────────────────────────────
 function ImageCarousel({ images }) {
   const [current, setCurrent] = useState(0);
@@ -108,7 +110,161 @@ function AvisCard({ avis }) {
   );
 }
 
-// ── Page principale ───────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+//  ClassifBar — barre de classification positif/neutre/négatif
+// ══════════════════════════════════════════════════════════
+function ClassifBar({ label, count, pct, color, icon }) {
+  return (
+    <div className="ai-classif-row">
+      <div className="ai-classif-left">
+        <span>{icon}</span>
+        <span className="ai-classif-lbl">{label}</span>
+      </div>
+      <div className="ai-classif-track">
+        <div className="ai-classif-fill" style={{ width: `${pct}%`, background: color }} />
+      </div>
+      <span className="ai-classif-count">{count} ({pct}%)</span>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+//  AIReportCard — rapport d'analyse IA
+// ══════════════════════════════════════════════════════════
+function AIReportCard({ report, onClose }) {
+  if (!report) return null;
+
+  const scoreColor =
+    report.score_satisfaction >= 75 ? "#27AE60" :
+    report.score_satisfaction >= 50 ? "#C4973A" :
+    "#C0392B";
+
+  const sentimentEmoji = {
+    "positif": "😊",
+    "neutre":  "😐",
+    "négatif": "😞",
+    "negatif": "😞",
+  }[report.sentiment_dominant?.toLowerCase()] || "📊";
+
+  const total = report.classification.positif + report.classification.neutre + report.classification.negatif;
+  const pct = (n) => total > 0 ? Math.round((n / total) * 100) : 0;
+
+  return (
+    <div className="ai-report">
+      {/* Header */}
+      <div className="ai-report-header">
+        <div className="ai-report-badge">
+          <span className="ai-report-icon">✨</span>
+          <div>
+            <span className="ai-report-label">ANALYSE IA — CLAUDE</span>
+            <span className="ai-report-sub">Rapport généré à partir de {report.nb_avis} avis</span>
+          </div>
+        </div>
+        <button className="ai-report-close" onClick={onClose} title="Fermer">✕</button>
+      </div>
+
+      {/* Hero : score circulaire + sentiment */}
+      <div className="ai-report-hero">
+        <div className="ai-score-circle">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#EEF2F8" strokeWidth="10"/>
+            <circle
+              cx="60" cy="60" r="52" fill="none"
+              stroke={scoreColor} strokeWidth="10" strokeLinecap="round"
+              strokeDasharray={`${(report.score_satisfaction / 100) * 326.7} 326.7`}
+              transform="rotate(-90 60 60)"
+            />
+          </svg>
+          <div className="ai-score-inner">
+            <span className="ai-score-val" style={{ color: scoreColor }}>
+              {report.score_satisfaction}
+            </span>
+            <span className="ai-score-lbl">/100</span>
+          </div>
+        </div>
+
+        <div className="ai-hero-details">
+          <div className="ai-sentiment">
+            <span className="ai-sentiment-emoji">{sentimentEmoji}</span>
+            <div>
+              <span className="ai-sentiment-lbl">Sentiment dominant</span>
+              <span className="ai-sentiment-val">{report.sentiment_dominant}</span>
+            </div>
+          </div>
+          <div className="ai-note-info">
+            ⭐ Note moyenne : <strong>{report.note_moyenne} / 5</strong>
+          </div>
+        </div>
+      </div>
+
+      {/* Résumé global */}
+      <div className="ai-section">
+        <h4 className="ai-section-title">📝 Résumé global</h4>
+        <p className="ai-resume">{report.resume_global}</p>
+      </div>
+
+      {/* Classification */}
+      <div className="ai-section">
+        <h4 className="ai-section-title">📊 Classification des avis</h4>
+        <div className="ai-classif-bars">
+          <ClassifBar label="Positifs" count={report.classification.positif} pct={pct(report.classification.positif)} color="#27AE60" icon="👍" />
+          <ClassifBar label="Neutres"  count={report.classification.neutre}  pct={pct(report.classification.neutre)}  color="#C4973A" icon="😐" />
+          <ClassifBar label="Négatifs" count={report.classification.negatif} pct={pct(report.classification.negatif)} color="#C0392B" icon="👎" />
+        </div>
+      </div>
+
+      {/* Grid positifs / négatifs */}
+      <div className="ai-pn-grid">
+        <div className="ai-pn-card ai-pn-positive">
+          <h4 className="ai-section-title">✅ Points forts</h4>
+          {report.points_positifs.length === 0 ? (
+            <p className="ai-empty-list">Aucun point fort identifié</p>
+          ) : (
+            <ul className="ai-pn-list">
+              {report.points_positifs.map((p, i) => (
+                <li key={i}><span className="ai-check">+</span>{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="ai-pn-card ai-pn-negative">
+          <h4 className="ai-section-title">⚠️ Points à améliorer</h4>
+          {report.points_negatifs.length === 0 ? (
+            <p className="ai-empty-list">Aucun point négatif identifié 🎉</p>
+          ) : (
+            <ul className="ai-pn-list">
+              {report.points_negatifs.map((p, i) => (
+                <li key={i}><span className="ai-cross">−</span>{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      {/* Recommandations */}
+      <div className="ai-section ai-reco-section">
+        <h4 className="ai-section-title">💡 Recommandations pour vous</h4>
+        <div className="ai-reco-list">
+          {report.recommandations.map((r, i) => (
+            <div key={i} className="ai-reco-item">
+              <span className="ai-reco-num">{i + 1}</span>
+              <span>{r}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="ai-report-footer">
+        <span>🤖 Généré par Claude AI · Analyse basée sur {report.nb_avis} avis clients</span>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+// Page principale
+// ══════════════════════════════════════════════════════════
 export default function HotelDetail({ hotelId, onBack }) {
   const [hotel,   setHotel]   = useState(null);
   const [images,  setImages]  = useState([]);
@@ -116,18 +272,20 @@ export default function HotelDetail({ hotelId, onBack }) {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState("");
 
+  // ── États IA ───────────────────────────────────────────
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError,   setAiError]   = useState("");
+  const [aiReport,  setAiReport]  = useState(null);
+
   useEffect(() => { loadAll(); }, [hotelId]);
 
   const loadAll = async () => {
     setLoading(true);
     setError("");
     try {
-      // ✅ D'abord charger l'hôtel seul — c'est le plus important
       const hotelData = await hotelsApi.get(hotelId);
       setHotel(hotelData);
 
-      // ✅ Ensuite charger images et avis indépendamment
-      // allSettled : même si l'un échoue, l'autre s'affiche quand même
       const [imgResult, avisResult] = await Promise.allSettled([
         imagesApi.list(hotelId),
         hotelsApi.getAvis(hotelId),
@@ -148,11 +306,52 @@ export default function HotelDetail({ hotelId, onBack }) {
       }
 
     } catch (err) {
-      // Seul hotelsApi.get() peut déclencher cette erreur
       setError(err.message || "Impossible de charger les détails de l'hôtel");
     } finally {
       setLoading(false);
     }
+  };
+
+  // ── Génération du rapport IA ───────────────────────────
+  const handleGenerateAIReport = async () => {
+    setAiError("");
+    setAiLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(`${BASE}/hotels/partenaire/${hotelId}/avis/analyse-ia`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token || ""}`,
+        },
+      });
+      const text = await res.text();
+      let data;
+      try { data = text ? JSON.parse(text) : {}; } catch { data = {}; }
+      if (!res.ok) {
+        const msg = data?.detail
+          ? (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail))
+          : `Erreur ${res.status}`;
+        throw new Error(msg);
+      }
+      setAiReport(data);
+      // Auto-scroll vers le rapport après génération
+      setTimeout(() => {
+        document.querySelector(".ai-report")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
+    } catch (e) {
+      setAiError(e.message || "Impossible de générer le rapport");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleCloseReport = () => {
+    setAiReport(null);
+    setAiError("");
   };
 
   if (loading) return (
@@ -229,12 +428,11 @@ export default function HotelDetail({ hotelId, onBack }) {
             </div>
             <div className="quick-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
+                <polyline points="20 6 9 17 4 12"/>
               </svg>
               <div>
                 <span className="quick-label">Statut</span>
-                <span className={`quick-value status-${hotel.actif ? "actif" : "inactif"}`}>
+                <span className={`quick-value ${hotel.actif ? "status-actif" : "status-inactif"}`}>
                   {hotel.actif ? "Actif" : "Inactif"}
                 </span>
               </div>
@@ -242,18 +440,18 @@ export default function HotelDetail({ hotelId, onBack }) {
           </div>
         </div>
 
-        {/* Colonne droite — Détails */}
+        {/* Colonne droite — Infos */}
         <div className="detail-right">
-          {/* Header hôtel */}
-          <div className="detail-header">
-            <div className="detail-title-row">
+          {/* Header */}
+          <div className="detail-head">
+            <div className="detail-head-top">
               <h1 className="detail-nom">{hotel.nom}</h1>
-              <Stars count={hotel.etoiles} size="lg" />
+              <Stars count={hotel.etoiles} />
             </div>
 
-            {/* Note globale */}
-            <div className="detail-note-global">
-              <div className="note-circle">
+            {/* Note moyenne */}
+            <div className="detail-note-block">
+              <div className="note-badge-big">
                 <span className="note-num">
                   {noteGlobale > 0 ? noteGlobale.toFixed(1) : "—"}
                 </span>
@@ -314,15 +512,62 @@ export default function HotelDetail({ hotelId, onBack }) {
 
           {/* Avis */}
           <div className="detail-section">
-            <h3 className="section-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-              Avis clients
+            <div className="avis-section-header">
+              <h3 className="section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Avis clients
+                {avis.length > 0 && (
+                  <span className="avis-count-badge">{avis.length}</span>
+                )}
+              </h3>
+
+              {/* ── Bouton IA — visible uniquement si avis disponibles ── */}
               {avis.length > 0 && (
-                <span className="avis-count-badge">{avis.length}</span>
+                <button
+                  type="button"
+                  className={`ai-generate-btn ${aiLoading ? "is-loading" : ""}`}
+                  onClick={handleGenerateAIReport}
+                  disabled={aiLoading}
+                  title="Analyser tous les avis avec Claude IA"
+                >
+                  {aiLoading ? (
+                    <>
+                      <span className="ai-spinner" />
+                      Analyse en cours…
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                           strokeWidth="2" width="14" height="14">
+                        <path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 20 12 16.77 7.82 20 9 13.87 4 9l5.91-.74L12 2z"/>
+                      </svg>
+                      {aiReport ? "Régénérer le rapport IA" : "Générer un rapport IA"}
+                    </>
+                  )}
+                </button>
               )}
-            </h3>
+            </div>
+
+            {/* Erreur IA */}
+            {aiError && (
+              <div className="ai-error-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {aiError}
+              </div>
+            )}
+
+            {/* Rapport IA */}
+            {aiReport && (
+              <AIReportCard report={aiReport} onClose={handleCloseReport} />
+            )}
+
+            {/* Liste d'avis */}
             {avis.length === 0 ? (
               <div className="no-avis">
                 <span>💬</span>

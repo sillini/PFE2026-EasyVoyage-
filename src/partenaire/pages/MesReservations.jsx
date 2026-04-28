@@ -150,6 +150,8 @@ function HotelReservations({ hotel, onBack }) {
   const [searchFacture, setSearchFacture] = useState("");
   const [filterSource,  setFilterSource]  = useState("");
   const [filterStatut,  setFilterStatut]  = useState("");
+  const [dateDebut,     setDateDebut]     = useState("");   // ← NOUVEAU
+  const [dateFin,       setDateFin]       = useState("");   // ← NOUVEAU
   const [selectedResa,  setSelectedResa]  = useState(null);
 
   const [dSearch,  setDSearch]  = useState("");
@@ -174,8 +176,17 @@ function HotelReservations({ hotel, onBack }) {
 
   useEffect(() => { load(); }, [load]);
 
-  const items = data?.items || [];
-  const hasFilters = dSearch || dFacture || filterSource || filterStatut;
+  // ── Filtrage par date côté client ──────────────────────
+  // La réservation est retenue si son intervalle [date_debut, date_fin] chevauche
+  // la fenêtre [dateDebut, dateFin] sélectionnée par le partenaire.
+  const allItems = data?.items || [];
+  const items = allItems.filter(r => {
+    if (dateDebut && r.date_fin   < dateDebut) return false;  // se termine avant le début du filtre
+    if (dateFin   && r.date_debut > dateFin)   return false;  // commence après la fin du filtre
+    return true;
+  });
+
+  const hasFilters = dSearch || dFacture || filterSource || filterStatut || dateDebut || dateFin;
 
   return (
     <div className="mr-page">
@@ -253,8 +264,40 @@ function HotelReservations({ hotel, onBack }) {
           <option value="ANNULEE">Annulée</option>
         </select>
 
+        {/* ── NOUVEAU : Filtre par date (Arrivée / Départ) ── */}
+        <div className="mr-filter-dates">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13" className="mr-filter-dates-ico">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <input
+            type="date"
+            className="mr-filter-date"
+            value={dateDebut}
+            onChange={e => setDateDebut(e.target.value)}
+            title="Arrivée à partir du"
+          />
+          <span className="mr-filter-dates-sep">→</span>
+          <input
+            type="date"
+            className="mr-filter-date"
+            value={dateFin}
+            onChange={e => setDateFin(e.target.value)}
+            title="Départ jusqu'au"
+          />
+        </div>
+
         {hasFilters && (
-          <button className="mr-btn-reset" onClick={() => { setDSearch(""); setDFacture(""); setFilterSource(""); setFilterStatut(""); }}>
+          <button
+            className="mr-btn-reset"
+            onClick={() => {
+              setDSearch(""); setDFacture("");
+              setFilterSource(""); setFilterStatut("");
+              setDateDebut(""); setDateFin("");
+            }}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
               <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
             </svg>
@@ -295,7 +338,7 @@ function HotelReservations({ hotel, onBack }) {
           <table className="mr-table">
             <thead>
               <tr>
-                <th>#ID</th>
+                {/* ❌ Colonne #ID supprimée */}
                 <th>Type</th>
                 <th>Client</th>
                 <th>Email</th>
@@ -314,7 +357,7 @@ function HotelReservations({ hotel, onBack }) {
                 <tr key={`${r.source}-${r.id}`} className="mr-tr"
                   style={{ animationDelay:`${i*0.03}s` }}
                   onClick={() => setSelectedResa(r)}>
-                  <td className="mr-td-id">#{r.id}</td>
+                  {/* ❌ Cellule #ID supprimée */}
                   <td><SourceBadge source={r.source} /></td>
                   <td className="mr-td-client">{r.client_prenom} {r.client_nom}</td>
                   <td className="mr-td-email">{r.client_email}</td>

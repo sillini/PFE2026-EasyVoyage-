@@ -279,6 +279,7 @@
   width: 14px;
   height: 14px;
 }
+
 .nav-badge-red {
   background: #C0392B !important;
   color: white !important;
@@ -287,4 +288,101 @@
 @keyframes sidebarPulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); }
   50% { box-shadow: 0 0 0 5px rgba(192,57,43,0); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Carte utilisateur cliquable → redirige vers la page profil
+══════════════════════════════════════════════════════════ */
+
+/* Mode normal — la carte devient un bouton cliquable */
+.sidebar-user-clickable {
+  /* reset du bouton natif */
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+
+  /* transitions + curseur */
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-user-clickable:hover {
+  background: rgba(196, 151, 58, 0.12);
+  transform: translateX(2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-user-clickable:hover .user-avatar {
+  transform: scale(1.05);
+}
+
+.sidebar-user-clickable:active {
+  transform: translateX(1px);
+  background: rgba(196, 151, 58, 0.18);
+}
+
+/* État actif : la page profil est ouverte */
+.sidebar-user-clickable.active {
+  background: linear-gradient(
+    135deg,
+    rgba(196, 151, 58, 0.22),
+    rgba(196, 151, 58, 0.08)
+  );
+  box-shadow: inset 0 0 0 1px rgba(196, 151, 58, 0.4);
+}
+
+.sidebar-user-clickable.active .user-name {
+  color: var(--or-clair);
+}
+
+/* Flèche (>) visible au hover / quand actif */
+.sidebar-user-arrow {
+  margin-left: auto;
+  color: rgba(196, 151, 58, 0.75);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.22s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.sidebar-user-clickable:hover .sidebar-user-arrow,
+.sidebar-user-clickable.active .sidebar-user-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Avatar — transition douce */
+.sidebar-user-clickable .user-avatar {
+  transition: transform 0.22s ease;
+}
+
+/* Mode collapsed — avatar seul cliquable */
+.sidebar-user-collapsed {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+.sidebar-user-collapsed:hover {
+  background: rgba(196, 151, 58, 0.12);
+}
+.sidebar-user-collapsed:hover .user-avatar {
+  transform: scale(1.08);
+}
+.sidebar-user-collapsed.active {
+  background: rgba(196, 151, 58, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(196, 151, 58, 0.4);
+}
+.sidebar-user-collapsed .user-avatar {
+  transition: transform 0.2s;
 }

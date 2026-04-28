@@ -1,7 +1,16 @@
 import { useState } from "react";
 import "./Sidebar.css";
 
+// ══════════════════════════════════════════════════════════
+//  MENU réorganisé selon la logique métier :
+//    1. Vue d'ensemble        → Tableau de bord
+//    2. Gestion de l'offre    → Hôtels, Chambres, Promotions
+//    3. Activité commerciale  → Réservations, Finances
+//    4. Aide & outils         → Support, Agent IA
+//  (Marketing supprimé)
+// ══════════════════════════════════════════════════════════
 const MENU_ITEMS = [
+  // ── 1. Vue d'ensemble ─────────────────────────────────
   {
     id: "dashboard",
     label: "Tableau de bord",
@@ -12,6 +21,8 @@ const MENU_ITEMS = [
       </svg>
     ),
   },
+
+  // ── 2. Gestion de l'offre (ce que le partenaire vend) ──
   {
     id: "hotels",
     label: "Mes Hôtels",
@@ -44,6 +55,8 @@ const MENU_ITEMS = [
       </svg>
     ),
   },
+
+  // ── 3. Activité commerciale (ce qui est vendu / revenus) ──
   {
     id: "reservations",
     label: "Réservations",
@@ -67,17 +80,8 @@ const MENU_ITEMS = [
       </svg>
     ),
   },
-  {
-    id: "marketing",
-    label: "Marketing",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-      </svg>
-    ),
-  },
+
+  // ── 4. Aide & outils ──────────────────────────────────
   {
     id: "support",
     label: "Support",
@@ -139,8 +143,14 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
 
       {/* User & Logout */}
       <div className="sidebar-bottom">
-        {!collapsed && (
-          <div className="sidebar-user">
+        {!collapsed ? (
+          // ─── Mode normal : carte utilisateur cliquable → profil ───
+          <button
+            type="button"
+            className={`sidebar-user sidebar-user-clickable ${activePage === "profil" ? "active" : ""}`}
+            onClick={() => onNavigate && onNavigate("profil")}
+            title="Mon profil"
+          >
             <div className="user-avatar">
               {user?.nom?.[0]}{user?.prenom?.[0]}
             </div>
@@ -148,8 +158,26 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
               <span className="user-name">{user?.prenom} {user?.nom}</span>
               <span className="user-role">Partenaire</span>
             </div>
-          </div>
+            <span className="sidebar-user-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </span>
+          </button>
+        ) : (
+          // ─── Mode collapsed : avatar seul cliquable → profil ───
+          <button
+            type="button"
+            className={`sidebar-user-collapsed ${activePage === "profil" ? "active" : ""}`}
+            onClick={() => onNavigate && onNavigate("profil")}
+            title="Mon profil"
+          >
+            <div className="user-avatar">
+              {user?.nom?.[0]}{user?.prenom?.[0]}
+            </div>
+          </button>
         )}
+
         <button className="btn-logout" onClick={onLogout} title="Déconnexion">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>

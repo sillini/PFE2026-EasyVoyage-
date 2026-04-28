@@ -1,12 +1,11 @@
-// src/partenaire/services/api.js — VERSION CORRIGÉE
+// src/partenaire/services/api.js — VERSION CORRIGÉE + IA DESCRIPTIONS (Hôtel + Chambre)
 //
 // CORRECTIONS :
-//   ✅ hotelsApi.mesHotels() → GET /hotels/mes-hotels  (seulement hôtels du partenaire connecté)
-//   ✅ hotelsApi.list()      → GET /hotels             (tous les hôtels, NE PAS utiliser côté partenaire)
-//
-// FICHIERS À MODIFIER côté partenaire :
-//   MesHotels.jsx    : remplacer hotelsApi.list()  →  hotelsApi.mesHotels()
-//   ChambresPage.jsx : remplacer hotelsApi.list()  →  hotelsApi.mesHotels()
+//   ✅ hotelsApi.mesHotels() → GET /hotels/mes-hotels
+//   ✅ hotelsApi.list()      → GET /hotels  (NE PAS utiliser côté partenaire)
+//   ✅ hotelsApi.generateDescriptionAI()    → POST /hotels/description/generate-ai
+//   ✅ chambresApi.generateDescriptionAI()  → POST /chambres/description/generate-ai
+//      (amélioration IA de la description d'une chambre dans ChambreModal)
 
 const CLOUDINARY_CLOUD  = "dzfznxn0q";
 const CLOUDINARY_PRESET = "Image_Hotel";
@@ -89,6 +88,15 @@ export const hotelsApi = {
 
   getAvis: (id) =>
     fetch(`${BASE}/hotels/${id}/avis`, { headers: authHeaders() }).then(handleResponse),
+
+  // ✨ IA — Améliorer la description d'un hôtel via Claude
+  // Utilisé dans : HotelModal.jsx (ajout + modification)
+  generateDescriptionAI: (payload) =>
+    fetch(`${BASE}/hotels/description/generate-ai`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(payload),
+    }).then(handleResponse),
 };
 
 // ── Disponibilités API ────────────────────────────────────
@@ -126,6 +134,27 @@ export const chambresApi = {
   delete: (hotelId, chambreId) =>
     fetch(`${BASE}/hotels/${hotelId}/chambres/${chambreId}`, {
       method: "DELETE", headers: authHeaders(),
+    }).then(handleResponse),
+
+  // ✨ IA — Améliorer la description d'une chambre via Claude
+  // Utilisé dans : ChambreModal.jsx (ajout + modification)
+  //
+  // payload attendu :
+  //   {
+  //     type_chambre: string,        // obligatoire (ex: "Deluxe", "Familiale")
+  //     capacite: number,            // obligatoire (1-20)
+  //     nb_chambres?: number,
+  //     description_brute: string,   // obligatoire
+  //     hotel_nom?: string,
+  //     hotel_etoiles?: number (1-5)
+  //   }
+  //
+  // Retourne : { description_amelioree: string }
+  generateDescriptionAI: (payload) =>
+    fetch(`${BASE}/chambres/description/generate-ai`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(payload),
     }).then(handleResponse),
 };
 

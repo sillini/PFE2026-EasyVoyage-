@@ -471,3 +471,139 @@
   .mr-kpi-strip { grid-template-columns: 1fr; }
   .mr-hotels-grid { grid-template-columns: 1fr; }
 }
+/* ══════════════════════════════════════════════════════════════════════════
+   👉 AJOUT À FAIRE : À coller À LA FIN de
+   src/partenaire/pages/MesReservations.css
+   
+   Style du nouveau filtre par date (Arrivée → Départ) ajouté dans la toolbar.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Groupe filtre dates ─────────────────────────────────── */
+.mr-filter-dates {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.mr-filter-dates:focus-within {
+  border-color: var(--sky);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(26, 63, 99, 0.08);
+}
+
+.mr-filter-dates-ico {
+  color: var(--text-4);
+  flex-shrink: 0;
+}
+
+.mr-filter-dates-sep {
+  color: var(--text-4);
+  font-size: 0.8rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.mr-filter-date {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 9px 0;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-1);
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.mr-filter-date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.mr-filter-date::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* ── Responsive mobile : les dates passent sur leur propre ligne ── */
+@media (max-width: 900px) {
+  .mr-filter-dates {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .mr-filter-date {
+    flex: 1;
+    min-width: 0;
+  }
+}
+/* ── KPI globaux (Hôtels, Réservations, CA Total) ────────── */
+.mr-kpi-val {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.85rem !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+ 
+/* ── Stats vue détail hôtel (Total, Clients, Visiteurs) ──── */
+.mr-sc-val {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.5rem !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+ 
+/* ── KPI dans la carte hôtel (11, 3, 8, 5600, 70, 27, etc.) ── */
+.mr-hkpi-val {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+ 
+/* ── Compteur de résultats (pill "11 résultats") ─────────── */
+.mr-rp-num {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  font-variant-numeric: tabular-nums;
+}
+ 
+/* ── Montant dans le modal de détail ─────────────────────── */
+.mr-modal-montant strong {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 1.5rem !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+ 
+.mr-prix-strong {
+  font-family: 'Lato', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  font-variant-numeric: tabular-nums;
+}
+ 
+/* ── Chiffres du tableau (montants, nuits, etc.) ─────────── */
+.mr-td-montant {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.1px;
+}
+ 
+.mr-nuits-badge {
+  font-variant-numeric: tabular-nums;
+}
+ 
+/* ── Références (FAC-XXXX, VCH-XXXX) ─────────────────────── */
+.mr-ref-chip {
+  font-variant-numeric: tabular-nums;
+}

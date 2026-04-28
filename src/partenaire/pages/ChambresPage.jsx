@@ -463,9 +463,13 @@ export default function ChambresPage() {
       </div>
 
       {chambreModal.open && (
-        <ChambreModal chambre={chambreModal.data} typesChambres={typesChambres}
+        <ChambreModal
+          chambre={chambreModal.data}
+          typesChambres={typesChambres}
+          hotel={selectedHotel}
           onClose={() => setChambreModal({ open:false, data:null })}
-          onSave={handleSaveChambre} />
+          onSave={handleSaveChambre}
+        />
       )}
       {tarifModal.open && (
         <TarifModal tarif={tarifModal.data} typesReservation={typesReservation}
