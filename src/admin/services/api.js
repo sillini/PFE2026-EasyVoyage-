@@ -113,6 +113,70 @@ export const partenairesApi = {
     }).then(handleResponse),
 };
 
+// ══════════════════════════════════════════════════════════
+//  ✨ NEW — Administrateurs (Super Admin uniquement)
+// ══════════════════════════════════════════════════════════
+export const adminsApi = {
+  // ── Étape 1 : envoyer OTP ───────────────────────────
+  invite: (email) =>
+    fetch(`${BASE}/admin/admins/invite`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify({ email }),
+    }).then(handleResponse),
+
+  // ── Étape 2 : vérifier OTP ──────────────────────────
+  verifyCode: (email, code) =>
+    fetch(`${BASE}/admin/admins/verify-code`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify({ email, code }),
+    }).then(handleResponse),
+
+  // ── Étape 3 : créer le compte ───────────────────────
+  create: (data) =>
+    fetch(`${BASE}/admin/admins/create`, {
+      method:  "POST",
+      headers: authHeaders(),
+      body:    JSON.stringify(data),
+    }).then(handleResponse),
+
+  // ── Liste avec filtres ──────────────────────────────
+  list: (params = {}) => {
+    const q = new URLSearchParams({ page: 1, per_page: 100, ...params });
+    return fetch(`${BASE}/admin/admins?${q}`, { headers: authHeaders() })
+      .then(handleResponse);
+  },
+
+  // ── Détail ──────────────────────────────────────────
+  get: (id) =>
+    fetch(`${BASE}/admin/admins/${id}`, { headers: authHeaders() })
+      .then(handleResponse),
+
+  // ── Activer / désactiver ────────────────────────────
+  toggle: (id, actif) =>
+    fetch(`${BASE}/admin/admins/${id}/toggle`, {
+      method:  "PATCH",
+      headers: authHeaders(),
+      body:    JSON.stringify({ actif }),
+    }).then(handleResponse),
+
+  // ── Modifier (nom, prénom, téléphone) ───────────────
+  update: (id, data) =>
+    fetch(`${BASE}/admin/admins/${id}`, {
+      method:  "PUT",
+      headers: authHeaders(),
+      body:    JSON.stringify(data),
+    }).then(handleResponse),
+
+  // ── Supprimer définitivement ────────────────────────
+  delete: (id) =>
+    fetch(`${BASE}/admin/admins/${id}`, {
+      method:  "DELETE",
+      headers: authHeaders(),
+    }).then(handleResponse),
+};
+
 // ── Marketing ─────────────────────────────────────────────
 export const marketingAdminApi = {
   list: (params = {}) => {
@@ -284,6 +348,7 @@ export const adminSupportApi = {
       body:    JSON.stringify({ contenu }),
     }).then(handleResponse),
 
+  // ── Notifications ────────────────────────────────────
   getNotifications: () =>
     fetch(`${BASE}/support/notifications`, {
       headers: authHeaders(),
@@ -300,15 +365,27 @@ export const adminSupportApi = {
       method:  "PATCH",
       headers: authHeaders(),
     }).then(handleResponse),
+
+  // ✨ Compteur léger (pour polling sidebar)
+  unreadCount: () =>
+    fetch(`${BASE}/support/notifications/unread-count`, {
+      headers: authHeaders(),
+    }).then(handleResponse),
+
+  // ✨ Supprimer une notif
+  deleteNotification: (id) =>
+    fetch(`${BASE}/support/notifications/${id}`, {
+      method:  "DELETE",
+      headers: authHeaders(),
+    }).then(handleResponse),
+
+  // ✨ Vider toutes les notifs lues
+  deleteAllRead: () =>
+    fetch(`${BASE}/support/notifications/read/all`, {
+      method:  "DELETE",
+      headers: authHeaders(),
+    }).then(handleResponse),
 };
-
-
-
-
-// ══════════════════════════════════════════════════════════
-//  AJOUTER CE BLOC dans src/admin/services/api.js
-//  (après les autres exports, ex: après marketingAdminApi)
-// ══════════════════════════════════════════════════════════
 
 // ── Promotions Admin ──────────────────────────────────────
 export const promotionsAdminApi = {

@@ -26,6 +26,8 @@ import AdminHotelsVedettes     from "./admin/pages/AdminHotelsVedettes";
 import AdminPromotions         from "./admin/pages/AdminPromotions";
 import FiscalConfig            from "./admin/pages/FiscalConfig";
 import AdminVideoCampaigns     from "./admin/pages/video-campaigns/AdminVideoCampaigns";
+import AdminNotifications      from "./admin/pages/AdminNotifications";
+import AdminAdministrateurs    from "./admin/pages/AdminAdministrateurs";   // ✨ NEW
 
 import Sidebar               from "./partenaire/components/layout/Sidebar";
 import Topbar                from "./partenaire/components/layout/Topbar";
@@ -54,6 +56,18 @@ export default function App() {
     const savedRole = localStorage.getItem("role");
     if (token && savedRole) fetchMe(token, savedRole);
   }, []);
+
+  // ✨ NOUVEAU — Titre dynamique de l'onglet selon le rôle utilisateur
+  useEffect(() => {
+    let titre;
+    switch (role) {
+      case "ADMIN":      titre = "EasyVoyage — Espace Admin";      break;
+      case "PARTENAIRE": titre = "EasyVoyage — Espace Partenaire"; break;
+      case "CLIENT":     titre = "EasyVoyage — Mon compte";        break;
+      default:           titre = "EasyVoyage — Voyages & Hôtels";
+    }
+    document.title = titre;
+  }, [role]);
 
   const fetchMe = async (token, savedRole) => {
     try {
@@ -87,16 +101,9 @@ export default function App() {
   };
 
   // ✨ Déclencheur du modal de connexion depuis l'Agent IA
-  // Essaye plusieurs stratégies dans l'ordre pour maximiser la compat avec
-  // l'implementation existante de LandingPage :
-  //   1. Événement custom "open-login-modal" (si LandingPage l'écoute)
-  //   2. Clic sur un élément marqué [data-login-trigger]
-  //   3. Clic sur un bouton dont le texte contient "se connecter" (fallback)
   const handleOpenLoginModal = () => {
-    // 1. Dispatch l'événement custom
     window.dispatchEvent(new CustomEvent("open-login-modal"));
 
-    // 2. Essaye de trouver un trigger explicite
     const trigger = document.querySelector("[data-login-trigger]");
     if (trigger) {
       trigger.click();
@@ -104,7 +111,6 @@ export default function App() {
       return;
     }
 
-    // 3. Fallback : cherche un bouton "Se connecter" dans la landing
     const buttons = Array.from(document.querySelectorAll("button, a"));
     const loginBtn = buttons.find((el) => {
       const txt = (el.textContent || "").trim().toLowerCase();
@@ -167,6 +173,20 @@ export default function App() {
         case "support":         return <AdminSupport currentUserId={user?.id}/>;
         case "agent":           return <AdminAgentIA />;
         case "profil":          return <AdminProfil />;
+
+        // Centre de notifications
+        case "notifications":   return <AdminNotifications onNavigate={setActivePage} />;
+
+        // ✨ NEW — Gestion administrateurs (Super Admin uniquement)
+        case "administrateurs":
+          // Garde-fou côté frontend : si quelqu'un tape l'URL/state à la main
+          // mais n'est pas super admin, on redirige vers le dashboard.
+          // Le backend bloque aussi avec 403 (require_super_admin).
+          if (!user?.is_super_admin) {
+            return <AdminDashboard onNavigate={setActivePage} user={user} />;
+          }
+          return <AdminAdministrateurs currentUser={user} />;
+
         default:                return <AdminDashboard onNavigate={setActivePage} user={user} />;  // ← MODIFIÉ
       }
     };

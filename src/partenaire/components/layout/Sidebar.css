@@ -35,18 +35,19 @@
   overflow: hidden;
 }
 
-.sidebar.collapsed .sidebar-logo-img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-
 .sidebar-logo-img {
-  width: 160px;
-  height: 56px;
+  width: 250px;          /* 🔧 NOUVEAU */
+  height: 60px;          /* 🔧 NOUVEAU */
+  max-width: 100%;
   object-fit: contain;
-  flex-shrink: 0;
-  mix-blend-mode: lighten;
+  transition: all 0.3s;
+}
+ 
+/* Mode collapsed → on bascule vers l'icône seule */
+.sidebar.collapsed .sidebar-logo-img {
+  content: url("/logo_icon.png");
+  width: 38px;
+  height: 38px;
 }
 
 .sidebar-logo-text {

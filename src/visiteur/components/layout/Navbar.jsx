@@ -63,16 +63,17 @@ export default function Navbar({
         <div className="ev-nav-inner">
 
           {/* Logo */}
-          <div className="ev-logo" onClick={()=>handleNav("top")} style={{cursor:"pointer"}}>
-            <div className="ev-logo-icon">
-              <svg viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="16" r="14" fill="#1A3F63" stroke="#C4973A" strokeWidth="2"/>
-                <path d="M8 20 Q16 8 24 20" stroke="#C4973A" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-                <circle cx="16" cy="13" r="3" fill="#C4973A"/>
-              </svg>
-            </div>
-            <span className="ev-logo-text">Easy<span>Voyage</span></span>
-          </div>
+<div
+  className="ev-logo"
+  onClick={() => handleNav("top")}
+  style={{ cursor: "pointer" }}
+>
+  <img
+    src="/logo_principale.png"
+    alt="EasyVoyage"
+    className="ev-logo-img"
+  />
+</div>
 
           {/* Liens */}
           <div className="ev-nav-links">

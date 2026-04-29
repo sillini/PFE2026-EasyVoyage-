@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { adminSupportApi } from "../../services/api";
 import "./AdminSidebar.css";
 
 const MENU_TOP = [
@@ -79,6 +80,17 @@ const MENU_TOP = [
       </svg>
     ),
   },
+  // ✨ NEW : Administrateurs (visible UNIQUEMENT pour Super Admin)
+  {
+    id: "administrateurs",
+    label: "Administrateurs",
+    superAdminOnly: true,   // ← clé spéciale pour le filtrage
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+  },
 ];
 
 const MENU_FINANCE = [
@@ -128,6 +140,17 @@ const MENU_FINANCE = [
 ];
 
 const MENU_BOTTOM = [
+  // Notifications (en tête de la section CONFIGURATION)
+  {
+    id: "notifications",
+    label: "Notifications",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    ),
+  },
   {
     id: "hotels-vedettes",
     label: "Mise en avant",
@@ -174,7 +197,6 @@ const MENU_BOTTOM = [
 
 /* ══════════════════════════════════════════════════════════
    Sous-items du groupe Marketing / Campagnes
-   ← "video-campaigns" ajouté ici
 ══════════════════════════════════════════════════════════ */
 const MARKETING_ITEMS = [
   {
@@ -196,7 +218,6 @@ const MARKETING_ITEMS = [
       </svg>
     ),
   },
-  // ── NOUVEAU ──────────────────────────────────────────
   {
     id: "video-campaigns",
     label: "Vidéo Campaigns",
@@ -218,10 +239,12 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
   const [collapsed,    setCollapsed]    = useState(false);
   const [mktOpen,      setMktOpen]      = useState(MARKETING_IDS.includes(activePage));
   const [pendingCount, setPendingCount] = useState(0);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
 
   const isMarketingActive = MARKETING_IDS.includes(activePage);
   const isProfilActive    = activePage === "profil";
 
+  // ── Polling : promotions PENDING ──────────────────────
   useEffect(() => {
     const fetchPending = async () => {
       try {
@@ -243,8 +266,37 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
     return () => clearInterval(interval);
   }, []);
 
+  // ── Polling notifications non lues ────────────────────
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        // Essai 1 : endpoint léger (si PATCH 3 backend appliqué)
+        if (typeof adminSupportApi.unreadCount === "function") {
+          try {
+            const data = await adminSupportApi.unreadCount();
+            setUnreadNotifs(data?.unread ?? 0);
+            return;
+          } catch {
+            // fallback ci-dessous
+          }
+        }
+        // Fallback : compter depuis la liste complète
+        const data = await adminSupportApi.getNotifications();
+        const list = data?.items || [];
+        setUnreadNotifs(list.filter(n => !n.lue).length);
+      } catch {
+        // silencieux
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30_000);
+    return () => clearInterval(interval);
+  }, [activePage]); // refresh aussi quand on navigue (ex: après avoir lu)
+
   const renderItem = (item) => {
-    const showPendingBadge = item.id === "promotions" && pendingCount > 0;
+    const showPendingBadge = item.id === "promotions"    && pendingCount > 0;
+    const showUnreadBadge  = item.id === "notifications" && unreadNotifs > 0;
+
     return (
       <button
         key={item.id}
@@ -254,17 +306,28 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
       >
         <span className="adm-nav-icon" style={{ position: "relative" }}>
           {item.icon}
-          {showPendingBadge && collapsed && (
+          {(showPendingBadge || showUnreadBadge) && collapsed && (
             <span className="adm-nav-dot-badge" />
           )}
         </span>
         {!collapsed && (
           <>
             <span className="adm-nav-label">{item.label}</span>
+
+            {/* Badge promotions PENDING */}
             {showPendingBadge && (
               <span className="adm-pending-badge">{pendingCount}</span>
             )}
-            {item.badge && !showPendingBadge && (
+
+            {/* Badge notifications non lues (rouge) */}
+            {showUnreadBadge && (
+              <span className="adm-pending-badge adm-unread-badge">
+                {unreadNotifs > 99 ? "99+" : unreadNotifs}
+              </span>
+            )}
+
+            {/* Badge "Beta" etc. — uniquement si pas d'autre badge */}
+            {item.badge && !showPendingBadge && !showUnreadBadge && (
               <span className="adm-badge">{item.badge}</span>
             )}
           </>
@@ -274,7 +337,7 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
     );
   };
 
-  // ✅ NOUVEAU : handler navigation vers le profil admin
+  // Handler navigation vers le profil admin
   const handleProfilClick = () => {
     onNavigate("profil");
   };
@@ -284,7 +347,11 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
       {/* ── Logo ── */}
       <div className="adm-logo">
-        <img src="/logo_final.png" alt="EasyVoyage" className="adm-logo-img" />
+        <img
+          src="/logo_principale.png"
+          alt="EasyVoyage"
+          className="adm-logo-img"
+        />
         {!collapsed && (
           <div className="adm-role-tag">
             <span className="adm-role-dot" />
@@ -297,7 +364,10 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
       <nav className="adm-nav">
 
         {!collapsed && <p className="adm-section-label">GESTION</p>}
-        {MENU_TOP.map(renderItem)}
+        {/* ✨ Filtrage : on cache les entrées superAdminOnly si pas Super Admin */}
+        {MENU_TOP
+          .filter(item => !item.superAdminOnly || user?.is_super_admin)
+          .map(renderItem)}
 
         {!collapsed && <p className="adm-section-label">FINANCE & FACTURATION</p>}
         {MENU_FINANCE.map(renderItem)}
@@ -356,8 +426,6 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
 
       {/* ── Utilisateur + Logout ── */}
       <div className="adm-bottom">
-        {/* ✅ MODIFIÉ : la zone utilisateur est maintenant un bouton cliquable
-             qui redirige vers la page "profil" */}
         {!collapsed && (
           <button
             type="button"
@@ -370,9 +438,10 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
             </div>
             <div className="adm-user-info">
               <span className="adm-user-name">{user?.prenom} {user?.nom}</span>
-              <span className="adm-user-role">Administrateur</span>
+              <span className="adm-user-role">
+                {user?.is_super_admin ? "Super Administrateur" : "Administrateur"}
+              </span>
             </div>
-            {/* Petite flèche pour indiquer que c'est cliquable */}
             <span className="adm-user-arrow" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
                    width="14" height="14">
@@ -383,7 +452,6 @@ export default function AdminSidebar({ activePage, onNavigate, user, onLogout })
           </button>
         )}
 
-        {/* En mode collapsed, l'avatar seul reste cliquable vers profil */}
         {collapsed && (
           <button
             type="button"

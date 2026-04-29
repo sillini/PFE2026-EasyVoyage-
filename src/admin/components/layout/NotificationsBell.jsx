@@ -8,6 +8,8 @@
  *   - Animation pulse à l'arrivée d'une nouvelle notif
  *   - Click → marque lu + redirige selon le type
  *   - Bouton "Tout marquer lu"
+ *   - ✨ NEW: Bouton "Voir toutes les notifications" (page dédiée)
+ *   - ✨ NEW: Icônes complètes pour TOUS les types
  */
 import { useState, useEffect, useRef, useCallback } from "react";
 import { adminSupportApi } from "../../services/api";
@@ -15,6 +17,9 @@ import "./NotificationsBell.css";
 
 const POLL_MS = 30_000;
 
+// ══════════════════════════════════════════════════════════
+//  ROUTAGE selon le type de notification
+// ══════════════════════════════════════════════════════════
 function targetPageForType(type) {
   switch (type) {
     case "NOUVEAU_MESSAGE":
@@ -42,7 +47,11 @@ function targetPageForType(type) {
   }
 }
 
+// ══════════════════════════════════════════════════════════
+//  ICÔNES COMPLÈTES par type
+// ══════════════════════════════════════════════════════════
 function iconForType(type) {
+  // Support / Messages
   if (type?.includes("MESSAGE") || type?.includes("SUPPORT") || type?.includes("CONVERSATION")) {
     return {
       color: "blue",
@@ -53,6 +62,7 @@ function iconForType(type) {
       ),
     };
   }
+  // Promotions
   if (type?.includes("PROMOTION")) {
     return {
       color: "amber",
@@ -64,43 +74,61 @@ function iconForType(type) {
       ),
     };
   }
+  // Retrait / paiement (FINANCE)
   if (type?.includes("RETRAIT") || type?.includes("PAIEMENT")) {
-    return {
-      color: "purple",
-      svg: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="12" y1="1" x2="12" y2="23" />
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-        </svg>
-      ),
-    };
-  }
-  if (type?.includes("PARTENAIRE")) {
     return {
       color: "green",
       svg: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-          <circle cx="8.5" cy="7" r="4" />
-          <line x1="20" y1="8" x2="20" y2="14" />
-          <line x1="23" y1="11" x2="17" y2="11" />
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
         </svg>
       ),
     };
   }
+  // Demande partenaire
+  if (type?.includes("PARTENAIRE")) {
+    return {
+      color: "purple",
+      svg: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      ),
+    };
+  }
+  // Réservation
   if (type?.includes("RESERVATION")) {
     return {
       color: "teal",
       svg: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
         </svg>
       ),
     };
   }
+  // Nouveau client
+  if (type?.includes("CLIENT")) {
+    return {
+      color: "red",
+      svg: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      ),
+    };
+  }
+  // Default
   return {
     color: "slate",
     svg: (
@@ -112,19 +140,22 @@ function iconForType(type) {
   };
 }
 
-function timeAgo(dateStr) {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "—";
-  const diff = (Date.now() - d.getTime()) / 1000;
-  if (diff < 60)        return "à l'instant";
-  if (diff < 3600)      return `il y a ${Math.floor(diff / 60)} min`;
-  if (diff < 86400)     return `il y a ${Math.floor(diff / 3600)} h`;
-  if (diff < 86400 * 2) return "hier";
-  if (diff < 86400 * 7) return `il y a ${Math.floor(diff / 86400)} j`;
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+// ══════════════════════════════════════════════════════════
+//  Helper temps relatif
+// ══════════════════════════════════════════════════════════
+function timeAgo(d) {
+  if (!d) return "";
+  const diff = Date.now() - new Date(d);
+  if (diff < 60000)    return "À l'instant";
+  if (diff < 3600000)  return `${Math.floor(diff/60000)} min`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)} h`;
+  if (diff < 604800000) return `${Math.floor(diff/86400000)} j`;
+  return new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
 }
 
+// ══════════════════════════════════════════════════════════
+//  COMPONENT
+// ══════════════════════════════════════════════════════════
 export default function NotificationsBell({ onNavigate }) {
   const [open,    setOpen]    = useState(false);
   const [items,   setItems]   = useState([]);
@@ -202,6 +233,12 @@ export default function NotificationsBell({ onNavigate }) {
     catch (err) { console.error(err); load(); }
   };
 
+  // ✨ NEW : ouvre la page dédiée Notifications
+  const handleVoirToutes = () => {
+    onNavigate?.("notifications");
+    setOpen(false);
+  };
+
   return (
     <div className="adm-nb-wrap">
       <button
@@ -266,7 +303,8 @@ export default function NotificationsBell({ onNavigate }) {
               </div>
             )}
 
-            {items.map((n) => {
+            {/* On affiche les 8 plus récentes dans la cloche */}
+            {items.slice(0, 8).map((n) => {
               const ico = iconForType(n.type);
               return (
                 <button
@@ -296,9 +334,9 @@ export default function NotificationsBell({ onNavigate }) {
               <button
                 type="button"
                 className="adm-nb-link"
-                onClick={() => { onNavigate?.("support"); setOpen(false); }}
+                onClick={handleVoirToutes}
               >
-                Aller au support →
+                Voir toutes les notifications →
               </button>
             </div>
           )}

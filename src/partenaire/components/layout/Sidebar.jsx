@@ -113,8 +113,12 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       {/* Logo */}
       <div className="sidebar-logo">
-        <img src="/logo_final.png" alt="EasyVoyage" className="sidebar-logo-img" />
-      </div>
+  <img
+    src="/logo_principale.png"
+    alt="EasyVoyage"
+    className="sidebar-logo-img"
+  />
+</div>
 
       {/* Navigation */}
       <nav className="sidebar-nav">

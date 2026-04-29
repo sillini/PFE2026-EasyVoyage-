@@ -10,6 +10,7 @@ const PAGE_META = {
   partenaires:           { title: "Partenaires",             subtitle: "Gestion des comptes partenaires" },
   "demandes-partenaire": { title: "Demandes partenaires",    subtitle: "Demandes d'inscription reçues depuis la landing page" },
   clients:               { title: "Clients",                 subtitle: "Gestion des comptes clients" },
+  administrateurs:       { title: "Administrateurs",         subtitle: "Gestion des comptes administrateurs (Super Admin uniquement)" }, // ✨ NEW
   // ── Finance & Facturation ────────────────────────────
   finances:              { title: "Finances",                subtitle: "Revenus, commissions partenaires & facturation" },
   promotions:            { title: "Promotions",              subtitle: "Validation des promotions soumises par les partenaires" },
@@ -20,6 +21,7 @@ const PAGE_META = {
   catalogue:             { title: "Catalogues Email",        subtitle: "Créez et envoyez des catalogues personnalisés à vos contacts" },
   "video-campaigns":     { title: "Vidéo Campaigns",         subtitle: "Générez et envoyez des campagnes vidéo marketing automatisées" },
   // ── Configuration ────────────────────────────────────
+  notifications:         { title: "Notifications",           subtitle: "Centre de notifications — toutes les activités de la plateforme" },
   "hotels-vedettes":     { title: "Mise en avant",           subtitle: "Hôtels et villes affichés sur la page client" },
   "hero-slides":         { title: "Hero Slides",             subtitle: "Gestion du carousel de la page d'accueil" },
   support:               { title: "Support",                 subtitle: "Conversations avec les partenaires" },
@@ -36,6 +38,9 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
   });
 
+  // ✨ Badge ADMIN ou SUPER ADMIN selon le rôle
+  const isSuper = !!user?.is_super_admin;
+
   return (
     <header className="adm-topbar">
       <div className="adm-topbar-left">
@@ -43,7 +48,7 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
-          ADMIN
+          {isSuper ? "SUPER ADMIN" : "ADMIN"}
         </div>
         <div className="adm-topbar-titles">
           <h1 className="adm-topbar-title">{title}</h1>
@@ -69,7 +74,9 @@ export default function AdminTopbar({ activePage, user, onNavigate }) {
           </div>
           <div className="adm-topbar-user-info">
             <span className="adm-topbar-name">{user?.prenom} {user?.nom}</span>
-            <span className="adm-topbar-role">Administrateur</span>
+            <span className="adm-topbar-role">
+              {isSuper ? "Super Administrateur" : "Administrateur"}
+            </span>
           </div>
         </div>
       </div>

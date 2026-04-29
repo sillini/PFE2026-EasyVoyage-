@@ -28,13 +28,15 @@
 }
 
 .adm-logo-img {
-  width: 148px;
-  height: 52px;
+  width: 250px;          /* 🔧 NOUVEAU : largeur logo principal */
+  height: 60px;          /* 🔧 NOUVEAU : hauteur logo principal */
+  max-width: 100%;       /* sécurité responsive */
   object-fit: contain;
-  mix-blend-mode: lighten;
+  /* mix-blend-mode: lighten;  ← retiré : le nouveau logo a déjà un fond noir */
   transition: all 0.3s;
 }
 .adm-sidebar.collapsed .adm-logo-img {
+  content: url("/logo_icon.png");  /* swap vers la version icône */
   width: 38px;
   height: 38px;
 }
@@ -554,4 +556,46 @@
 }
 .adm-user-collapsed:hover .adm-avatar {
   transform: scale(1.08);
+}
+
+
+
+/* ════════════════════════════════════════════════════════════
+   AJOUT à src/admin/components/layout/AdminSidebar.css
+   ════════════════════════════════════════════════════════════
+   Colle ces 2 règles N'IMPORTE OÙ dans ton AdminSidebar.css existant
+   (par exemple juste APRÈS la règle .adm-pending-badge déjà présente).
+
+   ⚠️ Si tu n'as pas encore .adm-pending-badge, c'est qu'elle est définie
+   ailleurs — pas grave, ces 2 règles sont auto-suffisantes.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Badge ROUGE pour notifications non lues ───────────── */
+.adm-unread-badge {
+  background: linear-gradient(135deg, #C0392B, #E74C3C) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+  animation: adm-unread-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes adm-unread-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(192, 57, 43, 0.6),
+                0 0 0 3px rgba(192, 57, 43, 0.12);
+  }
+}
+
+/* ── (Si pas déjà défini ailleurs) Petit dot rouge en mode collapsed ── */
+.adm-nav-dot-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #C0392B;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #0F2235, 0 0 8px rgba(192, 57, 43, 0.6);
 }

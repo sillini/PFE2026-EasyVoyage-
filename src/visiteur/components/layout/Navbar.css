@@ -39,16 +39,35 @@
   display: flex; align-items: center;
   height: 66px; gap: 32px;
 }
-
-/* Logo */
-.ev-logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
-.ev-logo-icon svg { width:36px; height:36px; }
-.ev-logo-text {
-  font-family:'Cormorant Garamond',serif; font-size:1.4rem;
-  font-weight:700; color:#0F2235; letter-spacing:-0.3px;
+.ev-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-.ev-logo-text span { color:#C4973A; }
-
+ 
+/* 🔧 NOUVEAU — image du logo */
+.ev-logo-img {
+  height: 60px;          /* hauteur fixe = 60 px (cohérent avec sidebar) */
+  width: auto;           /* largeur auto pour conserver le ratio */
+  max-width: 250px;      /* plafond de sécurité */
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s;
+}
+ 
+.ev-logo:hover .ev-logo-img {
+  transform: scale(1.03);
+}
+ 
+/* 🔧 Adaptation mobile — logo un peu plus petit */
+@media (max-width: 768px) {
+  .ev-logo-img {
+    height: 44px;
+    max-width: 180px;
+  }
+}
 /* Nav links */
 .ev-nav-links {
   display:flex; gap:2px; margin-left:auto;
