@@ -1,16 +1,18 @@
 import "./Topbar.css";
+import NotificationsBell from "./NotificationsBell.jsx";
 
 const PAGE_TITLES = {
-  dashboard:    { title: "Tableau de bord",    subtitle: "Vue d'ensemble de votre activité" },
-  hotels:       { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
-  chambres:     { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
-  promotions:   { title: "Mes Promotions",     subtitle: "Créez et gérez les offres spéciales de vos hôtels" },
-  reservations: { title: "Réservations",       subtitle: "Consultez les réservations de vos établissements" },
-  finances:     { title: "Finances",           subtitle: "Vos revenus, réservations et demandes de retrait" },
-  marketing:    { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },
-  support:      { title: "Support",            subtitle: "Vos échanges avec l'équipe" },
-  agent:        { title: "Agent IA",           subtitle: "Votre assistant intelligent" },
-  profil:       { title: "Mon Profil",         subtitle: "Gérer vos informations personnelles" },
+  dashboard:     { title: "Tableau de bord",    subtitle: "Vue d'ensemble de votre activité" },
+  hotels:        { title: "Mes Hôtels",         subtitle: "Gérez vos établissements" },
+  chambres:      { title: "Chambres & Tarifs",  subtitle: "Gérez vos chambres et grilles tarifaires" },
+  promotions:    { title: "Mes Promotions",     subtitle: "Créez et gérez les offres spéciales de vos hôtels" },
+  reservations:  { title: "Réservations",       subtitle: "Consultez les réservations de vos établissements" },
+  finances:      { title: "Finances",           subtitle: "Vos revenus, réservations et demandes de retrait" },
+  marketing:     { title: "Marketing",          subtitle: "Vos campagnes promotionnelles" },
+  support:       { title: "Support",            subtitle: "Vos échanges avec l'équipe" },
+  agent:         { title: "Agent IA",           subtitle: "Votre assistant intelligent" },
+  notifications: { title: "Notifications",      subtitle: "Toutes vos alertes et mises à jour" },  // ← AJOUT
+  profil:        { title: "Mon Profil",         subtitle: "Gérer vos informations personnelles" },
 };
 
 export default function Topbar({ activePage, user, onNavigate }) {
@@ -28,13 +30,10 @@ export default function Topbar({ activePage, user, onNavigate }) {
       <div className="topbar-right">
         <div className="topbar-date">{dateStr}</div>
         <div className="topbar-divider" />
-        <button className="topbar-notif">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span className="notif-dot" />
-        </button>
+
+        {/* ✨ NEW : Cloche de notifications avec polling auto */}
+        <NotificationsBell onNavigate={onNavigate} />
+
         <div
           className={`topbar-user ${activePage === "profil" ? "active" : ""}`}
           onClick={() => onNavigate && onNavigate("profil")}

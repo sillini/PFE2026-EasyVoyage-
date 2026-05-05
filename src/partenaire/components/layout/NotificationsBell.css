@@ -1,0 +1,356 @@
+/* ═══════════════════════════════════════════════════════════════
+   PARTENAIRE NOTIFICATIONS BELL — Design cohérent topbar
+   Préfixe : pb- (Partenaire Bell)
+═══════════════════════════════════════════════════════════════ */
+
+.pb-nb-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Bouton cloche ─────────────────────────────────────── */
+.pb-nb-trigger {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  background: #F5F7FA;
+  border: 1px solid #EEF2F8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #8A9BB0;
+  transition: all 0.2s;
+}
+
+.pb-nb-trigger:hover {
+  background: #EEF2F8;
+  color: #2B5F8E;
+  border-color: rgba(43,95,142,0.2);
+}
+
+.pb-nb-trigger-open {
+  background: rgba(43,95,142,0.08);
+  border-color: #2B5F8E;
+  color: #1A3F63;
+}
+
+.pb-nb-trigger svg { width: 18px; height: 18px; }
+
+/* Animation pulse à l'arrivée d'une nouvelle notif */
+.pb-nb-pulse {
+  animation: pb-pulse-notif 1.6s ease-in-out;
+}
+@keyframes pb-pulse-notif {
+  0%, 100% { transform: scale(1); }
+  20%      { transform: scale(1.15); }
+  40%      { transform: scale(0.95); }
+  60%      { transform: scale(1.08); }
+  80%      { transform: scale(0.98); }
+}
+
+/* ── Badge compteur ────────────────────────────────────── */
+.pb-nb-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: linear-gradient(135deg, #C0392B, #E74C3C);
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(192,57,43,0.4);
+  animation: pb-badge-pop 0.3s cubic-bezier(0.36, 1.4, 0.5, 1);
+}
+@keyframes pb-badge-pop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Panel dropdown ────────────────────────────────────── */
+.pb-nb-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 380px;
+  max-height: 540px;
+  background: #fff;
+  border: 1px solid #E4EAF3;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(15,34,53,0.14), 0 4px 12px rgba(15,34,53,0.08);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pb-panel-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes pb-panel-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .pb-nb-panel {
+    width: calc(100vw - 32px);
+    right: -8px;
+  }
+}
+
+/* ── Header du panel ───────────────────────────────────── */
+.pb-nb-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid #EEF2F7;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.pb-nb-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0F2235;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.pb-nb-sub {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.74rem;
+  color: #7A93AE;
+  margin: 3px 0 0;
+}
+
+.pb-nb-mark-all {
+  background: none;
+  border: none;
+  color: #2B5F8E;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.pb-nb-mark-all:hover { background: rgba(43,95,142,0.08); }
+
+/* ── Liste ─────────────────────────────────────────────── */
+.pb-nb-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #DDE5EE transparent;
+}
+.pb-nb-list::-webkit-scrollbar { width: 6px; }
+.pb-nb-list::-webkit-scrollbar-thumb { background: #DDE5EE; border-radius: 3px; }
+.pb-nb-list::-webkit-scrollbar-track { background: transparent; }
+
+/* ── State (loading / empty) ───────────────────────────── */
+.pb-nb-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  color: #7A93AE;
+  font-size: 0.85rem;
+  gap: 10px;
+}
+
+.pb-nb-spin {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #DDE5EE;
+  border-top-color: #1A3F63;
+  border-radius: 50%;
+  animation: pb-nb-spin 0.7s linear infinite;
+}
+@keyframes pb-nb-spin { to { transform: rotate(360deg); } }
+
+.pb-nb-empty {
+  flex-direction: column;
+  padding: 40px 20px;
+  gap: 8px;
+  text-align: center;
+}
+.pb-nb-empty p {
+  font-size: 0.88rem;
+  color: #3A5570;
+  font-weight: 600;
+  margin: 0;
+}
+.pb-nb-empty small {
+  font-size: 0.75rem;
+  color: #7A93AE;
+}
+
+.pb-nb-empty-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #F5F7FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.pb-nb-empty-icon svg { width: 26px; height: 26px; color: #B0C4D8; }
+
+/* ── Item de notification ──────────────────────────────── */
+.pb-nb-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid #F5F7FA;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  position: relative;
+}
+
+.pb-nb-item:last-child { border-bottom: none; }
+
+.pb-nb-item:hover { background: #F8FAFD; }
+
+.pb-nb-item:focus-visible {
+  outline: 2px solid #1A3F63;
+  outline-offset: -2px;
+}
+
+.pb-nb-item-unread {
+  background: rgba(196, 151, 58, 0.04);
+}
+
+.pb-nb-item-unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: linear-gradient(180deg, #C4973A, #B5852C);
+  border-radius: 0 2px 2px 0;
+}
+
+.pb-nb-item-unread:hover {
+  background: rgba(196, 151, 58, 0.08);
+}
+
+/* ── Icône colorée par type ────────────────────────────── */
+.pb-nb-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pb-nb-icon svg { width: 16px; height: 16px; }
+
+.pb-nb-ico-blue   { background: rgba(26,63,99,0.10);   color: #1A3F63; }
+.pb-nb-ico-amber  { background: rgba(217,119,6,0.10);  color: #D97706; }
+.pb-nb-ico-green  { background: rgba(39,174,96,0.10);  color: #27AE60; }
+.pb-nb-ico-red    { background: rgba(231,76,60,0.10);  color: #C0392B; }
+.pb-nb-ico-purple { background: rgba(142,68,173,0.10); color: #8E44AD; }
+.pb-nb-ico-teal   { background: rgba(15,110,86,0.10);  color: #0F6E56; }
+.pb-nb-ico-slate  { background: rgba(122,147,174,0.10); color: #7A93AE; }
+
+/* ── Body de la notif ──────────────────────────────────── */
+.pb-nb-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pb-nb-titre {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #0F2235;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pb-nb-dot-unread {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #C4973A;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(196,151,58,0.5);
+  animation: pb-dot-pulse 1.6s ease infinite;
+}
+@keyframes pb-dot-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+.pb-nb-msg {
+  font-size: 0.78rem;
+  color: #3A5570;
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pb-nb-time {
+  font-size: 0.7rem;
+  color: #7A93AE;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+.pb-nb-foot {
+  border-top: 1px solid #EEF2F7;
+  padding: 10px 14px;
+  flex-shrink: 0;
+  background: #FAFCFE;
+}
+
+.pb-nb-voir-toutes {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #2B5F8E;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.pb-nb-voir-toutes:hover {
+  background: rgba(43,95,142,0.08);
+  color: #1A3F63;
+}

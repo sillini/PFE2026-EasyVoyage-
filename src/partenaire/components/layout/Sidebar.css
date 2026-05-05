@@ -387,3 +387,45 @@
 .sidebar-user-collapsed .user-avatar {
   transition: transform 0.2s;
 }
+/* ═══════════════════════════════════════════════════════════════
+   À COLLER À LA FIN DU FICHIER : src/partenaire/components/layout/Sidebar.css
+   ═══════════════════════════════════════════════════════════════
+   Ces règles ajoutent les badges pour l'item Notifications.
+   Le reste du CSS Sidebar.css existant n'a PAS besoin d'être modifié.
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Badge ROUGE pour notifications non lues (mode normal) ── */
+.nav-badge-unread {
+  background: linear-gradient(135deg, #C0392B, #E74C3C) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+  animation: nav-unread-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes nav-unread-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.35);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(192, 57, 43, 0.6),
+                0 0 0 3px rgba(192, 57, 43, 0.12);
+  }
+}
+
+/* ── Petit dot rouge en mode collapsed ───────────────────── */
+.nav-dot-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  background: #C0392B;
+  border-radius: 50%;
+  border: 2px solid var(--sidebar-bg);
+  animation: nav-dot-pulse 1.6s ease infinite;
+}
+
+@keyframes nav-dot-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.7; }
+}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { notificationsApi } from "../../services/notificationsApi";
 import "./Sidebar.css";
 
 // ══════════════════════════════════════════════════════════
@@ -6,8 +7,7 @@ import "./Sidebar.css";
 //    1. Vue d'ensemble        → Tableau de bord
 //    2. Gestion de l'offre    → Hôtels, Chambres, Promotions
 //    3. Activité commerciale  → Réservations, Finances
-//    4. Aide & outils         → Support, Agent IA
-//  (Marketing supprimé)
+//    4. Aide & outils         → Notifications, Support, Agent IA
 // ══════════════════════════════════════════════════════════
 const MENU_ITEMS = [
   // ── 1. Vue d'ensemble ─────────────────────────────────
@@ -22,7 +22,7 @@ const MENU_ITEMS = [
     ),
   },
 
-  // ── 2. Gestion de l'offre (ce que le partenaire vend) ──
+  // ── 2. Gestion de l'offre ─────────────────────────────
   {
     id: "hotels",
     label: "Mes Hôtels",
@@ -56,7 +56,7 @@ const MENU_ITEMS = [
     ),
   },
 
-  // ── 3. Activité commerciale (ce qui est vendu / revenus) ──
+  // ── 3. Activité commerciale ───────────────────────────
   {
     id: "reservations",
     label: "Réservations",
@@ -82,6 +82,17 @@ const MENU_ITEMS = [
   },
 
   // ── 4. Aide & outils ──────────────────────────────────
+  // ✨ NEW : Notifications (avec badge unread auto)
+  {
+    id: "notifications",
+    label: "Notifications",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    ),
+  },
   {
     id: "support",
     label: "Support",
@@ -108,41 +119,93 @@ const MENU_ITEMS = [
 
 export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupportNonLus = 0 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
+
+  // ── ✨ Polling notifications non lues (toutes les 30s) ──
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        // Essai 1 : endpoint léger
+        if (typeof notificationsApi.unreadCount === "function") {
+          try {
+            const data = await notificationsApi.unreadCount();
+            setUnreadNotifs(data?.unread ?? 0);
+            return;
+          } catch {
+            // fallback ci-dessous
+          }
+        }
+        // Fallback : compter depuis la liste complète
+        const data = await notificationsApi.getNotifications();
+        const list = data?.items || [];
+        setUnreadNotifs(list.filter(n => !n.lue).length);
+      } catch {
+        // silencieux
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30_000);
+    return () => clearInterval(interval);
+  }, [activePage]); // refresh aussi quand on navigue
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       {/* Logo */}
       <div className="sidebar-logo">
-  <img
-    src="/logo_principale.png"
-    alt="EasyVoyage"
-    className="sidebar-logo-img"
-  />
-</div>
+        <img
+          src="/logo_principale.png"
+          alt="EasyVoyage"
+          className="sidebar-logo-img"
+        />
+      </div>
 
       {/* Navigation */}
       <nav className="sidebar-nav">
         <div className="nav-section-label">{!collapsed && "NAVIGATION"}</div>
-        {MENU_ITEMS.map((item) => (
-          <button
-            key={item.id}
-            className={`nav-item ${activePage === item.id ? "active" : ""}`}
-            onClick={() => onNavigate(item.id)}
-            title={collapsed ? item.label : ""}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            {!collapsed && (
-              <span className="nav-label">{item.label}</span>
-            )}
-            {!collapsed && item.badge && (
-              <span className="nav-badge">{item.badge}</span>
-            )}
-            {!collapsed && item.id === "support" && nbSupportNonLus > 0 && (
-              <span className="nav-badge nav-badge-red">{nbSupportNonLus}</span>
-            )}
-            {activePage === item.id && <span className="nav-active-bar" />}
-          </button>
-        ))}
+        {MENU_ITEMS.map((item) => {
+          // ✨ Badge unread sur l'item Notifications
+          const showUnreadBadge = item.id === "notifications" && unreadNotifs > 0;
+
+          return (
+            <button
+              key={item.id}
+              className={`nav-item ${activePage === item.id ? "active" : ""}`}
+              onClick={() => onNavigate(item.id)}
+              title={collapsed ? item.label : ""}
+            >
+              <span className="nav-icon" style={{ position: "relative" }}>
+                {item.icon}
+                {/* Petit dot rouge en mode collapsed */}
+                {showUnreadBadge && collapsed && (
+                  <span className="nav-dot-badge"/>
+                )}
+              </span>
+              {!collapsed && (
+                <>
+                  <span className="nav-label">{item.label}</span>
+
+                  {/* ✨ Badge notifs non lues (rouge, prioritaire) */}
+                  {showUnreadBadge && (
+                    <span className="nav-badge nav-badge-unread">
+                      {unreadNotifs > 99 ? "99+" : unreadNotifs}
+                    </span>
+                  )}
+
+                  {/* Badge support non lu (existant) */}
+                  {!showUnreadBadge && item.id === "support" && nbSupportNonLus > 0 && (
+                    <span className="nav-badge nav-badge-red">{nbSupportNonLus}</span>
+                  )}
+
+                  {/* Badge Beta (uniquement si pas d'autre badge) */}
+                  {!showUnreadBadge && item.badge && (
+                    <span className="nav-badge">{item.badge}</span>
+                  )}
+                </>
+              )}
+              {activePage === item.id && <span className="nav-active-bar" />}
+            </button>
+          );
+        })}
       </nav>
 
       {/* User & Logout */}
@@ -159,17 +222,12 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
               {user?.nom?.[0]}{user?.prenom?.[0]}
             </div>
             <div className="user-info">
-              <span className="user-name">{user?.prenom} {user?.nom}</span>
+              <span className="user-name">{user?.nom} {user?.prenom}</span>
               <span className="user-role">Partenaire</span>
             </div>
-            <span className="sidebar-user-arrow" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </span>
           </button>
         ) : (
-          // ─── Mode collapsed : avatar seul cliquable → profil ───
+          // ─── Mode collapsed : avatar seul cliquable ───
           <button
             type="button"
             className={`sidebar-user-collapsed ${activePage === "profil" ? "active" : ""}`}
@@ -182,6 +240,8 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
           </button>
         )}
 
+        {/* ✅ FIX : className="btn-logout" (correspond au CSS existant)
+            AVANT : "logout-btn" → CSS introuvable → SVG taille par défaut (énorme) */}
         <button className="btn-logout" onClick={onLogout} title="Déconnexion">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -192,11 +252,17 @@ export default function Sidebar({ activePage, onNavigate, user, onLogout, nbSupp
         </button>
       </div>
 
-      {/* Toggle */}
-      <button className="sidebar-toggle" onClick={() => setCollapsed(!collapsed)}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-          style={{ transform: collapsed ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
-          <polyline points="15 18 9 12 15 6"/>
+      {/* Toggle collapse */}
+      <button
+        className="sidebar-toggle"
+        onClick={() => setCollapsed(!collapsed)}
+        title={collapsed ? "Développer" : "Réduire"}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {collapsed
+            ? <polyline points="9 18 15 12 9 6"/>
+            : <polyline points="15 18 9 12 15 6"/>
+          }
         </svg>
       </button>
     </aside>

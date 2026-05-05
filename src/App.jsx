@@ -29,17 +29,19 @@ import AdminVideoCampaigns     from "./admin/pages/video-campaigns/AdminVideoCam
 import AdminNotifications      from "./admin/pages/AdminNotifications";
 import AdminAdministrateurs    from "./admin/pages/AdminAdministrateurs";   // ✨ NEW
 
-import Sidebar               from "./partenaire/components/layout/Sidebar";
-import Topbar                from "./partenaire/components/layout/Topbar";
-import MesHotels             from "./partenaire/pages/MesHotels";
-import ChambresPage          from "./partenaire/pages/ChambresPage";
-import MesPromotions         from "./partenaire/pages/MesPromotions";
-import PlaceholderPage       from "./partenaire/pages/PlaceholderPage";
-import PartenaireProfil      from "./partenaire/pages/PartenaireProfil";
-import PartenaireSupportPage from "./partenaire/pages/PartenaireSupportPage";
-import MesReservations       from "./partenaire/pages/MesReservations";
-import PartenaireFinances    from "./partenaire/pages/PartenaireFinances";
-import PartenaireAgentIA     from "./partenaire/pages/PartenaireAgentIA";  // ← AJOUT
+import Sidebar                  from "./partenaire/components/layout/Sidebar";
+import Topbar                   from "./partenaire/components/layout/Topbar";
+import PartenaireDashboard      from "./partenaire/pages/PartenaireDashboard";
+import MesHotels                from "./partenaire/pages/MesHotels";
+import ChambresPage             from "./partenaire/pages/ChambresPage";
+import MesPromotions            from "./partenaire/pages/MesPromotions";
+import PlaceholderPage          from "./partenaire/pages/PlaceholderPage";
+import PartenaireProfil         from "./partenaire/pages/PartenaireProfil";
+import PartenaireSupportPage    from "./partenaire/pages/PartenaireSupportPage";
+import MesReservations          from "./partenaire/pages/MesReservations";
+import PartenaireFinances       from "./partenaire/pages/PartenaireFinances";
+import PartenaireAgentIA        from "./partenaire/pages/PartenaireAgentIA";
+import PartenaireNotifications  from "./partenaire/pages/PartenaireNotifications";  // ← AJOUT
 
 import "./App.css";
 
@@ -146,7 +148,7 @@ export default function App() {
   if (role === "ADMIN") {
     const renderAdmin = () => {
       switch (activePage) {
-        case "dashboard":       return <AdminDashboard onNavigate={setActivePage} user={user} />;  // ← MODIFIÉ
+        case "dashboard":       return <AdminDashboard onNavigate={setActivePage} user={user} />;
         case "reservations":    return <AdminReservations />;
         case "hotels":          return <AdminHotels />;
         case "voyages":         return <AdminVoyages />;
@@ -187,7 +189,7 @@ export default function App() {
           }
           return <AdminAdministrateurs currentUser={user} />;
 
-        default:                return <AdminDashboard onNavigate={setActivePage} user={user} />;  // ← MODIFIÉ
+        default:                return <AdminDashboard onNavigate={setActivePage} user={user} />;
       }
     };
 
@@ -210,15 +212,17 @@ export default function App() {
   // ── PARTENAIRE ─────────────────────────────────────────
   const renderPartenaire = () => {
     switch (activePage) {
+      case "dashboard":     return <PartenaireDashboard onNavigate={setActivePage} user={user} />;
       case "hotels":        return <MesHotels />;
       case "chambres":      return <ChambresPage />;
       case "promotions":    return <MesPromotions />;
       case "reservations":  return <MesReservations />;
       case "finances":      return <PartenaireFinances />;
+      case "notifications": return <PartenaireNotifications onNavigate={setActivePage} />;  // ← AJOUT
       case "profil":        return <PartenaireProfil />;
       case "support":       return <PartenaireSupportPage currentUserId={user?.id}/>;
-      case "agent":         return <PartenaireAgentIA />;                         // ← AJOUT
-      default:              return <PlaceholderPage page={activePage} />;
+      case "agent":         return <PartenaireAgentIA />;
+      default:              return <PartenaireDashboard onNavigate={setActivePage} user={user} />;
     }
   };
 
