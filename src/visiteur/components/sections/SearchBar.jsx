@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import "./SearchBar.css";
 
 // ── Helpers ────────────────────────────────────────────────
@@ -25,20 +25,123 @@ function getDays(n = 60) {
   return days;
 }
 
+// ══════════════════════════════════════════════════════════
+//  ✨ HOOK : useStickyState
+//  Détecte quand la barre doit passer en mode "stuck" via
+//  un sentinel + IntersectionObserver. Mesure aussi la hauteur
+//  exacte de la barre pour générer un placeholder qui empêche
+//  tout saut de layout dans la page.
+// ══════════════════════════════════════════════════════════
+function useStickyState(navbarOffset, rootRef) {
+  const sentinelRef = useRef(null);
+  const [stuck, setStuck] = useState(false);
+  const [rootHeight, setRootHeight] = useState(0);
+
+  // Mesure la hauteur de la barre AVANT qu'elle ne passe en fixed
+  // pour pouvoir réserver exactement le bon espace via le placeholder.
+  useLayoutEffect(() => {
+    if (!rootRef.current) return;
+
+    const measure = () => {
+      // On ne mesure que si la barre n'est PAS encore stuck
+      // (sinon elle est en position fixed et n'a plus sa vraie hauteur)
+      if (rootRef.current && !rootRef.current.classList.contains("sb-stuck")) {
+        setRootHeight(rootRef.current.offsetHeight);
+      }
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(rootRef.current);
+    return () => ro.disconnect();
+  }, [rootRef]);
+
+  // Bascule entre stuck et non-stuck via IntersectionObserver
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isAbove = entry.boundingClientRect.top < navbarOffset;
+        setStuck(!entry.isIntersecting && isAbove);
+      },
+      {
+        rootMargin: `-${navbarOffset}px 0px 0px 0px`,
+        threshold: [0, 1],
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [navbarOffset]);
+
+  return { sentinelRef, stuck, rootHeight };
+}
+
+// ══════════════════════════════════════════════════════════
+//  ✨ HOOK : useDropdownPosition
+//  Calcule dynamiquement où afficher le dropdown (en bas ou
+//  en haut du trigger) pour éviter qu'il ne sorte du viewport.
+//  → Gère le cas où la SearchBar est sticky et où ouvrir un
+//    dropdown vers le bas ferait déborder sous les cartes.
+// ══════════════════════════════════════════════════════════
+function useDropdownPosition(triggerRef, isOpen) {
+  const [placement, setPlacement] = useState("bottom"); // "bottom" | "top"
+  const [maxHeight, setMaxHeight] = useState(420);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+
+    const compute = () => {
+      const trig = triggerRef.current;
+      if (!trig) return;
+      const rect = trig.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const spaceBelow = vh - rect.bottom - 16;   // 16 = marge de sécurité
+      const spaceAbove = rect.top - 16;
+
+      // Préfère le bas ; bascule en haut seulement si peu d'espace dessous
+      if (spaceBelow >= 320 || spaceBelow >= spaceAbove) {
+        setPlacement("bottom");
+        setMaxHeight(Math.max(220, Math.min(460, spaceBelow)));
+      } else {
+        setPlacement("top");
+        setMaxHeight(Math.max(220, Math.min(460, spaceAbove)));
+      }
+    };
+
+    compute();
+    window.addEventListener("scroll", compute, { passive: true });
+    window.addEventListener("resize", compute);
+    return () => {
+      window.removeEventListener("scroll", compute);
+      window.removeEventListener("resize", compute);
+    };
+  }, [isOpen, triggerRef]);
+
+  return { placement, maxHeight };
+}
+
 // ── DatePicker ──────────────────────────────────────────────
 function DatePicker({ label, icon, value, onChange, min }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef();
+  const wrapRef = useRef();
+  const triggerRef = useRef();
   const days = getDays(90);
+
   useEffect(() => {
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const h = e => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
-  // ✅ FIX: utiliser "sb-dd" (qui a position:relative dans le CSS)
+
+  const { placement, maxHeight } = useDropdownPosition(triggerRef, open);
+
   return (
-    <div className="sb-dd" ref={ref}>
-      <button className={`sb-dd-trigger ${open ? "open" : ""}`}
+    <div className="sb-dd" ref={wrapRef}>
+      <button ref={triggerRef}
+        className={`sb-dd-trigger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)} type="button">
         <div className="sb-dd-trigger-inner">
           <span className="sb-dd-label">{icon}{label}</span>
@@ -50,24 +153,27 @@ function DatePicker({ label, icon, value, onChange, min }) {
         </svg>
       </button>
       {open && (
-        <div className="sb-dd-panel sb-date-panel">
-          <div className="sb-cal-grid">
-            {days.map(d => {
-              const dt = new Date(d);
-              const isSelected = d === value;
-              const dayNum = dt.getDate();
-              const isFirst = dayNum === 1 || d === days[0];
-              const monthLabel = isFirst ? dt.toLocaleDateString("fr-FR", { month: "short" }) : "";
-              return (
-                <button key={d}
-                  className={`sb-cal-day ${isSelected ? "sel" : ""} ${d < (min || todayStr()) ? "disabled" : ""}`}
-                  onClick={() => { onChange(d); setOpen(false); }}
-                  disabled={d < (min || todayStr())}>
-                  {monthLabel && <span className="sb-cal-month">{monthLabel}</span>}
-                  {dayNum}
-                </button>
-              );
-            })}
+        <div className={`sb-dd-panel sb-date-panel sb-place-${placement}`}
+          style={{ maxHeight: `${maxHeight}px` }}>
+          <div className="sb-date-scroll">
+            <div className="sb-cal-grid">
+              {days.map(d => {
+                const dt = new Date(d);
+                const isSelected = d === value;
+                const dayNum = dt.getDate();
+                const isFirst = dayNum === 1 || d === days[0];
+                const monthLabel = isFirst ? dt.toLocaleDateString("fr-FR", { month: "short" }) : "";
+                return (
+                  <button key={d}
+                    className={`sb-cal-day ${isSelected ? "sel" : ""} ${d < (min || todayStr()) ? "disabled" : ""}`}
+                    onClick={() => { onChange(d); setOpen(false); }}
+                    disabled={d < (min || todayStr())}>
+                    {monthLabel && <span className="sb-cal-month">{monthLabel}</span>}
+                    {dayNum}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           {value && (
             <div className="sb-cal-selected">
@@ -86,18 +192,21 @@ function DatePicker({ label, icon, value, onChange, min }) {
 // ── Dropdown générique ──────────────────────────────────────
 function Dropdown({ label, icon, value, children, align = "left" }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef();
+  const wrapRef = useRef();
+  const triggerRef = useRef();
+
   useEffect(() => {
-    const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const h = e => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
-  // ✅ FIX: utiliser "sb-dd" (qui a position:relative dans le CSS)
-  //         au lieu de "sb-dd-wrap" qui n'a aucune règle CSS,
-  //         ce qui faisait apparaître les panels à gauche de la page
+
+  const { placement, maxHeight } = useDropdownPosition(triggerRef, open);
+
   return (
-    <div className="sb-dd" ref={ref}>
-      <button className={`sb-dd-trigger ${open ? "open" : ""}`}
+    <div className="sb-dd" ref={wrapRef}>
+      <button ref={triggerRef}
+        className={`sb-dd-trigger ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)} type="button">
         <div className="sb-dd-trigger-inner">
           <span className="sb-dd-label">{icon}{label}</span>
@@ -109,7 +218,8 @@ function Dropdown({ label, icon, value, children, align = "left" }) {
         </svg>
       </button>
       {open && (
-        <div className={`sb-dd-panel ${align === "right" ? "right" : ""}`}
+        <div className={`sb-dd-panel sb-place-${placement} ${align === "right" ? "right" : ""}`}
+          style={{ maxHeight: `${maxHeight}px` }}
           onClick={() => setOpen(false)}>
           {children}
         </div>
@@ -156,6 +266,22 @@ const IcoPeople = (
 // ══════════════════════════════════════════════════════════
 export default function SearchBar({ onSearch }) {
   const today = todayStr();
+  const rootRef = useRef(null);
+
+  // ✨ Sticky state + mesure de la hauteur réelle de la barre
+  const [navbarOffset, setNavbarOffset] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 768 ? 66 : 104
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setNavbarOffset(window.innerWidth <= 768 ? 66 : 104);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const { sentinelRef, stuck, rootHeight } = useStickyState(navbarOffset, rootRef);
 
   // Catégorie active
   const [cat, setCat] = useState("hotels");
@@ -206,7 +332,7 @@ export default function SearchBar({ onSearch }) {
     } else {
       onSearch?.({
         categorie: "voyages",
-        ville:  destVoyage,   // texte libre
+        ville:  destVoyage,
         texte:  texteVoyage,
         adultes: nbVoyageurs,
         enfants: 0,
@@ -215,170 +341,172 @@ export default function SearchBar({ onSearch }) {
     }
   };
 
-  // Changer d'onglet
-  const handleCat = (c) => {
-    setCat(c);
-  };
+  const handleCat = (c) => setCat(c);
 
   return (
-    <div className="sb-root">
-      {/* ── Onglets ── */}
-      <div className="sb-tabs">
-        <button className={`sb-tab ${cat === "hotels" ? "on" : ""}`}
-          onClick={() => handleCat("hotels")}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-          Hôtels en Tunisie
-        </button>
-        <button className={`sb-tab ${cat === "voyages" ? "on" : ""}`}
-          onClick={() => handleCat("voyages")}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 2L11 13" /><path d="M22 2L15 22 11 13 2 9l20-7z" />
-          </svg>
-          Voyages organisés
-        </button>
+    <>
+      {/* ✨ SENTINEL : 1px invisible juste avant la barre */}
+      <div ref={sentinelRef} className="sb-sentinel" aria-hidden="true" />
+
+      <div ref={rootRef} className={`sb-root ${stuck ? "sb-stuck" : ""}`}>
+        {/* ── Onglets ── */}
+        <div className="sb-tabs">
+          <button className={`sb-tab ${cat === "hotels" ? "on" : ""}`}
+            onClick={() => handleCat("hotels")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Hôtels en Tunisie
+          </button>
+          <button className={`sb-tab ${cat === "voyages" ? "on" : ""}`}
+            onClick={() => handleCat("voyages")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M22 2L11 13" /><path d="M22 2L15 22 11 13 2 9l20-7z" />
+            </svg>
+            Voyages organisés
+          </button>
+        </div>
+
+        {/* ── Barre HÔTELS ── */}
+        {cat === "hotels" && (
+          <div className="sb-bar">
+            <Dropdown label="DESTINATION" icon={IcoPin} value={villeHotel}>
+              <div className="sb-ville-list">
+                {VILLES.map(v => (
+                  <button key={v}
+                    className={`sb-ville-item ${v === villeHotel ? "sel" : ""}`}
+                    onClick={() => setVilleHotel(v)}>
+                    {IcoPin}
+                    {v}
+                    {v === villeHotel && (
+                      <svg className="sb-check" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </Dropdown>
+
+            <div className="sb-sep" />
+
+            <div className="sb-field-text">
+              <span className="sb-dd-label">{IcoSearch}NOM DE L'HÔTEL</span>
+              <input value={texteHotel} onChange={e => setTexteHotel(e.target.value)}
+                placeholder="Ex : Barceló, Marhaba..."
+                className="sb-text-input"
+                onKeyDown={e => e.key === "Enter" && doSearch()} />
+            </div>
+
+            <div className="sb-sep" />
+
+            <DatePicker label="ARRIVÉE" icon={IcoCal}
+              value={arrivee} onChange={handleArrivee} min={today} />
+
+            <div className="sb-sep" />
+
+            <DatePicker label="DÉPART" icon={IcoCal}
+              value={depart} onChange={handleDepart} min={addDays(arrivee, 1)} />
+
+            <div className="sb-sep" />
+
+            <div className="sb-field-nuits">
+              <span className="sb-dd-label">{IcoNuit}NUITÉES</span>
+              <div className="sb-counter">
+                <button onClick={() => handleNuits(nuits - 1)} disabled={nuits <= 1}>−</button>
+                <span>{nuits}</span>
+                <button onClick={() => handleNuits(nuits + 1)}>+</button>
+              </div>
+            </div>
+
+            <div className="sb-sep" />
+
+            <Dropdown label="OCCUPATION" icon={IcoPeople} value={occVal} align="right">
+              <div className="sb-occ-panel">
+                {[
+                  { lbl: "Chambres", val: chambres, set: setChambres, min: 1 },
+                  { lbl: "Adultes",  val: adultes,  set: setAdultes,  min: 1 },
+                  { lbl: "Enfants",  val: enfants,  set: setEnfants,  min: 0 },
+                ].map(({ lbl, val, set, min }) => (
+                  <div key={lbl} className="sb-occ-row">
+                    <span>{lbl}</span>
+                    <div className="sb-counter">
+                      <button onClick={() => set(Math.max(min, val - 1))} disabled={val <= min}>−</button>
+                      <span>{val}</span>
+                      <button onClick={() => set(val + 1)}>+</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Dropdown>
+
+            <button className="sb-btn" onClick={doSearch}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Rechercher
+            </button>
+          </div>
+        )}
+
+        {/* ── Barre VOYAGES ── */}
+        {cat === "voyages" && (
+          <div className="sb-bar">
+            <div className="sb-field-dest-voyage">
+              <span className="sb-dd-label">{IcoPin}DESTINATION</span>
+              <input
+                value={destVoyage}
+                onChange={e => setDestVoyage(e.target.value)}
+                placeholder="Ex : Djerba, Sahara, Rome..."
+                className="sb-text-input sb-dest-input"
+                onKeyDown={e => e.key === "Enter" && doSearch()}
+              />
+            </div>
+
+            <div className="sb-sep" />
+
+            <div className="sb-field-text">
+              <span className="sb-dd-label">{IcoSearch}NOM DU VOYAGE</span>
+              <input value={texteVoyage} onChange={e => setTexteVoyage(e.target.value)}
+                placeholder="Ex : Circuit Sahara, Tour du Sud..."
+                className="sb-text-input"
+                onKeyDown={e => e.key === "Enter" && doSearch()} />
+            </div>
+
+            <div className="sb-sep" />
+
+            <div className="sb-field-nuits">
+              <span className="sb-dd-label">{IcoPeople}VOYAGEURS</span>
+              <div className="sb-counter">
+                <button onClick={() => setNbVoyageurs(Math.max(1, nbVoyageurs - 1))}
+                  disabled={nbVoyageurs <= 1}>−</button>
+                <span>{nbVoyageurs}</span>
+                <button onClick={() => setNbVoyageurs(nbVoyageurs + 1)}>+</button>
+              </div>
+            </div>
+
+            <button className="sb-btn" onClick={doSearch}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Rechercher
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* ── Barre HÔTELS ── */}
-      {cat === "hotels" && (
-        <div className="sb-bar">
-          {/* Destination — dropdown liste de villes */}
-          <Dropdown label="DESTINATION" icon={IcoPin} value={villeHotel}>
-            <div className="sb-ville-list">
-              {VILLES.map(v => (
-                <button key={v}
-                  className={`sb-ville-item ${v === villeHotel ? "sel" : ""}`}
-                  onClick={() => setVilleHotel(v)}>
-                  {IcoPin}
-                  {v}
-                  {v === villeHotel && (
-                    <svg className="sb-check" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.5">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          </Dropdown>
-
-          <div className="sb-sep" />
-
-          {/* Nom hôtel */}
-          <div className="sb-field-text">
-            <span className="sb-dd-label">{IcoSearch}NOM DE L'HÔTEL</span>
-            <input value={texteHotel} onChange={e => setTexteHotel(e.target.value)}
-              placeholder="Ex : Barceló, Marhaba..."
-              className="sb-text-input"
-              onKeyDown={e => e.key === "Enter" && doSearch()} />
-          </div>
-
-          <div className="sb-sep" />
-
-          {/* Arrivée */}
-          <DatePicker label="ARRIVÉE" icon={IcoCal}
-            value={arrivee} onChange={handleArrivee} min={today} />
-
-          <div className="sb-sep" />
-
-          {/* Départ */}
-          <DatePicker label="DÉPART" icon={IcoCal}
-            value={depart} onChange={handleDepart} min={addDays(arrivee, 1)} />
-
-          <div className="sb-sep" />
-
-          {/* Nuitées */}
-          <div className="sb-field-nuits">
-            <span className="sb-dd-label">{IcoNuit}NUITÉES</span>
-            <div className="sb-counter">
-              <button onClick={() => handleNuits(nuits - 1)} disabled={nuits <= 1}>−</button>
-              <span>{nuits}</span>
-              <button onClick={() => handleNuits(nuits + 1)}>+</button>
-            </div>
-          </div>
-
-          <div className="sb-sep" />
-
-          {/* Occupation */}
-          <Dropdown label="OCCUPATION" icon={IcoPeople} value={occVal} align="right">
-            <div className="sb-occ-panel">
-              {[
-                { lbl: "Chambres", val: chambres, set: setChambres, min: 1 },
-                { lbl: "Adultes",  val: adultes,  set: setAdultes,  min: 1 },
-                { lbl: "Enfants",  val: enfants,  set: setEnfants,  min: 0 },
-              ].map(({ lbl, val, set, min }) => (
-                <div key={lbl} className="sb-occ-row">
-                  <span>{lbl}</span>
-                  <div className="sb-counter">
-                    <button onClick={() => set(Math.max(min, val - 1))} disabled={val <= min}>−</button>
-                    <span>{val}</span>
-                    <button onClick={() => set(val + 1)}>+</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Dropdown>
-
-          {/* Bouton recherche */}
-          <button className="sb-btn" onClick={doSearch}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            Rechercher
-          </button>
-        </div>
+      {/* ✨ PLACEHOLDER : réserve l'espace dans le flux quand la barre
+          est passée en position:fixed. Évite tout saut du contenu
+          (titre "Nos Meilleurs Hôtels…" plus jamais coupé). */}
+      {stuck && (
+        <div
+          className="sb-placeholder"
+          style={{ height: `${rootHeight}px` }}
+          aria-hidden="true"
+        />
       )}
-
-      {/* ── Barre VOYAGES — plus simple ── */}
-      {cat === "voyages" && (
-        <div className="sb-bar">
-          {/* Destination — INPUT TEXTE LIBRE */}
-          <div className="sb-field-dest-voyage">
-            <span className="sb-dd-label">{IcoPin}DESTINATION</span>
-            <input
-              value={destVoyage}
-              onChange={e => setDestVoyage(e.target.value)}
-              placeholder="Ex : Djerba, Sahara, Rome..."
-              className="sb-text-input sb-dest-input"
-              onKeyDown={e => e.key === "Enter" && doSearch()}
-            />
-          </div>
-
-          <div className="sb-sep" />
-
-          {/* Nom du voyage */}
-          <div className="sb-field-text">
-            <span className="sb-dd-label">{IcoSearch}NOM DU VOYAGE</span>
-            <input value={texteVoyage} onChange={e => setTexteVoyage(e.target.value)}
-              placeholder="Ex : Circuit Sahara, Tour du Sud..."
-              className="sb-text-input"
-              onKeyDown={e => e.key === "Enter" && doSearch()} />
-          </div>
-
-          <div className="sb-sep" />
-
-          {/* Nombre de voyageurs */}
-          <div className="sb-field-nuits">
-            <span className="sb-dd-label">{IcoPeople}VOYAGEURS</span>
-            <div className="sb-counter">
-              <button onClick={() => setNbVoyageurs(Math.max(1, nbVoyageurs - 1))}
-                disabled={nbVoyageurs <= 1}>−</button>
-              <span>{nbVoyageurs}</span>
-              <button onClick={() => setNbVoyageurs(nbVoyageurs + 1)}>+</button>
-            </div>
-          </div>
-
-          {/* Bouton recherche */}
-          <button className="sb-btn" onClick={doSearch}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            Rechercher
-          </button>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

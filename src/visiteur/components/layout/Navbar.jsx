@@ -52,8 +52,8 @@ export default function Navbar({
         <div className="nav-topbar-inner">
           <span className="nav-topbar-slogan">🇹🇳 EasyVoyage — La plateforme tunisienne de réservation</span>
           <div className="nav-topbar-right">
-            <span>📧 contact@easyvoyage.tn</span>
-            <span>📞 +216 XX XXX XXX</span>
+            <span>📧 EasyVoyageTN@gmail.com</span>
+            <span>📞 +216 98 000 001</span>
           </div>
         </div>
       </div>

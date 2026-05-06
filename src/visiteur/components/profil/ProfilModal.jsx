@@ -377,7 +377,6 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
         </div>
         <div className="pm-resa-summary">
           <div className="pm-resa-top-row">
-            <span className="pm-resa-id">#{resa.id}</span>
             <span className="pm-resa-type-label">{isV?"Voyage organisé":"Hôtel"}</span>
           </div>
           <div className="pm-resa-dates-row">
@@ -400,10 +399,7 @@ function ReservationCard({ resa, onAnnuler, onPdf }) {
       {expanded && (
         <div className="pm-resa-details">
           <div className="pm-resa-detail-grid">
-            <div className="pm-detail-item">
-              <span className="pm-detail-k">Référence</span>
-              <span className="pm-detail-v pm-mono">#{resa.id}</span>
-            </div>
+            
             <div className="pm-detail-item">
               <span className="pm-detail-k">Type</span>
               <span className="pm-detail-v">{isV?"Voyage organisé":"Séjour hôtel"}</span>

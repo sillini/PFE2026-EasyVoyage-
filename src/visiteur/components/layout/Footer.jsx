@@ -7,9 +7,7 @@ export default function Footer() {
         <div className="ft-brand">
           <span className="ft-logo">Easy<span>Voyage</span></span>
           <p>La plateforme tunisienne de réservation d'hôtels et de voyages organisés.</p>
-          <div className="ft-socials">
-            {["📘","📸","🐦"].map((s,i) => <button key={i} className="ft-social">{s}</button>)}
-          </div>
+         
         </div>
         <div className="ft-col">
           <h4>Navigation</h4>
@@ -25,8 +23,8 @@ export default function Footer() {
         </div>
         <div className="ft-col">
           <h4>Contact</h4>
-          <p>📧 contact@easyvoyage.tn</p>
-          <p>📞 +216 XX XXX XXX</p>
+          <p>📧 EasyVoyageTN@gmail.com</p>
+          <p>📞 +216 98 000 001</p>
           <p>📍 Tunisie</p>
         </div>
       </div>

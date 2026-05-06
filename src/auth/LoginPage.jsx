@@ -1,5 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { RECAPTCHA_SITE_KEY } from "../config/auth";
 import "./LoginPage.css";
+
+// ══ reCAPTCHA v2 ══════════════════════════════════════════
+function ReCaptcha({ onVerify }) {
+  const ref = useRef();
+  const widgetId = useRef(null);
+
+  useEffect(() => {
+    const render = () => {
+      if (window.grecaptcha && ref.current && widgetId.current === null) {
+        widgetId.current = window.grecaptcha.render(ref.current, {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback:           (tok) => onVerify(tok),
+          "expired-callback": ()    => onVerify(null),
+        });
+      }
+    };
+    if (window.grecaptcha?.render) { render(); return; }
+    if (!document.getElementById("rc-script")) {
+      window._rcReady = render;
+      const s = document.createElement("script");
+      s.id  = "rc-script";
+      s.src = "https://www.google.com/recaptcha/api.js?onload=_rcReady&render=explicit";
+      s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    } else { window._rcReady = render; }
+    return () => { widgetId.current = null; };
+  }, []);
+
+  return <div ref={ref} className="login-recaptcha"/>;
+}
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail]       = useState("");
@@ -7,16 +38,18 @@ export default function LoginPage({ onLogin }) {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [captcha, setCaptcha]   = useState(null);   // ← token reCAPTCHA
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!captcha) { setError("Veuillez valider le captcha"); return; }
     setLoading(true);
     try {
       const res = await fetch("http://localhost:8000/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captcha_token: captcha }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Identifiants incorrects");
@@ -145,6 +178,9 @@ export default function LoginPage({ onLogin }) {
                 <a href="#" className="forgot-link">Mot de passe oublié ?</a>
               </div>
 
+              {/* ── reCAPTCHA ── */}
+              <ReCaptcha onVerify={setCaptcha}/>
+
               {error && (
                 <div className="form-error">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -159,7 +195,7 @@ export default function LoginPage({ onLogin }) {
               <button
                 type="submit"
                 className={`btn-login ${loading ? "loading" : ""}`}
-                disabled={loading}
+                disabled={loading || !captcha}
               >
                 {loading ? (
                   <span className="spinner" />

@@ -635,7 +635,7 @@ export default function AdminReservations() {
   const [page,   setPage]   = useState(1);
   const [detail, setDetail] = useState(null);
 
-  const perPage = 30;
+  const perPage = tab === "tous" ? 30 : 1000;
 
   const load = useCallback(async () => {
     setLoading(true); setErr(null);
@@ -656,9 +656,14 @@ export default function AdminReservations() {
     finally { setLoading(false); }
   }, [page, statut, source, tab, search]);
 
-  useEffect(() => { load(); }, [load]);
-  useEffect(() => { setPage(1); }, [statut, source, tab]);
-  useEffect(() => { const t = setTimeout(() => setPage(1), 400); return () => clearTimeout(t); }, [search]);
+ useEffect(() => { load(); }, [load]);
+    // Au changement de tab/filtres : reset page + vider data pour éviter
+    // l'affichage transitoire "Hôtel inconnu" / "Voyage inconnu"
+    useEffect(() => {
+      setPage(1);
+      setData([]);
+    }, [statut, source, tab]);
+    useEffect(() => { const t = setTimeout(() => setPage(1), 400); return () => clearTimeout(t); }, [search]);
 
   const totalPages = Math.ceil(total / perPage);
   const pageRevenu = data.reduce((s, r) => s + (r.total_ttc || 0), 0);

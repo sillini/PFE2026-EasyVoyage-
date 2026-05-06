@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { GOOGLE_CLIENT_ID, RECAPTCHA_SITE_KEY, VERIMAIL_API_KEY } from "../../../config/auth";
+import ForgotPasswordFlow from "./ForgotPasswordFlow";
 import "./AuthModal.css";
 
 const API = "http://localhost:8000/api/v1";
@@ -164,19 +165,22 @@ async function verifyEmail(email) {
 }
 
 // ══ Formulaire connexion ══════════════════════════════════
-function FormLogin({ onLogin, onSwitch }) {
+function FormLogin({ onLogin, onSwitch, onForgotPassword }) {
   const [email,   setEmail]   = useState("");
   const [password,setPassword]= useState("");
   const [showPw,  setShowPw]  = useState(false);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
+  const [captcha, setCaptcha] = useState(null);   // ← token reCAPTCHA
 
   const submit = async (e) => {
-    e.preventDefault(); setError(""); setLoading(true);
+    e.preventDefault(); setError("");
+    if (!captcha) { setError("Veuillez valider le captcha"); return; }
+    setLoading(true);
     try {
       const res = await fetch(`${API}/auth/login`, {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({ email, password, captcha_token: captcha }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Identifiants incorrects");
@@ -205,7 +209,13 @@ function FormLogin({ onLogin, onSwitch }) {
         <div className="am-field">
           <div className="am-field-row">
             <label>Mot de passe</label>
-            <button type="button" className="am-forgot">Mot de passe oublié ?</button>
+            <button
+              type="button"
+              className="am-forgot"
+              onClick={() => onForgotPassword?.(email)}
+            >
+              Mot de passe oublié ?
+            </button>
           </div>
           <div className="am-input-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -219,8 +229,11 @@ function FormLogin({ onLogin, onSwitch }) {
             </button>
           </div>
         </div>
+
+        <ReCaptcha onVerify={setCaptcha}/>
+
         {error && <div className="am-error"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{error}</div>}
-        <button type="submit" className="am-submit" disabled={loading}>
+        <button type="submit" className="am-submit" disabled={loading||!captcha}>
           {loading ? <span className="am-spin"/> : "Se connecter"}
         </button>
       </form>
@@ -421,6 +434,8 @@ function FormRegister({ onLogin, onSwitch }) {
 // ══ MODAL ═════════════════════════════════════════════════
 export default function AuthModal({ onClose, onLogin, defaultTab="login" }) {
   const [tab, setTab] = useState(defaultTab);
+  // ✨ NEW : email préremplit le flow forgot password (saisi sur le formulaire de login)
+  const [forgotEmail, setForgotEmail] = useState("");
 
   useEffect(() => {
     const fn = e => { if(e.key==="Escape") onClose(); };
@@ -435,24 +450,54 @@ export default function AuthModal({ onClose, onLogin, defaultTab="login" }) {
     };
   }, [onClose]);
 
+  // ✨ NEW : déclenchement du flow forgot password depuis FormLogin
+  const handleForgotPassword = (email = "") => {
+    setForgotEmail(email);
+    setTab("forgot");
+  };
+
+  // ✨ NEW : retour vers le login depuis le flow forgot password
+  const handleBackToLogin = () => {
+    setTab("login");
+    setForgotEmail("");
+  };
+
+  // ✨ NEW : titre du panneau gauche selon l'onglet
+  const leftTitle =
+    tab === "login"    ? "Bon retour !" :
+    tab === "register" ? "Rejoignez-nous !" :
+                         "Récupération sécurisée";
+
+  // ✨ NEW : sous-titre du panneau gauche selon l'onglet
+  const leftSub =
+    tab === "login"    ? "Connectez-vous pour accéder à vos réservations et profiter de toutes nos offres exclusives." :
+    tab === "register" ? "Créez votre compte et découvrez les meilleures offres de voyage en Tunisie." :
+                         "Pas de panique ! En quelques étapes, retrouvez l'accès à votre compte EasyVoyage en toute sécurité.";
+
+  // ✨ NEW : features du panneau gauche selon l'onglet
+  const leftFeats = tab === "forgot"
+    ? [
+        {icon:"📧",txt:"Code envoyé par email"},
+        {icon:"⏱",txt:"Validité 15 minutes"},
+        {icon:"🔒",txt:"Connexion chiffrée"},
+        {icon:"✓",txt:"Aucun appel téléphonique"},
+      ]
+    : [
+        {icon:"🏨",txt:"Meilleurs hôtels de Tunisie"},
+        {icon:"✈️",txt:"Voyages organisés tout compris"},
+        {icon:"💳",txt:"Gestion facile de vos réservations"},
+        {icon:"🔔",txt:"Offres exclusives en avant-première"},
+      ];
+
   return (
     <div className="am-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="am-modal">
         <div className="am-left">
           <img src="/logo_final.png" alt="EasyVoyage" className="am-left-logo"/>
-          <h2 className="am-left-title">{tab==="login"?"Bon retour !":"Rejoignez-nous !"}</h2>
-          <p className="am-left-sub">
-            {tab==="login"
-              ?"Connectez-vous pour accéder à vos réservations et profiter de toutes nos offres exclusives."
-              :"Créez votre compte et découvrez les meilleures offres de voyage en Tunisie."}
-          </p>
+          <h2 className="am-left-title">{leftTitle}</h2>
+          <p className="am-left-sub">{leftSub}</p>
           <div className="am-left-feats">
-            {[
-              {icon:"🏨",txt:"Meilleurs hôtels de Tunisie"},
-              {icon:"✈️",txt:"Voyages organisés tout compris"},
-              {icon:"💳",txt:"Gestion facile de vos réservations"},
-              {icon:"🔔",txt:"Offres exclusives en avant-première"},
-            ].map(f=>(
+            {leftFeats.map(f=>(
               <div key={f.txt} className="am-feat">
                 <span>{f.icon}</span><span>{f.txt}</span>
               </div>
@@ -466,16 +511,36 @@ export default function AuthModal({ onClose, onLogin, defaultTab="login" }) {
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          <div className="am-tabs">
-            <button className={`am-tab ${tab==="login"?"on":""}`} onClick={()=>setTab("login")}>Se connecter</button>
-            <button className={`am-tab ${tab==="register"?"on":""}`} onClick={()=>setTab("register")}>S'inscrire</button>
-            <div className="am-tab-ind" style={{left:tab==="login"?"3px":"calc(50% + 1px)",width:"calc(50% - 4px)"}}/>
-          </div>
+
+          {/* ✨ Tabs masqués en mode forgot password */}
+          {tab !== "forgot" && (
+            <div className="am-tabs">
+              <button className={`am-tab ${tab==="login"?"on":""}`} onClick={()=>setTab("login")}>Se connecter</button>
+              <button className={`am-tab ${tab==="register"?"on":""}`} onClick={()=>setTab("register")}>S'inscrire</button>
+              <div className="am-tab-ind" style={{left:tab==="login"?"3px":"calc(50% + 1px)",width:"calc(50% - 4px)"}}/>
+            </div>
+          )}
+
           <div className="am-scroll">
-            {tab==="login"
-              ?<FormLogin    onLogin={onLogin} onSwitch={()=>setTab("register")}/>
-              :<FormRegister onLogin={onLogin} onSwitch={()=>setTab("login")}/>
-            }
+            {tab === "login" && (
+              <FormLogin
+                onLogin={onLogin}
+                onSwitch={()=>setTab("register")}
+                onForgotPassword={handleForgotPassword}
+              />
+            )}
+            {tab === "register" && (
+              <FormRegister
+                onLogin={onLogin}
+                onSwitch={()=>setTab("login")}
+              />
+            )}
+            {tab === "forgot" && (
+              <ForgotPasswordFlow
+                onBackToLogin={handleBackToLogin}
+                prefilledEmail={forgotEmail}
+              />
+            )}
           </div>
         </div>
       </div>
